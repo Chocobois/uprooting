@@ -5,6 +5,7 @@
   "type": "module",
   "license": "unlicensed",
   "scripts": {
+    "start": "vite",
     "dev": "vite",
     "build": "rimraf dist && tsc && vite build",
     "postinstall": "neu update"
