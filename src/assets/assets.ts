@@ -30,10 +30,16 @@ import cover_dice_red from "../assets/images/cover/dice_red.png";
 import cover_knights from "../assets/images/cover/knights.png";
 
 import circle from "../assets/images/circle.png";
+import overworld from "../assets/images/overworld.png";
+import underground from "../assets/images/underground.png";
+import tree from "../assets/images/tree.png";
 
 
 const images: Asset[] = [
 	{ key: "circle",	path: circle },
+	{ key: "overworld",	path: overworld },
+	{ key: "underground",	path: underground },
+	{ key: "tree",	path: tree },
 
 	// Cover
 	{ key: "cover_background_orange",	path: cover_background_orange },

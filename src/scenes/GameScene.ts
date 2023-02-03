@@ -3,17 +3,20 @@ import { Music } from "./../components/Music";
 import { Node } from "./../components/Node";
 
 
-const DRAG_LIMIT = 70;
+const DRAG_LIMIT = 150;
 
 
 export class GameScene extends BaseScene {
-	// public bg: Phaser.GameObjects.Image;
+	private background: Phaser.GameObjects.Image;
+	private tree: Phaser.GameObjects.Image;
+
 	private dragGraphics: Phaser.GameObjects.Graphics;
 	private rootsGraphics: Phaser.GameObjects.Graphics;
 	private nodes: Node[];
 
 	private currentNode: Node | null;
 	private debugText: Phaser.GameObjects.Text;
+	private cameraDragArea: Phaser.GameObjects.Rectangle;
 
 
 	constructor() {
@@ -21,26 +24,55 @@ export class GameScene extends BaseScene {
 	}
 
 	create(): void {
-		this.cameras.main.setBackgroundColor(0x222222);
+		this.cameras.main.setBackgroundColor(0x4FC3F7);
 		this.fade(false, 200, 0x000000);
 
 
+		// Camera management
+
+		this.cameras.main.setBounds(0, 0, this.W, 10000);
+		// this.cameras.main.setZoom(4);
+		// this.cameras.main.centerOn(0, 0);
+
+		this.cameraDragArea = this.add.rectangle(this.CX, this.CY, this.W, this.H, 0xFF0000, 0.0);
+		this.cameraDragArea.setScrollFactor(0);
+		this.cameraDragArea.setInteractive({ useHandCursor: true, draggable: true });
+		// this.cameraDragArea.on('dragend', this.onDragEnd, this);
+		this.cameraDragArea.on('drag', this.onDrag, this);
+		// this.cameraDragArea.on('dragstart', this.onDragStart, this);
+
+
+		// Background
+
+		this.background = this.add.image(this.CX, this.CY, "underground");
+		this.background.setOrigin(0.5, 0);
+		this.background.setScale(1*this.W / this.background.width);
+		// this.fitToScreen(this.background);
+
+		this.tree = this.add.image(this.CX, this.CY+20, "tree");
+		this.tree.setOrigin(0.5, 1.0);
+		this.tree.setScale(100 / this.tree.width);
+
+
 		// Graphics
+
 		this.dragGraphics = this.add.graphics();
 		this.rootsGraphics = this.add.graphics();
 
+
 		// Root nodes
+
 		this.currentNode = null;
 		this.nodes = [];
-		this.addNode(this.CX, 0, true);
+		this.addNode(this.CX, this.CY+30, true);
 
 
 		// Input
-		this.input.on('pointerup', this.onPointerUp, this);
-		this.input.on('pointermove', this.onPointerMove, this);
 
-		this.debugText = this.add.text(0, 0, 'hello', { fontFamily: 'Arial', fontSize: "32px", color: '#FFFFFF' });
-		this.debugText.setOrigin(0.5, 2.0);
+		this.input.on("pointerup", this.onPointerUp, this);
+
+		this.debugText = this.add.text(0, 0, "hello", { fontFamily: "Arial", fontSize: "32px", color: "#FFFFFF" });
+		// this.debugText.setOrigin(0.5, 2.0);
 	}
 
 
@@ -49,13 +81,18 @@ export class GameScene extends BaseScene {
 			node.update(time, delta);
 		});
 
+		// Todo: Move this elsewhere
+		const treeSize = 100 + 1 * this.nodes[0].score;
+		this.tree.setScale(treeSize / this.tree.width);
+
 
 		// Check mouse dragging
-		const pointer = this.input.activePointer;
+		const pointer = new Phaser.Math.Vector2(this.input.activePointer.x, this.input.activePointer.y);
+		pointer.y += this.cameras.main.scrollY;
 
 		// this.debugText.setPosition(pointer.x, pointer.y);
 
-		if (this.currentNode && pointer.isDown) {
+		if (this.currentNode && this.input.activePointer.isDown) {
 			const distance = Phaser.Math.Distance.BetweenPoints(this.currentNode, pointer);
 			const start = new Phaser.Math.Vector2(this.currentNode.x, this.currentNode.y);
 			const vector = new Phaser.Math.Vector2(pointer);
@@ -107,7 +144,8 @@ export class GameScene extends BaseScene {
 	drawRoot(node: Node) {
 		if (!node.parent) { return; }
 
-		this.rootsGraphics.lineStyle(5+node.score, 0x795548, 1.0);
+		const thickness = 3 + 4 * Math.sqrt(node.score);
+		this.rootsGraphics.lineStyle(thickness, 0x795548, 1.0);
 		this.rootsGraphics.beginPath();
 		this.rootsGraphics.moveTo(node.parent.x, node.parent.y);
 		this.rootsGraphics.lineTo(node.x, node.y);
@@ -122,10 +160,15 @@ export class GameScene extends BaseScene {
 		this.currentNode = node;
 	}
 
-	onPointerMove(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) {}
-
 	onPointerUp(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]): void {
 		this.currentNode = null;
 		this.dragGraphics.clear();
 	}
+
+	// onDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) {}
+	onDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number) {
+		this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom;
+		this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
+	}
+	// onDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) {}
 }
