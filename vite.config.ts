@@ -1,17 +1,21 @@
 import { defineConfig } from 'vite'
 import zip from 'vite-plugin-zip-pack';
 import { execSync } from 'child_process';
+import checker from 'vite-plugin-checker'
 
 // https://vitejs.dev/config
 export default defineConfig({
   root: 'src',
   plugins: [
+    checker({
+      typescript: true
+    }),
     {
       name: 'neu-build',
       apply: 'build',
       closeBundle() {
         console.log('Building standalone app')
-        execSync('neu build');
+        execSync('neu build --release');
       }
     },
     zip({
