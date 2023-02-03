@@ -29,8 +29,12 @@ import cover_dice_green from "../assets/images/cover/dice_green.png";
 import cover_dice_red from "../assets/images/cover/dice_red.png";
 import cover_knights from "../assets/images/cover/knights.png";
 
+import circle from "../assets/images/circle.png";
+
 
 const images: Asset[] = [
+	{ key: "circle",	path: circle },
+
 	// Cover
 	{ key: "cover_background_orange",	path: cover_background_orange },
 	{ key: "cover_body",				path: cover_body },
