@@ -25,7 +25,8 @@ dist-ssr
 
 # Neutralino files
 bin/
-static/neutralino.js
+src/neutralino.js
+.tmp
 
 # Misc files
 .cache/

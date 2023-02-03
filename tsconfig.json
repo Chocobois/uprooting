@@ -15,7 +15,11 @@
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "noImplicitAny": false,
-    "sourceMap": true
+    "sourceMap": false,
+    "removeComments": true,
+    "stripInternal":true,
+    "allowJs": true,
+    "emitDecoratorMetadata": false
   },
   "include": ["src", "typings/vite-env.d.ts", "typings/vite-env.d.ts"]
 }
