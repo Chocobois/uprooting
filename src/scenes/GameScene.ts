@@ -70,6 +70,7 @@ export class GameScene extends BaseScene {
 		// Input
 
 		this.input.on("pointerup", this.onPointerUp, this);
+		this.input.on("wheel", this.onScroll, this);
 
 		this.debugText = this.add.text(0, 0, "hello", { fontFamily: "Arial", fontSize: "32px", color: "#FFFFFF" });
 		// this.debugText.setOrigin(0.5, 2.0);
@@ -163,6 +164,10 @@ export class GameScene extends BaseScene {
 	onPointerUp(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]): void {
 		this.currentNode = null;
 		this.dragGraphics.clear();
+	}
+
+	onScroll(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) {
+		this.cameras.main.scrollY += deltaY;
 	}
 
 	// onDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) {}
