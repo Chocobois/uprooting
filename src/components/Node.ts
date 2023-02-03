@@ -16,7 +16,7 @@ export class Node extends Button {
 
 
 		this.image = this.scene.add.image(x, y, "circle");
-		this.setSize(root ? 40 : 10);
+		this.image.setScale((root ? 40 : 10) / this.image.width);
 
 		this.bindInteractive(this.image, true);
 		// const inputPadding = 1000;
@@ -29,9 +29,9 @@ export class Node extends Button {
 	}
 
 
-	setSize(size: number) {
-		this.image.setScale(size / this.image.width);
-	}
+	// setSize(size: number): void {
+		// this.image.setScale(size / this.image.width);
+	// }
 
 	addParent(node: Node) {
 		this.parent = node;

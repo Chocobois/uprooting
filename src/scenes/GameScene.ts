@@ -10,7 +10,7 @@ export class GameScene extends BaseScene {
 	// public bg: Phaser.GameObjects.Image;
 	private dragGraphics: Phaser.GameObjects.Graphics;
 	private rootsGraphics: Phaser.GameObjects.Graphics;
-	private nodes: Phaser.GameObjects.Image[];
+	private nodes: Node[];
 
 	private currentNode: Node | null;
 	private debugText: Phaser.GameObjects.Text;
@@ -39,7 +39,7 @@ export class GameScene extends BaseScene {
 		this.input.on('pointerup', this.onPointerUp, this);
 		this.input.on('pointermove', this.onPointerMove, this);
 
-		this.debugText = this.add.text(0, 0, 'hello', { fontFamily: 'Arial', fontSize: 32, color: '#FFFFFF' });
+		this.debugText = this.add.text(0, 0, 'hello', { fontFamily: 'Arial', fontSize: "32px", color: '#FFFFFF' });
 		this.debugText.setOrigin(0.5, 2.0);
 	}
 
@@ -90,6 +90,8 @@ export class GameScene extends BaseScene {
 	}
 
 	addConnection(position: Phaser.Math.Vector2) {
+		if (!this.currentNode) { return; }
+
 		const oldNode = this.currentNode;
 		const newNode = this.addNode(position.x, position.y);
 		newNode.addParent(oldNode);
@@ -103,16 +105,16 @@ export class GameScene extends BaseScene {
 	}
 
 	drawRoot(node: Node) {
-		if (node.parent) {
-			this.rootsGraphics.lineStyle(5+node.score, 0x795548, 1.0);
-			this.rootsGraphics.beginPath();
-			this.rootsGraphics.moveTo(node.parent.x, node.parent.y);
-			this.rootsGraphics.lineTo(node.x, node.y);
-			this.rootsGraphics.closePath();
-			this.rootsGraphics.strokePath();
+		if (!node.parent) { return; }
 
-			this.drawRoot(node.parent);
-		}
+		this.rootsGraphics.lineStyle(5+node.score, 0x795548, 1.0);
+		this.rootsGraphics.beginPath();
+		this.rootsGraphics.moveTo(node.parent.x, node.parent.y);
+		this.rootsGraphics.lineTo(node.x, node.y);
+		this.rootsGraphics.closePath();
+		this.rootsGraphics.strokePath();
+
+		this.drawRoot(node.parent);
 	}
 
 

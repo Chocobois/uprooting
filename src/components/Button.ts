@@ -1,8 +1,8 @@
-import { BaseScene } from "../../scenes/BaseScene";
+import { BaseScene } from "./../scenes/BaseScene";
 
 export class Button extends Phaser.GameObjects.Container {
 	public scene: BaseScene;
-	private hover: boolean;
+	public hover: boolean;
 	private _hold: boolean;
 	protected blocked: boolean;
 	public liftSmooth: number;
