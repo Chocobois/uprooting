@@ -97,6 +97,7 @@ const images: Asset[] = [
 // Effects
 import green_magic from "./images/effects/green_magic.png";
 import meme_explosion from "./images/effects/meme_explosion.png";
+import dust_explosion from "./images/effects/dustyexplosion.png";
 
 const spritesheets: SpriteSheet[] = [
 
@@ -106,6 +107,7 @@ const spritesheets: SpriteSheet[] = [
 	// Effects
 	{ key: "green_magic", path: green_magic, width: 128, height: 128 },
 	{ key: "meme_explosion", path: meme_explosion, width: 200, height: 282 },
+	{ key: "dust_explosion", path: meme_explosion, width: 128, height: 128 },
 ];
 
 
