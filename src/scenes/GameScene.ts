@@ -2,6 +2,7 @@ import { BaseScene } from "./BaseScene";
 import { Music } from "./../components/Music";
 import { Node } from "./../components/Node";
 import { Tree } from "./../components/Tree";
+import { Underground } from "./../components/Underground";
 import GetShortestDistance from "phaser/src/geom/line/GetShortestDistance";
 
 const DRAG_LIMIT = 100;
@@ -21,18 +22,22 @@ const MUSIC_VOLUME = 0 * 0.4;
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
 
+	// Tree
 	private tree: Tree;
-
+	private currentNode: Node | null;
+	private nodes: Node[];
+	// Graphics for roots. Should be replaced as it's very inefficient.
 	private dragGraphics: Phaser.GameObjects.Graphics;
 	private rootsGraphics: Phaser.GameObjects.Graphics;
-	private nodes: Node[];
 
-	private currentNode: Node | null;
+	// Manages item spawns underground
+	private underground: Underground;
+
+	// Debug
 	private debugText: Phaser.GameObjects.Text;
 	private cameraDragArea: Phaser.GameObjects.Rectangle;
 
 	// Music
-
 	public musicMuted: boolean;
 	public musicState: MusicState;
 	public musicNormal: Music;
@@ -55,25 +60,28 @@ export class GameScene extends BaseScene {
 		// Camera management
 
 		this.cameras.main.setBounds(0, 0, this.W, 10000);
-		// this.cameras.main.setZoom(4);
-		// this.cameras.main.centerOn(0, 0);
-
 		this.cameraDragArea = this.add.rectangle(this.CX, this.CY, this.W, this.H, 0xFF0000, 0.0);
 		this.cameraDragArea.setScrollFactor(0);
 		this.cameraDragArea.setInteractive({ useHandCursor: true, draggable: true });
-		// this.cameraDragArea.on('dragend', this.onDragEnd, this);
 		this.cameraDragArea.on('drag', this.onDrag, this);
-		// this.cameraDragArea.on('dragstart', this.onDragStart, this);
 
 
 		// Background
 
-		this.background = this.add.image(this.CX, this.CY, "underground");
+		this.background = this.add.image(this.CX, this.SURFACE_Y-20, "underground");
 		this.background.setOrigin(0.5, 0);
 		this.background.setScale(1*this.W / this.background.width);
 		// this.fitToScreen(this.background);
 
-		this.tree = new Tree(this, this.CX, this.CY+20);
+
+		// Underground
+
+		this.underground = new Underground(this, this.SURFACE_Y, this.BEDROCK_Y);
+
+
+		// Tree
+
+		this.tree = new Tree(this, this.CX, this.SURFACE_Y);
 		this.tree.on("levelUp", this.onTreeLevelUp, this);
 
 
@@ -87,7 +95,7 @@ export class GameScene extends BaseScene {
 
 		this.currentNode = null;
 		this.nodes = [];
-		this.addNode(this.CX, this.CY+30, true);
+		this.addNode(this.CX, this.SURFACE_Y+10, true);
 
 
 		// Music
@@ -134,6 +142,7 @@ export class GameScene extends BaseScene {
 	update(time: number, delta: number) {
 
 		// Update game objects
+		this.underground.update(time, delta);
 		this.tree.update(time, delta);
 		this.nodes.forEach(node => {
 			node.update(time, delta);
@@ -321,6 +330,14 @@ export class GameScene extends BaseScene {
 	}
 	// onDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) {}
 
+
+	get SURFACE_Y() {
+		return this.CY + 10;
+	}
+
+	get BEDROCK_Y() {
+		return 10000; // Fix
+	}
 
 	get totalScore() {
 		return this.nodes[0].score;
