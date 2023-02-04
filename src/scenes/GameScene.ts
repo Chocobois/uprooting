@@ -1,15 +1,25 @@
 import { BaseScene } from "./BaseScene";
 import { Music } from "./../components/Music";
+import { Particles } from "./../components/Particles";
 import { Node } from "./../components/Node";
 import { Tree } from "./../components/Tree";
 import { Underground } from "./../components/Underground";
 import { SurfaceButton } from "./../components/SurfaceButton";
+import { HarvestButton } from "./../components/HarvestButton";
 import GetShortestDistance from "phaser/src/geom/line/GetShortestDistance";
 
 const DRAG_LIMIT = 100;
 const ANGLE_LIMIT = Math.PI/2;
 const PROXIMITY_LIMIT = DRAG_LIMIT/5;
-const MIN_Y = 590;
+
+enum GameState {
+	None = "None",
+	GrowingRoots = "Growing roots",
+	ReturningToSurfaceCutscene = "Returning to surface cutscene",
+	HarvestingTree = "Harvesting tree",
+	HarvestCompleteCutscene = "Harvest complete cutscene",
+	SomeOtherCutsceneIdk = "Some other cutscene idk",
+}
 
 enum MusicState {
 	Nothing,
@@ -18,10 +28,14 @@ enum MusicState {
 	Jingle
 }
 
-const MUSIC_VOLUME = 0.4;
+const MUSIC_VOLUME = 0 * 0.4;
 
 export class GameScene extends BaseScene {
+	// Gameplay state, see enum above
+	private state: GameState;
+
 	private background: Phaser.GameObjects.Image;
+	private overworld: Phaser.GameObjects.Image;
 
 	// Tree
 	private tree: Tree;
@@ -37,10 +51,14 @@ export class GameScene extends BaseScene {
 
 	// UI
 	private returnToSurfaceButton: SurfaceButton;
+	private harvestButton: HarvestButton;
 
 	// Debug
 	private debugText: Phaser.GameObjects.Text;
 	private cameraDragArea: Phaser.GameObjects.Rectangle;
+
+	// Particles
+	public particles: Particles;
 
 	// Music
 	public musicMuted: boolean;
@@ -61,6 +79,8 @@ export class GameScene extends BaseScene {
 		this.cameras.main.setBackgroundColor(0x4FC3F7);
 		this.fade(false, 200, 0x000000);
 
+		this.state = GameState.GrowingRoots;
+
 
 		// Camera management
 
@@ -72,6 +92,10 @@ export class GameScene extends BaseScene {
 
 
 		// Background
+
+		this.overworld = this.add.image(this.CX, this.SURFACE_Y, "overworld");
+		this.overworld.setOrigin(0.5, 1.0);
+		this.fitToScreen(this.overworld);
 
 		this.background = this.add.image(this.CX, this.SURFACE_Y-20, "underground");
 		this.background.setOrigin(0.5, 0);
@@ -88,6 +112,7 @@ export class GameScene extends BaseScene {
 
 		this.tree = new Tree(this, this.CX, this.SURFACE_Y);
 		this.tree.on("levelUp", this.onTreeLevelUp, this);
+		this.tree.on("click", this.onTreeClick, this);
 
 
 		// Graphics
@@ -104,12 +129,19 @@ export class GameScene extends BaseScene {
 		this.addNode(this.CX, this.SURFACE_Y+10, true);
 
 
+		// Particles
+
+		this.particles = new Particles(this);
+		this.particles.setDepth(100);
+
+
 		// UI
 
 		this.returnToSurfaceButton = new SurfaceButton(this, this.CX, .1*this.H);
-		this.returnToSurfaceButton.setDepth(1000);
-		this.returnToSurfaceButton.setScrollFactor(0);
 		this.returnToSurfaceButton.on("click", this.returnToSurface, this);
+
+		this.harvestButton = new HarvestButton(this, this.CX, .1*this.H);
+		// this.harvestButton.on("click", this.onHarvestComplete, this);
 
 
 		// Music
@@ -160,6 +192,7 @@ export class GameScene extends BaseScene {
 	update(time: number, delta: number) {
 
 		// Update game objects
+		this.particles.update(time, delta);
 		this.underground.update(time, delta);
 		this.tree.update(time, delta);
 		this.nodes.forEach(node => {
@@ -168,18 +201,107 @@ export class GameScene extends BaseScene {
 		this.returnToSurfaceButton.update(time, delta);
 
 		// Debug, move this to some ui thing
-		this.debugText.setText(`Energy: ${this.tree.energy}/${this.tree.maxEnergy}`);
+		this.debugText.setText(`State: ${this.state}\nEnergy: ${this.tree.energy}/${this.tree.maxEnergy}`);
 
 
-		// Move camera with mouse input
-		this.moveCamera();
+		if (this.state == GameState.GrowingRoots) {
+			// Move camera with mouse input
+			this.moveCamera();
+
+			this.handleRootDrawing();
+		}
+
+		// Update music based on if the player is drawing a line
+
+		this.musicDrawing.volume = this.musicMuted ? 0 : (
+			(this.musicState == MusicState.LayeredLoop) ? this.musicVolume : 0.00001
+		)
+	}
 
 
-		// Check mouse dragging
+	moveCamera() {
+		// Only allow touch camera movement during node drawing
+		if (!this.currentNode) { return; }
+
+		const pointer = this.input.activePointer;
+		const upperArea = 0.10 * this.H; // Upper 10% of the screen
+		const lowerArea = this.H - 0.30 * this.H; // Lower 30% of the screen
+		const maxScrollSpeed = 20;
+
+		// If pointer at the top of the screen, move camera upwards
+		if (pointer.y < upperArea) {
+			const factor = 1 - pointer.y / upperArea;
+			this.cameras.main.scrollY -= maxScrollSpeed * factor;
+		}
+		// If pointer at the bottom of the screen, move camera downwards
+		if (pointer.y > lowerArea) {
+			const factor = (pointer.y - lowerArea) / (this.H - lowerArea);
+			this.cameras.main.scrollY += maxScrollSpeed * factor;
+		}
+	}
+
+	setDeepestNode(y: number) {
+		if (y == 0) { this.deepestNodeY = 0; }
+		this.deepestNodeY = Math.max(y, this.deepestNodeY);
+		this.cameras.main.setBounds(0, 0, this.W, this.deepestNodeY + 0.6*this.H);
+	}
+
+	returnToSurface() {
+		this.state = GameState.ReturningToSurfaceCutscene;
+
+		// Smooth camera transition
+		this.tweens.addCounter({
+			from: this.cameras.main.scrollY,
+			to: 0,
+			duration: 1000,
+			ease: 'Quad',
+			onUpdate: (tween) => {
+				this.cameras.main.scrollY = tween.getValue();
+			},
+			onComplete: () => {
+				this.state = GameState.HarvestingTree;
+
+				// Reset camera limits
+				this.setDeepestNode(0);
+
+				this.returnToSurfaceButton.hide();
+				this.harvestButton.show();
+			}
+		});
+	}
+
+	onHarvestComplete() {
+		this.state = GameState.GrowingRoots;
+		this.oneTimeEvents.outOfEnergy = false;
+
+		// Add current score to growth
+		// Should be a whole sequence here instead and the shop thing, etc
+		this.tree.addMaxEnergy(this.totalScore);
+
+		// Destroy all nodes
+		this.currentNode = null;
+		this.nodes.forEach(node => {
+			node.destroy();
+		});
+		this.nodes = [];
+
+		this.dragGraphics.clear();
+		this.rootsGraphics.clear();
+		this.harvestButton.hide();
+
+
+		// Restart tree
+		this.addNode(this.CX, this.SURFACE_Y+10, true);
+		this.tree.reset();
+		this.updateScore();
+	}
+
+
+	/* Tree */
+
+	handleRootDrawing() {
 		const pointer = new Phaser.Math.Vector2(this.input.activePointer.x, this.input.activePointer.y);
 		pointer.y += this.cameras.main.scrollY;
-
-		// this.debugText.setPosition(pointer.x, pointer.y);
 
 		if (this.currentNode && this.input.activePointer.isDown) {
 			const start = new Phaser.Math.Vector2(this.currentNode.x, this.currentNode.y);
@@ -221,74 +343,7 @@ export class GameScene extends BaseScene {
 			this.dragGraphics.closePath();
 			this.dragGraphics.strokePath();
 		}
-
-		// Update music based on if the player is drawing a line
-
-		this.musicDrawing.volume = this.musicMuted ? 0 : (
-			(this.musicState == MusicState.LayeredLoop) ? this.musicVolume : 0.00001
-		)
 	}
-
-
-	moveCamera() {
-		// Only allow touch camera movement during node drawing
-		if (!this.currentNode) { return; }
-
-		const pointer = this.input.activePointer;
-		const upperArea = 0.10 * this.H; // Upper 10% of the screen
-		const lowerArea = this.H - 0.30 * this.H; // Lower 30% of the screen
-		const maxScrollSpeed = 20;
-
-		// If pointer at the top of the screen, move camera upwards
-		if (pointer.y < upperArea) {
-			const factor = 1 - pointer.y / upperArea;
-			this.cameras.main.scrollY -= maxScrollSpeed * factor;
-		}
-		// If pointer at the bottom of the screen, move camera downwards
-		if (pointer.y > lowerArea) {
-			const factor = (pointer.y - lowerArea) / (this.H - lowerArea);
-			this.cameras.main.scrollY += maxScrollSpeed * factor;
-		}
-	}
-
-	setDeepestNode(y: number) {
-		this.deepestNodeY = Math.max(y, this.deepestNodeY);
-		this.cameras.main.setBounds(0, 0, this.W, this.deepestNodeY + 0.6*this.H);
-	}
-
-	returnToSurface() {
-		// Add current score to growth
-		// Should be a whole sequence here instead and the shop thing, etc
-		this.tree.addMaxEnergy(this.totalScore);
-
-
-		// Destroy all nodes
-		this.currentNode = null;
-		this.nodes.forEach(node => {
-			node.destroy();
-		});
-		this.nodes = [];
-
-		this.dragGraphics.clear();
-		this.rootsGraphics.clear();
-
-
-		// Reset camera
-		this.cameras.main.scrollY = 0;
-		this.setDeepestNode(0);
-
-		this.returnToSurfaceButton.hide();
-		this.oneTimeEvents.outOfEnergy = false;
-
-
-		// Restart tree
-		this.addNode(this.CX, this.SURFACE_Y+10, true);
-		this.tree.reset();
-		this.updateScore();
-	}
-
-
-	/* Tree */
 
 	// Returns the position of next node to be created given the pointer's position
 	// If one can't be created, null is returned
@@ -296,7 +351,7 @@ export class GameScene extends BaseScene {
 		if(!this.currentNode) return null;
 
 		// Can't be above ground very far
-		if(pointer.y < MIN_Y) return null;
+		if(pointer.y < this.SURFACE_Y) return null;
 
 		const start = new Phaser.Math.Vector2(this.currentNode.x, this.currentNode.y);
 		const vector = new Phaser.Math.Vector2(pointer);
@@ -392,6 +447,19 @@ export class GameScene extends BaseScene {
 			if (!this.oneTimeEvents.growthStage2Sound) {
 				this.oneTimeEvents.growthStage2Sound = true;
 				this.sound.play("r_grow", { volume: 0.4, rate: 1.00 });
+			}
+		}
+	}
+
+	onTreeClick() {
+		if (this.state == GameState.HarvestingTree) {
+			this.tree.harvestCount -= 1;
+
+			this.particles.createGreenMagic(this.tree.x, this.tree.y-150, 3, 1.0, false);
+
+			if (this.tree.harvestCount <= 0) {
+				this.particles.createExplosion(this.tree.x, this.tree.y-100, 2, 1.0, false);
+				this.onHarvestComplete();
 			}
 		}
 	}

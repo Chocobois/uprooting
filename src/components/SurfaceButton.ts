@@ -10,11 +10,14 @@ export class SurfaceButton extends Button {
 	constructor(scene: BaseScene, x: number, y: number) {
 		super(scene, x, y);
 		this.scene.add.existing(this);
+		this.setDepth(1000);
+		this.setScrollFactor(0);
 
 		this.size = 0.2 * this.scene.W;
 
 		this.image = this.scene.add.image(0, 0, "surface_button");
 		this.image.setScale(this.size / this.image.width);
+		this.image.setTint(0xA1887F);
 		this.image.setScrollFactor(0);
 		this.add(this.image);
 
