@@ -17,7 +17,7 @@ enum MusicState {
 	Jingle
 }
 
-const MUSIC_VOLUME = 0 * 0.4;
+const MUSIC_VOLUME = 0.4;
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -26,6 +26,7 @@ export class GameScene extends BaseScene {
 	private tree: Tree;
 	private currentNode: Node | null;
 	private nodes: Node[];
+	private deepestNodeY: number;
 	// Graphics for roots. Should be replaced as it's very inefficient.
 	private dragGraphics: Phaser.GameObjects.Graphics;
 	private rootsGraphics: Phaser.GameObjects.Graphics;
@@ -59,11 +60,11 @@ export class GameScene extends BaseScene {
 
 		// Camera management
 
-		this.cameras.main.setBounds(0, 0, this.W, 10000);
+		this.cameras.main.setBounds(0, 0, this.W, this.H);
 		this.cameraDragArea = this.add.rectangle(this.CX, this.CY, this.W, this.H, 0xFF0000, 0.0);
 		this.cameraDragArea.setScrollFactor(0);
 		this.cameraDragArea.setInteractive({ useHandCursor: true, draggable: true });
-		this.cameraDragArea.on('drag', this.onDrag, this);
+		this.cameraDragArea.on('drag', this.onCameraDrag, this);
 
 
 		// Background
@@ -94,6 +95,7 @@ export class GameScene extends BaseScene {
 		// Root nodes
 
 		this.currentNode = null;
+		this.deepestNodeY = 0;
 		this.nodes = [];
 		this.addNode(this.CX, this.SURFACE_Y+10, true);
 
@@ -153,6 +155,10 @@ export class GameScene extends BaseScene {
 		this.debugText.setText(`Energy: ${this.tree.energy}`);
 
 
+		// Move camera with mouse input
+		this.moveCamera();
+
+
 		// Check mouse dragging
 		const pointer = new Phaser.Math.Vector2(this.input.activePointer.x, this.input.activePointer.y);
 		pointer.y += this.cameras.main.scrollY;
@@ -202,6 +208,29 @@ export class GameScene extends BaseScene {
 			(this.musicState == MusicState.LayeredLoop) ? this.musicVolume : 0.00001
 		)
 	}
+
+
+	moveCamera() {
+		// Only allow touch camera movement during node drawing
+		if (!this.currentNode) { return; }
+
+		const pointer = this.input.activePointer;
+		const upperArea = 0.10 * this.H; // Upper 10% of the screen
+		const lowerArea = this.H - 0.30 * this.H; // Lower 30% of the screen
+		const maxScrollSpeed = 20;
+
+		// If pointer at the top of the screen, move camera upwards
+		if (pointer.y < upperArea) {
+			const factor = 1 - pointer.y / upperArea;
+			this.cameras.main.scrollY -= maxScrollSpeed * factor;
+		}
+		// If pointer at the bottom of the screen, move camera downwards
+		if (pointer.y > lowerArea) {
+			const factor = (pointer.y - lowerArea) / (this.H - lowerArea);
+			this.cameras.main.scrollY += maxScrollSpeed * factor;
+		}
+	}
+
 
 	// Returns the position of next node to be created given the pointer's position
 	// If one can't be created, null is returned
@@ -254,6 +283,9 @@ export class GameScene extends BaseScene {
 		node.on("dragStart", this.onNodeDragStart, this);
 
 		this.nodes.push(node);
+
+		this.deepestNodeY = Math.max(y, this.deepestNodeY);
+		this.cameras.main.setBounds(0, 0, this.W, this.deepestNodeY + 0.4*this.H);
 
 		return node;
 	}
@@ -323,12 +355,10 @@ export class GameScene extends BaseScene {
 		this.cameras.main.scrollY += deltaY;
 	}
 
-	// onDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) {}
-	onDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number) {
+	onCameraDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number) {
 		this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom;
 		this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
 	}
-	// onDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) {}
 
 
 	get SURFACE_Y() {
