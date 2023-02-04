@@ -128,7 +128,7 @@ const images: Asset[] = [
 import green_magic from "./images/effects/green_magic.png";
 import meme_explosion from "./images/effects/meme_explosion.png";
 import dust_explosion from "./images/effects/dustyexplosion.png";
-import item_tag from "./images/effects/item_tag.png";
+import item_tag from "./images/ui/item_tag.png";
 
 const spritesheets: SpriteSheet[] = [
 	//UI with buttonstates
