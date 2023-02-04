@@ -44,6 +44,7 @@ import bone from "./images/items/bone.png";
 import dragonfruit from "./images/items/dragonfruit.png";
 import dragondragonfruit from "./images/items/dragondragonfruit.png";
 import pear from "./images/items/pear.png";
+import stone from "./images/items/stone.png";
 
 // UI
 import fruit_upgrade from "./images/ui/fruit_upgrade.png";
@@ -79,6 +80,7 @@ const images: Asset[] = [
 	{ key: "dragondragonfruit", path: dragondragonfruit },
 	{ key: "applecore", path: applecore },
 	{ key: "pear", path: pear },
+	{ key: "stone", path: stone },
 
 	// UI
 	{ key: "fruit_upgrade", path: fruit_upgrade },
