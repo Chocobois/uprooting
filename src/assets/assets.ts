@@ -47,6 +47,8 @@ import dragondragonfruit from "./images/items/dragondragonfruit.png";
 import pear from "./images/items/pear.png";
 import stone from "./images/items/stone.png";
 import banana from "./images/items/banana.png";
+import cherry from "./images/items/cherry.png";
+import orange from "./images/items/orange.png";
 import diamond from "./images/items/diamond.png";
 
 // UI
@@ -86,6 +88,8 @@ const images: Asset[] = [
 	{ key: "pear", path: pear },
 	{ key: "stone", path: stone },
 	{ key: "banana", path: banana },
+	{ key: "cherry", path: cherry },
+	{ key: "orange", path: orange },
 	{ key: "diamond", path: diamond },
 
 	// UI
