@@ -27,6 +27,7 @@ export default defineConfig({
   ],
   build: {
     outDir: '../dist/unpacked',
-    chunkSizeWarningLimit: 4096
+    chunkSizeWarningLimit: 4096,
+    assetsInlineLimit: 0
   }
 });

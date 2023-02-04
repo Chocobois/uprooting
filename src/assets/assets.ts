@@ -23,38 +23,38 @@ interface Audio {
 /* Images */
 
 // Backgrounds
-import overworld from "../assets/images/backgrounds/overworld.png";
-import underground from "../assets/images/backgrounds/underground.png";
-import testshop from "../assets/images/backgrounds/emptybkg.png";
-import shopwall from "../assets/images/backgrounds/rocksbkg.png";
+import overworld from "./images/backgrounds/overworld.png";
+import underground from "./images/backgrounds/underground.png";
+import testshop from "./images/backgrounds/emptybkg.png";
+import shopwall from "./images/backgrounds/rocksbkg.png";
 
 // NPCs
-import jbun from "../assets/images/character/jbun.png";
+import jbun from "./images/character/jbun.png";
 
 // Tree
-import tree from "../assets/images/tree/tree.png";
-import tree_little from "../assets/images/tree/tree_little.png";
-import sapling from "../assets/images/tree/sapling.png";
-import rootline from "../assets/images/tree/rootline.png";
+import tree from "./images/tree/tree.png";
+import tree_little from "./images/tree/tree_little.png";
+import sapling from "./images/tree/sapling.png";
+import rootline from "./images/tree/rootline.png";
 
 // Items
-import apple from "../assets/images/items/apple.png";
-import applecore from "../assets/images/items/applecore.png";
-import bone from "../assets/images/items/bone.png";
-import dragonfruit from "../assets/images/items/dragonfruit.png";
-import dragondragonfruit from "../assets/images/items/dragondragonfruit.png";
-import pear from "../assets/images/items/pear.png";
+import apple from "./images/items/apple.png";
+import applecore from "./images/items/applecore.png";
+import bone from "./images/items/bone.png";
+import dragonfruit from "./images/items/dragonfruit.png";
+import dragondragonfruit from "./images/items/dragondragonfruit.png";
+import pear from "./images/items/pear.png";
 
 // UI
-import fruit_upgrade from "../assets/images/ui/fruit_upgrade.png";
-import energy_teter from "../assets/images/ui/meter.png";
-import prompt from "../assets/images/ui/prompt.png";
-import surface_button from "../assets/images/ui/surface_button.png";
-import music from "../assets/images/ui/music.png";
-import audio from "../assets/images/ui/audio.png";
+import fruit_upgrade from "./images/ui/fruit_upgrade.png";
+import energy_teter from "./images/ui/meter.png";
+import prompt from "./images/ui/prompt.png";
+import surface_button from "./images/ui/surface_button.png";
+import music from "./images/ui/music.png";
+import audio from "./images/ui/audio.png";
 
 // Other
-import circle from "../assets/images/circle.png";
+import circle from "./images/circle.png";
 
 const images: Asset[] = [
 	// Backgrounds
@@ -95,8 +95,8 @@ const images: Asset[] = [
 /* Spritesheets */
 
 // Effects
-import green_magic from "../assets/images/effects/green_magic.png";
-import meme_explosion from "../assets/images/effects/meme_explosion.png";
+import green_magic from "./images/effects/green_magic.png";
+import meme_explosion from "./images/effects/meme_explosion.png";
 
 const spritesheets: SpriteSheet[] = [
 
@@ -113,17 +113,17 @@ const spritesheets: SpriteSheet[] = [
 /* Audio */
 
 // UI
-import m_main_menu from "../assets/music/title.mp3";
+import m_main_menu from "./music/title.mp3";
 
 // Music
-import m_first from "../assets/music/first.mp3";
-import m_first_draw from "../assets/music/first_draw.mp3";
-import m_first_end from "../assets/music/first_end.mp3";
+import m_first from "./music/first.mp3";
+import m_first_draw from "./music/first_draw.mp3";
+import m_first_end from "./music/first_end.mp3";
 
 // SFX: Roots
-import r_grow from "../assets/sounds/roots/grow.mp3";
-import r_place from "../assets/sounds/roots/place.mp3";
-import r_place_error from "../assets/sounds/roots/place_error.mp3";
+import r_grow from "./sounds/roots/grow.mp3";
+import r_place from "./sounds/roots/place.mp3";
+import r_place_error from "./sounds/roots/place_error.mp3";
 
 const audios: Audio[] = [
 	{ key: "m_main_menu", path: m_main_menu, volume: 1 },
