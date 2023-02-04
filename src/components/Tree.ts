@@ -18,7 +18,7 @@ export class Tree extends Button {
 
 		// Stats
 		this.level = 0;
-		this.energy = 100;
+		this.energy = 1000;
 
 
 		// Tree sprite
