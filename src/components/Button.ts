@@ -10,6 +10,7 @@ export class Button extends Phaser.GameObjects.Container {
 	public category: number;
 	public aliveValue: number;
 	private tween: Phaser.Tweens.Tween;
+	public enabled: boolean;
 
 	constructor(scene: BaseScene, x: number, y: number) {
 		super(scene, x, y);
@@ -19,6 +20,7 @@ export class Button extends Phaser.GameObjects.Container {
 		this.hover = false;
 		this._hold = false;
 		this.blocked = false;
+		this.enabled = true;
 
 		this.liftSmooth = 0;
 		this.holdSmooth = 0;

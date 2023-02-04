@@ -8,12 +8,13 @@ export class ShopItem extends Button {
 	private size: number;
 	private originalY;
 
-	public itemData: ItemData;
+	public itemData: ItemData | null;
 
 	constructor(scene: BaseScene, x: number, y: number, size: number) {
 		super(scene, x, y);
 		this.size = size;
 		this.originalY = y;
+		this.itemData = null;
 
 		this.background = this.scene.add.image(0, 0, "fruit_upgrade");
 		this.background.setScale(this.size / this.background.width);
