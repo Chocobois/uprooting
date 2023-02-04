@@ -75,8 +75,8 @@ export class GameScene extends BaseScene {
 
 		// Graphics
 
-		this.dragGraphics = this.add.graphics();
 		this.rootsGraphics = this.add.graphics();
+		this.dragGraphics = this.add.graphics();
 
 
 		// Root nodes
@@ -133,15 +133,22 @@ export class GameScene extends BaseScene {
 		if (this.currentNode && this.input.activePointer.isDown) {
 			const start = new Phaser.Math.Vector2(this.currentNode.x, this.currentNode.y);
 			const next = this.nextNodePos(pointer);
+
+			// Distance must be DRAG_LIMIT
+			// Also, don't create anything if cursor is too far,
+			// to prevent placing extra segments accidentally
+			const distance = Phaser.Math.Distance.BetweenPoints(this.currentNode, pointer);
+			const canDraw = distance >= DRAG_LIMIT && distance <DRAG_LIMIT*2;
+
+			this.dragGraphics.clear();
+			this.dragGraphics.lineStyle(5, next ? 0x00FF00 : 0xFF0000, 1.0);
 			
-			if (next) {
+			if (next && canDraw) {
 				this.addConnection(next);
 			}
 
 			const end = next ? next : start.clone().add(pointer.clone().subtract(this.currentNode).limit(DRAG_LIMIT));
 
-			this.dragGraphics.clear();
-			this.dragGraphics.lineStyle(5, 0xFF0000, 1.0);
 			this.dragGraphics.beginPath();
 			this.dragGraphics.moveTo(start.x, start.y);
 			this.dragGraphics.lineTo(end.x, end.y);
@@ -160,12 +167,6 @@ export class GameScene extends BaseScene {
 	// If one can't be created, null is returned
 	nextNodePos(pointer: Phaser.Math.Vector2): Phaser.Math.Vector2 | null {
 		if(!this.currentNode) return null;
-
-		// Distance must be DRAG_LIMIT
-		// Also, don't create anything if cursor is too far,
-		// to prevent placing extra segments accidentally
-		const distance = Phaser.Math.Distance.BetweenPoints(this.currentNode, pointer);
-		if(distance < DRAG_LIMIT || distance >= DRAG_LIMIT*2) return null;
 
 		// Can't be above ground very far
 		if(pointer.y < MIN_Y) return null;
