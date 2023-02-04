@@ -1,9 +1,11 @@
 import { BaseScene } from "./BaseScene";
 import { Music } from "./../components/Music";
 import { Node } from "./../components/Node";
+import GetShortestDistance from "phaser/src/geom/line/GetShortestDistance";
 
-
-const DRAG_LIMIT = 150;
+const DRAG_LIMIT = 100;
+const ANGLE_LIMIT = Math.PI/2;
+const PROXIMITY_LIMIT = DRAG_LIMIT/5;
 
 enum MusicState {
 	Nothing,
@@ -13,7 +15,6 @@ enum MusicState {
 }
 
 const MUSIC_VOLUME = 0.4;
-
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -128,16 +129,14 @@ export class GameScene extends BaseScene {
 		// this.debugText.setPosition(pointer.x, pointer.y);
 
 		if (this.currentNode && this.input.activePointer.isDown) {
-			const distance = Phaser.Math.Distance.BetweenPoints(this.currentNode, pointer);
 			const start = new Phaser.Math.Vector2(this.currentNode.x, this.currentNode.y);
-			const vector = new Phaser.Math.Vector2(pointer);
-			vector.subtract(this.currentNode).limit(DRAG_LIMIT);
-			const end = start.clone().add(vector);
-
-			// this.debugText.setText(distance);
-			if (distance > DRAG_LIMIT) {
-				this.addConnection(end);
+			const next = this.nextNodePos(pointer);
+			
+			if (next) {
+				this.addConnection(next);
 			}
+
+			const end = next ? next : start.clone().add(pointer.clone().subtract(this.currentNode).limit(DRAG_LIMIT));
 
 			this.dragGraphics.clear();
 			this.dragGraphics.lineStyle(5, 0xFF0000, 1.0);
@@ -155,6 +154,53 @@ export class GameScene extends BaseScene {
 		)
 	}
 
+	// Returns the position of next node to be created given the pointer's position
+	// If one can't be created, null is returned
+	nextNodePos(pointer: Phaser.Math.Vector2): Phaser.Math.Vector2 | null {
+		if(!this.currentNode) return null;
+
+		// Distance must be DRAG_LIMIT
+		// Also, don't create anything if cursor is too far,
+		// to prevent placing extra segments accidentally
+		const distance = Phaser.Math.Distance.BetweenPoints(this.currentNode, pointer);
+		if(distance < DRAG_LIMIT || distance >= DRAG_LIMIT*2) return null;
+
+
+		const start = new Phaser.Math.Vector2(this.currentNode.x, this.currentNode.y);
+		const vector = new Phaser.Math.Vector2(pointer);
+		vector.subtract(this.currentNode).limit(DRAG_LIMIT);
+
+		// Check angles
+		const grandparent = this.currentNode.parent;
+		if (grandparent) {
+			const prev = new Phaser.Math.Vector2(grandparent.x, grandparent.y);
+			prev.subtract(this.currentNode).negate();
+
+			const cos = prev.dot(vector)/(prev.length()*vector.length());
+
+			if(cos < Math.cos(ANGLE_LIMIT)) return null;
+		}
+
+		const end = start.clone().add(vector);
+
+		// Check intersections and proximity (latter is not implemented yet)
+		const line = new Phaser.Geom.Line(start.x, start.y, end.x, end.y);
+
+		const anyEncroaching = this.nodes.some(node => {
+			if(!node.parent || node == this.currentNode || node.parent == this.currentNode) return false;
+
+			const otherLine = new Phaser.Geom.Line(node.parent.x, node.parent.y, node.x, node.y);
+
+			const intersects = Phaser.Geom.Intersects.LineToLine(line, otherLine);
+			//const tooClose = GetShortestDistance(otherLine, end) <= PROXIMITY_LIMIT;
+
+			return intersects;
+		});
+
+		if(anyEncroaching) return null;
+
+		return end;
+	}
 
 	addNode(x: number, y: number, root: boolean=false): Node {
 		let node = new Node(this, x, y, root);
