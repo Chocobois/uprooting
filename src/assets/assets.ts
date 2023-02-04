@@ -41,10 +41,13 @@ import rootline from "./images/tree/rootline.png";
 import apple from "./images/items/apple.png";
 import applecore from "./images/items/applecore.png";
 import bone from "./images/items/bone.png";
+import bones from "./images/items/bones.png";
 import dragonfruit from "./images/items/dragonfruit.png";
 import dragondragonfruit from "./images/items/dragondragonfruit.png";
 import pear from "./images/items/pear.png";
 import stone from "./images/items/stone.png";
+import banana from "./images/items/banana.png";
+import diamond from "./images/items/diamond.png";
 
 // UI
 import fruit_upgrade from "./images/ui/fruit_upgrade.png";
@@ -76,11 +79,14 @@ const images: Asset[] = [
 	// Items
 	{ key: "apple", path: apple },
 	{ key: "bone", path: bone },
+	{ key: "bones", path: bones },
 	{ key: "dragonfruit", path: dragonfruit },
 	{ key: "dragondragonfruit", path: dragondragonfruit },
 	{ key: "applecore", path: applecore },
 	{ key: "pear", path: pear },
 	{ key: "stone", path: stone },
+	{ key: "banana", path: banana },
+	{ key: "diamond", path: diamond },
 
 	// UI
 	{ key: "fruit_upgrade", path: fruit_upgrade },
