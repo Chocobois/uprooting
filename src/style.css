@@ -3,6 +3,7 @@
   margin: 0;
   padding: 0;
   overflow: hidden;
+  user-select: none;
 }
 
 html, body {
@@ -25,7 +26,7 @@ body {
 	color: #eee;
 }
 
-.fontPreloader, .fontGame {
+.fontPreloader {
 	display: flex;
   justify-content: center;
   align-items: center;
@@ -33,7 +34,6 @@ body {
   z-index: -10;
 	margin: auto;
   font-family: "Fredoka One", serif;
-  user-select: none;
 }
 
 /* fredoka-one-regular - latin */

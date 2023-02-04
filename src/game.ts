@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { PreloadScene } from "./scenes/PreloadScene";
-import { MenuScene } from "./scenes/MenuScene";
 import { GameScene } from "./scenes/GameScene";
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -16,7 +15,6 @@ const config: Phaser.Types.Core.GameConfig = {
 	},
 	scene: [
 		PreloadScene,
-		MenuScene,
 		GameScene
 	],
 	plugins: {
