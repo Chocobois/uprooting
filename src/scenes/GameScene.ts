@@ -7,6 +7,15 @@ const DRAG_LIMIT = 100;
 const ANGLE_LIMIT = 9000; //Math.PI/2;
 const PROXIMITY_LIMIT = DRAG_LIMIT/5;
 
+enum MusicState {
+	Nothing,
+	NormalLoop,
+	LayeredLoop,
+	Jingle
+}
+
+const MUSIC_VOLUME = 0.4;
+
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
 	private tree: Phaser.GameObjects.Image;
@@ -19,6 +28,14 @@ export class GameScene extends BaseScene {
 	private debugText: Phaser.GameObjects.Text;
 	private cameraDragArea: Phaser.GameObjects.Rectangle;
 
+	// Music
+
+	public musicMuted: boolean;
+	public musicState: MusicState;
+	public musicNormal: Music;
+	public musicDrawing: Music;
+	public musicJingle: Music;
+	public musicVolume: number;
 
 	constructor() {
 		super({key: "GameScene"});
@@ -67,6 +84,20 @@ export class GameScene extends BaseScene {
 		this.nodes = [];
 		this.addNode(this.CX, this.CY+30, true);
 
+		// Music
+		this.musicMuted = false; // TODO: Link up to mute button
+		this.musicVolume = MUSIC_VOLUME;
+		this.musicState = MusicState.Nothing;
+		
+		this.musicJingle?.stop()
+
+		this.musicNormal = new Music(this, 'm_first', { volume: this.musicMuted ? 0 : this.musicVolume });
+		this.musicDrawing = new Music(this, 'm_first_draw', { volume: 0 });
+		this.musicJingle = new Music(this, 'm_first_end', { volume: this.musicMuted ? 0 : this.musicVolume });
+		
+		this.musicNormal.play();
+		this.musicDrawing.play();
+		this.musicState = MusicState.NormalLoop;
 
 		// Input
 
@@ -112,6 +143,12 @@ export class GameScene extends BaseScene {
 			this.dragGraphics.closePath();
 			this.dragGraphics.strokePath();
 		}
+
+		// Update music based on if the player is drawing a line
+
+		this.musicDrawing.volume = this.musicMuted ? 0 : (
+			(this.musicState == MusicState.LayeredLoop) ? this.musicVolume : 0.00001
+		)
 	}
 
 	// Returns the position of next node to be created given the pointer's position
@@ -205,11 +242,13 @@ export class GameScene extends BaseScene {
 
 	onNodeDragStart(node: Node) {
 		this.currentNode = node;
+		this.musicState = MusicState.LayeredLoop;
 	}
 
 	onPointerUp(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]): void {
 		this.currentNode = null;
 		this.dragGraphics.clear();
+		this.musicState = MusicState.NormalLoop;
 	}
 
 	onScroll(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) {

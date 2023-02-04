@@ -58,11 +58,17 @@ const spritesheets: SpriteSheet[] = [];
 import u_attack_button from "../assets/sounds/ui/Attack_Button.mp3";
 import m_main_menu from "../assets/music/title.mp3";
 import m_slice from "../assets/sounds/misc/Slice.mp3";
+import m_first from "../assets/music/first.mp3";
+import m_first_draw from "../assets/music/first_draw.mp3";
+import m_first_end from "../assets/music/first_end.mp3";
 
 const audios: Audio[] = [
 	{ key: "u_attack_button", path: u_attack_button, volume: 1 },
 	{ key: "m_main_menu", path: m_main_menu, volume: 1 },
 	{ key: "m_slice", path: m_slice, volume: 1 },
+	{ key: "m_first", path: m_first, volume: 1 },
+	{ key: "m_first_draw", path: m_first_draw, volume: 1 },
+	{ key: "m_first_end", path: m_first_end, volume: 1 },
 ];
 
 export {

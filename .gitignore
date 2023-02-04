@@ -34,6 +34,9 @@ bin/
 src/neutralino.js
 .tmp
 
+# Uncompressed music
+*.wav
+
 # Misc files
 .cache/
 .firebase/
