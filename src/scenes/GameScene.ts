@@ -387,7 +387,7 @@ export class GameScene extends BaseScene {
 			const extended = end.distance(this.lastPos) < 4;
 
 			if (this.tree.energy > this.currentNode.cost) {
-				if (next && canDraw && extended) {
+				if (next && canDraw) {
 					this.addConnection(next);
 					this.lastPos = new Phaser.Math.Vector2(next.x, next.y);
 				}
