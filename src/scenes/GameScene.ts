@@ -262,9 +262,20 @@ export class GameScene extends BaseScene {
 
 		// Update music based on if the player is drawing a line
 
-		this.musicDrawing.volume = this.musicMuted ? 0 : (
+		const targetVolume = this.musicMuted ? 0 : (
 			(this.musicState == MusicState.LayeredLoop) ? this.musicVolume : 0.00001
 		)
+
+		const volumeSame = Math.abs(this.musicDrawing.volume - targetVolume) <= 1e-4;
+
+		if (!volumeSame) {
+			const volumeStep = (this.musicDrawing.volume < targetVolume) ? 1 : -1;
+			this.musicDrawing.volume += (volumeStep / delta) / 5;
+		}
+		
+		else if (this.musicDrawing.volume < 0) this.musicDrawing.volume = 0;
+
+		// If the drawing music plays for a split second after starting the game, it's an autoplay issue
 	}
 
 
