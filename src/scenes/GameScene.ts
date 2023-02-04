@@ -160,7 +160,7 @@ export class GameScene extends BaseScene {
 		// Also, don't create anything if cursor is too far,
 		// to prevent placing extra segments accidentally
 		const distance = Phaser.Math.Distance.BetweenPoints(this.currentNode, pointer);
-		if(distance < DRAG_LIMIT /*|| distance >= DRAG_LIMIT*2*/) return null;
+		if(distance < DRAG_LIMIT || distance >= DRAG_LIMIT*2) return null;
 
 
 		const start = new Phaser.Math.Vector2(this.currentNode.x, this.currentNode.y);
