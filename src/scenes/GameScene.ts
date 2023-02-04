@@ -229,7 +229,7 @@ export class GameScene extends BaseScene {
 
 		this.drawRoot(newNode);
 
-		this.sound.play("r_place", { volume: 1});
+//		this.sound.play("r_place", { volume: 1});
 
 		this.currentNode = newNode;
 	}
