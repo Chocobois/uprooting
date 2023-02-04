@@ -384,7 +384,7 @@ export class GameScene extends BaseScene {
 			this.dragGraphics.lineStyle(5*this.SCALE, next ? 0x00FF00 : 0xFF0000, 1.0);
 
 			const end = next ? next : start.clone().add(pointer.clone().subtract(this.currentNode).limit(this.DRAG_LIMIT));
-			const extended = end.distance(this.lastPos) < 3;
+			const extended = end.distance(this.lastPos) < 4;
 
 			if (this.tree.energy > this.currentNode.cost) {
 				if (next && canDraw && extended) {
