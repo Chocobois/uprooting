@@ -7,10 +7,11 @@ import { Underground } from "./../components/Underground";
 import { SurfaceButton } from "./../components/SurfaceButton";
 import { HarvestButton } from "./../components/HarvestButton";
 import GetShortestDistance from "phaser/src/geom/line/GetShortestDistance";
+import { MiniButton } from "../components/miniButton";
 
 const DRAG_LIMIT = 100;
-const ANGLE_LIMIT = Math.PI/2;
-const PROXIMITY_LIMIT = DRAG_LIMIT/5;
+const ANGLE_LIMIT = Math.PI / 2;
+const PROXIMITY_LIMIT = DRAG_LIMIT / 5;
 
 enum GameState {
 	None = "None",
@@ -52,6 +53,8 @@ export class GameScene extends BaseScene {
 	// UI
 	private returnToSurfaceButton: SurfaceButton;
 	private harvestButton: HarvestButton;
+	private musicButton: MiniButton;
+	private audioButton: MiniButton;
 
 	// Debug
 	private debugText: Phaser.GameObjects.Text;
@@ -72,7 +75,7 @@ export class GameScene extends BaseScene {
 	private oneTimeEvents: Record<string, boolean>;
 
 	constructor() {
-		super({key: "GameScene"});
+		super({ key: "GameScene" });
 	}
 
 	create(): void {
@@ -97,9 +100,9 @@ export class GameScene extends BaseScene {
 		this.overworld.setOrigin(0.5, 1.0);
 		this.fitToScreen(this.overworld);
 
-		this.background = this.add.image(this.CX, this.SURFACE_Y-20, "underground");
+		this.background = this.add.image(this.CX, this.SURFACE_Y - 20, "underground");
 		this.background.setOrigin(0.5, 0);
-		this.background.setScale(1*this.W / this.background.width);
+		this.background.setScale(1 * this.W / this.background.width);
 		// this.fitToScreen(this.background);
 
 
@@ -126,7 +129,7 @@ export class GameScene extends BaseScene {
 		this.currentNode = null;
 		this.deepestNodeY = 0;
 		this.nodes = [];
-		this.addNode(this.CX, this.SURFACE_Y+10, true);
+		this.addNode(this.CX, this.SURFACE_Y + 10, true);
 
 
 		// Particles
@@ -137,11 +140,27 @@ export class GameScene extends BaseScene {
 
 		// UI
 
-		this.returnToSurfaceButton = new SurfaceButton(this, this.CX, .1*this.H);
+		this.returnToSurfaceButton = new SurfaceButton(this, this.CX, .1 * this.H);
 		this.returnToSurfaceButton.on("click", this.returnToSurface, this);
 
-		this.harvestButton = new HarvestButton(this, this.CX, .1*this.H);
+		this.harvestButton = new HarvestButton(this, this.CX, .1 * this.H);
 		// this.harvestButton.on("click", this.onHarvestComplete, this);
+
+		const buttonSize = 35;
+		this.musicButton = new MiniButton(this, this.W - 3.5 * buttonSize, 1.5 * buttonSize, "music")
+			.on("click", () => {
+				this.musicButton.toggle();
+				this.musicMuted = !this.musicMuted;
+				this.musicNormal.mute = !this.musicNormal.mute;
+				this.musicDrawing.mute = !this.musicDrawing.mute;
+				this.musicJingle.mute = !this.musicJingle.mute;
+			});
+
+		this.audioButton = new MiniButton(this, this.W - buttonSize, 1.5 * buttonSize, "audio")
+			.on("click", () => {
+				this.audioButton.toggle();
+				this.sound.mute = !this.audioButton.active;
+			})
 
 
 		// Music
@@ -150,13 +169,13 @@ export class GameScene extends BaseScene {
 		this.sound.mute = false; // TODO: Link up to SFX button
 		this.musicVolume = MUSIC_VOLUME;
 		this.musicState = MusicState.Nothing;
-		
+
 		this.musicJingle?.stop()
 
 		this.musicNormal = new Music(this, 'm_first', { volume: this.musicMuted ? 0 : this.musicVolume });
 		this.musicDrawing = new Music(this, 'm_first_draw', { volume: 0 });
 		this.musicJingle = new Music(this, 'm_first_end', { volume: this.musicMuted ? 0 : this.musicVolume });
-		
+
 		this.musicNormal.play();
 		this.musicDrawing.play();
 		this.musicState = MusicState.NormalLoop;
@@ -243,7 +262,7 @@ export class GameScene extends BaseScene {
 	setDeepestNode(y: number) {
 		if (y == 0) { this.deepestNodeY = 0; }
 		this.deepestNodeY = Math.max(y, this.deepestNodeY);
-		this.cameras.main.setBounds(0, 0, this.W, this.deepestNodeY + 0.6*this.H);
+		this.cameras.main.setBounds(0, 0, this.W, this.deepestNodeY + 0.6 * this.H);
 	}
 
 	returnToSurface() {
@@ -291,7 +310,7 @@ export class GameScene extends BaseScene {
 
 
 		// Restart tree
-		this.addNode(this.CX, this.SURFACE_Y+10, true);
+		this.addNode(this.CX, this.SURFACE_Y + 10, true);
 		this.tree.reset();
 		this.updateScore();
 	}
@@ -311,11 +330,11 @@ export class GameScene extends BaseScene {
 			// Also, don't create anything if cursor is too far,
 			// to prevent placing extra segments accidentally
 			const distance = Phaser.Math.Distance.BetweenPoints(this.currentNode, pointer);
-			const canDraw = distance >= DRAG_LIMIT && distance <DRAG_LIMIT*2;
+			const canDraw = distance >= DRAG_LIMIT && distance < DRAG_LIMIT * 2;
 
 			this.dragGraphics.clear();
 			this.dragGraphics.lineStyle(5, next ? 0x00FF00 : 0xFF0000, 1.0);
-			
+
 			if (this.tree.energy > this.currentNode.cost) {
 				if (next && canDraw) {
 					this.addConnection(next);
@@ -348,10 +367,10 @@ export class GameScene extends BaseScene {
 	// Returns the position of next node to be created given the pointer's position
 	// If one can't be created, null is returned
 	nextNodePos(pointer: Phaser.Math.Vector2): Phaser.Math.Vector2 | null {
-		if(!this.currentNode) return null;
+		if (!this.currentNode) return null;
 
 		// Can't be above ground very far
-		if(pointer.y < this.SURFACE_Y) return null;
+		if (pointer.y < this.SURFACE_Y) return null;
 
 		const start = new Phaser.Math.Vector2(this.currentNode.x, this.currentNode.y);
 		const vector = new Phaser.Math.Vector2(pointer);
@@ -363,9 +382,9 @@ export class GameScene extends BaseScene {
 			const prev = new Phaser.Math.Vector2(grandparent.x, grandparent.y);
 			prev.subtract(this.currentNode).negate();
 
-			const cos = prev.dot(vector)/(prev.length()*vector.length());
+			const cos = prev.dot(vector) / (prev.length() * vector.length());
 
-			if(cos < Math.cos(ANGLE_LIMIT)) return null;
+			if (cos < Math.cos(ANGLE_LIMIT)) return null;
 		}
 
 		const end = start.clone().add(vector);
@@ -374,7 +393,7 @@ export class GameScene extends BaseScene {
 		const line = new Phaser.Geom.Line(start.x, start.y, end.x, end.y);
 
 		const anyEncroaching = this.nodes.some(node => {
-			if(!node.parent || node == this.currentNode || node.parent == this.currentNode) return false;
+			if (!node.parent || node == this.currentNode || node.parent == this.currentNode) return false;
 
 			const otherLine = new Phaser.Geom.Line(node.parent.x, node.parent.y, node.x, node.y);
 
@@ -384,12 +403,12 @@ export class GameScene extends BaseScene {
 			return intersects;
 		});
 
-		if(anyEncroaching) return null;
+		if (anyEncroaching) return null;
 
 		return end;
 	}
 
-	addNode(x: number, y: number, root: boolean=false): Node {
+	addNode(x: number, y: number, root: boolean = false): Node {
 		let node = new Node(this, x, y, root);
 		node.setDepth(100);
 
@@ -455,10 +474,10 @@ export class GameScene extends BaseScene {
 		if (this.state == GameState.HarvestingTree) {
 			this.tree.harvestCount -= 1;
 
-			this.particles.createGreenMagic(this.tree.x, this.tree.y-150, 3, 1.0, false);
+			this.particles.createGreenMagic(this.tree.x, this.tree.y - 150, 3, 1.0, false);
 
 			if (this.tree.harvestCount <= 0) {
-				this.particles.createExplosion(this.tree.x, this.tree.y-100, 2, 1.0, false);
+				this.particles.createExplosion(this.tree.x, this.tree.y - 100, 2, 1.0, false);
 				this.onHarvestComplete();
 			}
 		}
