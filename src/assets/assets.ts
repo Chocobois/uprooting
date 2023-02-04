@@ -53,6 +53,7 @@ import sapphire from "./images/items/sapphire.png";
 import emerald from "./images/items/emerald.png";
 import diamond from "./images/items/diamond.png";
 import platinum from "./images/items/platinum.png";
+import watercave1 from "./images/items/watercave1.png";
 
 // UI
 import fruit_upgrade from "./images/ui/fruit_upgrade.png";
@@ -100,6 +101,7 @@ const images: Asset[] = [
 	{ key: "emerald", path: emerald },
 	{ key: "diamond", path: diamond },
 	{ key: "platinum", path: platinum },
+	{ key: "watercave1", path: watercave1 },
 
 	// UI
 	{ key: "fruit_upgrade", path: fruit_upgrade },
