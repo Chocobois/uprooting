@@ -48,7 +48,7 @@ import m_first_end from "../assets/music/first_end.mp3";
 
 /* SFX: Roots */
 import r_grow from "../assets/sounds/roots/grow.mp3";
-import r_place from "./debug_placeroot.mp3";
+import r_place from "../assets/sounds/roots/place.mp3";
 import r_place_error from "../assets/sounds/roots/place_error.mp3";
 
 const audios: Audio[] = [
