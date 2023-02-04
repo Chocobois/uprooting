@@ -103,6 +103,7 @@ export class Shop extends Phaser.GameObjects.Container {
 		// House
 		this.overworldShop = new Button(this.scene, x, y);
 		let house = this.scene.add.image(0, 0, "overworld_shop");
+		house.setScrollFactor(0.9);
 		house.setScale(0.4 * H / house.height);
 		this.overworldShop.add(house);
 		this.overworldShop.y -= 0.4*house.displayHeight;

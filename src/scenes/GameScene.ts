@@ -107,17 +107,11 @@ export class GameScene extends BaseScene {
 		this.overworldBush.setScrollFactor(0.8);
 		this.fitToScreen(this.overworldBush);
 
-		this.background = this.add.image(this.CX, this.SURFACE_Y - 20*this.SCALE, "underground");
-		this.background.setOrigin(0.5, 0);
-		this.background.setScale(2 * this.W / this.background.width);
 		// this.fitToScreen(this.background);
-
-
-		// Underground
 
 		this.underground = new Underground(this, this.SURFACE_Y, this.BEDROCK_Y);
 
-		this.shop = new Shop(this, 0.2 * this.W, this.SURFACE_Y);
+		this.shop = new Shop(this, 0.2 * this.W, this.SURFACE_Y-5);
 		this.shop.on("open", () => {
 			this.cameras.main.scrollY = 0;
 
@@ -137,6 +131,11 @@ export class GameScene extends BaseScene {
 			// Or break up into more emits
 		});
 
+
+		// Underground
+		this.background = this.add.image(this.CX, this.SURFACE_Y - 20*this.SCALE, "underground");
+		this.background.setOrigin(0.5, 0);
+		this.background.setScale(2 * this.W / this.background.width);
 
 		// Tree
 
