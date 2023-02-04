@@ -2,6 +2,8 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  user-select: none;
+  overflow: hidden;
 }
 
 html, body {
@@ -14,6 +16,9 @@ html, body {
 }
 
 body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 	position: relative;
 	margin: 0;
 	padding: 0;
@@ -21,18 +26,13 @@ body {
 	color: #eee;
 }
 
-canvas {
-	display: block;
-	margin: auto;
-}
-
 .fontPreloader {
+	display: flex;
+  justify-content: center;
+  align-items: center;
   position: absolute;
-  left: -1000px;
-  visibility: hidden;
-}
-
-.fontGame {
+  z-index: -10;
+	margin: auto;
   font-family: "Fredoka One", serif;
 }
 
