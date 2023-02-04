@@ -114,7 +114,7 @@ export class GameScene extends BaseScene {
 
 		this.underground = new Underground(this, this.SURFACE_Y, this.BEDROCK_Y);
 
-		this.shop = new Shop(this, 0.2 * this.W, this.SURFACE_Y+48);
+		this.shop = new Shop(this, 0.2 * this.W, this.SURFACE_Y+192*this.SCALE );
 		this.shop.on("open", () => {
 			this.cameras.main.scrollY = 0;
 
