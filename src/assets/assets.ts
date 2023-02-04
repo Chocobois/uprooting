@@ -41,16 +41,20 @@ import rootline from "./images/tree/rootline.png";
 // Items
 import apple from "./images/items/apple.png";
 import applecore from "./images/items/applecore.png";
-import bone from "./images/items/bone.png";
-import bones from "./images/items/bones.png";
 import dragonfruit from "./images/items/dragonfruit.png";
 import dragondragonfruit from "./images/items/dragondragonfruit.png";
 import pear from "./images/items/pear.png";
-import stone from "./images/items/stone.png";
 import banana from "./images/items/banana.png";
 import cherry from "./images/items/cherry.png";
 import orange from "./images/items/orange.png";
+import bone from "./images/items/bone.png";
+import bones from "./images/items/bones.png";
+import stone from "./images/items/stone.png";
+import ruby from "./images/items/ruby.png";
+import sapphire from "./images/items/sapphire.png";
+import emerald from "./images/items/emerald.png";
 import diamond from "./images/items/diamond.png";
+import platinum from "./images/items/platinum.png";
 
 // UI
 import fruit_upgrade from "./images/ui/fruit_upgrade.png";
@@ -82,17 +86,21 @@ const images: Asset[] = [
 
 	// Items
 	{ key: "apple", path: apple },
-	{ key: "bone", path: bone },
-	{ key: "bones", path: bones },
 	{ key: "dragonfruit", path: dragonfruit },
 	{ key: "dragondragonfruit", path: dragondragonfruit },
 	{ key: "applecore", path: applecore },
 	{ key: "pear", path: pear },
-	{ key: "stone", path: stone },
 	{ key: "banana", path: banana },
 	{ key: "cherry", path: cherry },
 	{ key: "orange", path: orange },
+	{ key: "bone", path: bone },
+	{ key: "bones", path: bones },
+	{ key: "stone", path: stone },
+	{ key: "ruby", path: ruby },
+	{ key: "sapphire", path: sapphire },
+	{ key: "emerald", path: emerald },
 	{ key: "diamond", path: diamond },
+	{ key: "platinum", path: platinum },
 
 	// UI
 	{ key: "fruit_upgrade", path: fruit_upgrade },
