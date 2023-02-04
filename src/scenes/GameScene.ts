@@ -261,9 +261,20 @@ export class GameScene extends BaseScene {
 
 		// Update music based on if the player is drawing a line
 
-		this.musicDrawing.volume = this.musicMuted ? 0 : (
+		const targetVolume = this.musicMuted ? 0 : (
 			(this.musicState == MusicState.LayeredLoop) ? this.musicVolume : 0.00001
 		)
+
+		const volumeSame = Math.abs(this.musicDrawing.volume - targetVolume) <= 1e-4;
+
+		if (!volumeSame) {
+			const volumeStep = (this.musicDrawing.volume < targetVolume) ? 1 : -1;
+			this.musicDrawing.volume += (volumeStep / delta) / 5;
+		}
+		
+		else if (this.musicDrawing.volume < 0) this.musicDrawing.volume = 0;
+
+		// If the drawing music plays for a split second after starting the game, it's an autoplay issue
 	}
 
 
@@ -541,8 +552,8 @@ export class GameScene extends BaseScene {
 	onCameraDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number) {
 		if (this.state != GameState.GrowingRoots) { return; }
 
-		this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom * this.SCALE;
-		this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom * this.SCALE;
+		this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom;
+		this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
 
 	}
 
