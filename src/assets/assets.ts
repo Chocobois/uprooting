@@ -25,6 +25,11 @@ interface Audio {
 // Backgrounds
 import overworld from "../assets/images/backgrounds/overworld.png";
 import underground from "../assets/images/backgrounds/underground.png";
+import testshop from "../assets/images/backgrounds/emptybkg.png";
+import shopwall from "../assets/images/backgrounds/rocksbkg.png";
+
+// NPCs
+import jbun from "../assets/images/character/jbun.png";
 
 // Tree
 import tree from "../assets/images/tree/tree.png";
@@ -42,8 +47,6 @@ import fruit_upgrade from "../assets/images/ui/fruit_upgrade.png";
 import energy_teter from "../assets/images/ui/meter.png";
 import prompt from "../assets/images/ui/prompt.png";
 import surface_button from "../assets/images/ui/surface_button.png";
-import audio from "../assets/images/ui/audio.png";
-import music from "../assets/images/ui/music.png";
 
 // Other
 import circle from "../assets/images/circle.png";
@@ -52,12 +55,17 @@ const images: Asset[] = [
 	// Backgrounds
 	{ key: "overworld", path: overworld },
 	{ key: "underground", path: underground },
+	{ key: "testshop", path: testshop },
+	{ key: "shopwall", path: shopwall },
 
 	// Tree
 	{ key: "tree", path: tree },
 	{ key: "tree_little", path: tree_little },
 	{ key: "sapling", path: sapling },
 	{ key: "rootline", path: rootline },
+
+	//NPCs
+	{ key: "jbun", path: jbun },
 
 	// Items
 	{ key: "apple", path: apple },
@@ -85,9 +93,7 @@ import meme_explosion from "../assets/images/effects/meme_explosion.png";
 const spritesheets: SpriteSheet[] = [
 	// Effects
 	{ key: "green_magic", path: green_magic, width: 128, height: 128 },
-	{ key: "meme_explosion", path: meme_explosion, width: 200, height: 282 },
-	{ key: "audio", path: audio, width: 300, height: 300 },
-	{ key: "music", path: music, width: 300, height: 300 },
+	{ key: "meme_explosion", path: meme_explosion,	width: 200,	height: 282 },
 ];
 
 
@@ -113,7 +119,7 @@ const audios: Audio[] = [
 	{ key: "m_first_draw", path: m_first_draw, volume: 1 },
 	{ key: "m_first_end", path: m_first_end, volume: 1 },
 	{ key: "r_grow", path: r_grow, volume: 0.5 },
-	{ key: "r_place", path: r_place, volume: 1 },
+  	{ key: "r_place", path: r_place, volume: 1 },
 	{ key: "r_place_error", path: r_place_error, volume: 0.5 },
 ];
 
