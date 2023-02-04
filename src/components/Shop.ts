@@ -7,6 +7,7 @@ export enum ItemType {
 	TreeEnergy,
 	FruitUpgrade,
 	RockBreak,
+	ShopOwner,
 	SoldOut,
 }
 
@@ -18,11 +19,19 @@ export interface ItemData {
 	price: number;
 }
 
-const SOLD_OUT_ITEM = {
+const SOLD_OUT_ITEM: ItemData = {
 	type: ItemType.SoldOut,
 	image: "shop_sold_out",
 	title: "Out of stock",
 	description: "I give up. That's it.",
+	price: 0,
+};
+
+const OWNER: ItemData = {
+	type: ItemType.ShopOwner,
+	image: "shop_sold_out",
+	title: "Shop owner",
+	description: "H-hey, I'm not for sale!",
 	price: 0,
 };
 
@@ -45,7 +54,7 @@ export class Shop extends Phaser.GameObjects.Container {
 	private selectedItemDescription: Phaser.GameObjects.Text;
 
 	private items: ShopItem[];
-	private selectedItem: ShopItem | null;
+	private selectedItem: ItemData | null;
 
 	private itemsForSale: ItemData[];
 
@@ -126,6 +135,9 @@ export class Shop extends Phaser.GameObjects.Container {
 		this.ownerButton.add(this.ownerImage);
 
 		this.ownerButton.bindInteractive(this.ownerImage);
+		this.ownerButton.on("click", () => {
+			this.selectItem(OWNER);
+		});
 
 
 		// Foreground
@@ -201,7 +213,7 @@ export class Shop extends Phaser.GameObjects.Container {
 
 				let item = new ShopItem(this.scene, x, y, itemSize);
 				item.on("click", () => {
-					this.selectItem(item);
+					this.selectItem(item.itemData);
 				}, this);
 				this.add(item);
 				this.items.push(item);
@@ -219,7 +231,7 @@ export class Shop extends Phaser.GameObjects.Container {
 	update(time: number, delta: number) {
 		this.overworldShop.setScale(1.0 - 0.1 * this.overworldShop.holdSmooth);
 		this.exitButton.setScale(1.0 - 0.1 * this.exitButton.holdSmooth);
-		this.buyButton.setScale(1.0 - 0.1 * this.buyButton.holdSmooth);
+		this.buyButton.setScale(1.0 - 0.1 * this.buyButton.holdSmooth * (this.buyButton.enabled ? 1 : 0));
 
 		const jbunHoldX = 1.0 + 0.2 * this.ownerButton.holdSmooth;
 		const jbunHoldY = 1.0 - 0.3 * this.ownerButton.holdSmooth;
@@ -230,7 +242,7 @@ export class Shop extends Phaser.GameObjects.Container {
 		);
 
 		this.items.forEach(item => {
-			item.update(time, delta, item == this.selectedItem);
+			item.update(time, delta, item.itemData == this.selectedItem);
 		});
 	}
 
@@ -245,19 +257,19 @@ export class Shop extends Phaser.GameObjects.Container {
 		});
 	}
 
-	selectItem(item: ShopItem | null, justPurchased: boolean = false) {
-		this.selectedItem = item;
+	selectItem(itemData: ItemData | null, justPurchased: boolean = false) {
+		this.selectedItem = itemData;
 
-		// this.buyButton.input.enabled = false;
+		this.buyButton.enabled = false;
 		this.buyButton.setAlpha(0.5);
 
-		if (item) {
+		if (itemData) {
 			// this.selectedItemImage.setTexture("apple");
-			this.selectedItemTitle.setText(item.itemData.title);
-			this.selectedItemDescription.setText(item.itemData.description);
+			this.selectedItemTitle.setText(itemData.title);
+			this.selectedItemDescription.setText(itemData.description);
 
-			if (item.itemData.price > 0) {
-				// this.buyButton.input.enabled = true;
+			if (itemData.price > 0) {
+				this.buyButton.enabled = true;
 				this.buyButton.setAlpha(1.0);
 			}
 		}
@@ -274,10 +286,12 @@ export class Shop extends Phaser.GameObjects.Container {
 	}
 
 	buyItem() {
-		if (this.selectedItem) {
-			this.emit("buy", this.selectedItem.itemData);
+		if (!this.buyButton.enabled) { return; }
 
-			this.upgradeShopItem(this.selectedItem.itemData);
+		if (this.selectedItem) {
+			this.emit("buy", this.selectedItem);
+
+			this.upgradeShopItem(this.selectedItem);
 		}
 	}
 
