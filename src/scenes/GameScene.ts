@@ -34,6 +34,7 @@ export class GameScene extends BaseScene {
 
 	private background: Phaser.GameObjects.Image;
 	private overworld: Phaser.GameObjects.Image;
+	private overworldBush: Phaser.GameObjects.Image;
 
 	// Tree
 	private tree: Tree;
@@ -95,7 +96,13 @@ export class GameScene extends BaseScene {
 
 		this.overworld = this.add.image(this.CX, this.SURFACE_Y + 10*this.SCALE, "overworld");
 		this.overworld.setOrigin(0.5, 1.0);
+		this.overworld.setScrollFactor(0.3);
 		this.fitToScreen(this.overworld);
+
+		this.overworldBush = this.add.image(this.CX, this.SURFACE_Y + 10*this.SCALE, "overworld_bush");
+		this.overworldBush.setOrigin(0.5, 1.0);
+		this.overworldBush.setScrollFactor(0.8);
+		this.fitToScreen(this.overworldBush);
 
 		this.background = this.add.image(this.CX, this.SURFACE_Y - 20*this.SCALE, "underground");
 		this.background.setOrigin(0.5, 0);
@@ -508,6 +515,7 @@ export class GameScene extends BaseScene {
 	onCameraDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number) {
 		this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom * this.SCALE;
 		this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom * this.SCALE;
+
 	}
 
 

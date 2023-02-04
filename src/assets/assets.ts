@@ -24,6 +24,7 @@ interface Audio {
 
 // Backgrounds
 import overworld from "./images/backgrounds/overworld.png";
+import overworld_bush from "./images/backgrounds/overworld_bush.png";
 import underground from "./images/backgrounds/underground.png";
 import testshop from "./images/backgrounds/emptybkg.png";
 import shopwall from "./images/backgrounds/rocksbkg.png";
@@ -63,6 +64,7 @@ import circle from "./images/circle.png";
 const images: Asset[] = [
 	// Backgrounds
 	{ key: "overworld", path: overworld },
+	{ key: "overworld_bush", path: overworld_bush },
 	{ key: "underground", path: underground },
 	{ key: "testshop", path: testshop },
 	{ key: "shopwall", path: shopwall },
