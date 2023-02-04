@@ -137,6 +137,7 @@ export class Shop extends Phaser.GameObjects.Container {
 		this.ownerButton.bindInteractive(this.ownerImage);
 		this.ownerButton.on("click", () => {
 			this.selectItem(OWNER);
+			this.ownerImage.setFrame(2);
 		});
 
 
@@ -233,8 +234,8 @@ export class Shop extends Phaser.GameObjects.Container {
 		this.exitButton.setScale(1.0 - 0.1 * this.exitButton.holdSmooth);
 		this.buyButton.setScale(1.0 - 0.1 * this.buyButton.holdSmooth * (this.buyButton.enabled ? 1 : 0));
 
-		const jbunHoldX = 1.0 + 0.2 * this.ownerButton.holdSmooth;
-		const jbunHoldY = 1.0 - 0.3 * this.ownerButton.holdSmooth;
+		const jbunHoldX = 1.0 + 0.3 * this.ownerButton.holdSmooth;
+		const jbunHoldY = 1.0 - 0.2 * this.ownerButton.holdSmooth;
 		const jbunSquish = 0.04;
 		this.ownerButton.setScale(
 			(1.0 + jbunSquish * Math.sin(time/200)) * jbunHoldX,
@@ -262,6 +263,7 @@ export class Shop extends Phaser.GameObjects.Container {
 
 		this.buyButton.enabled = false;
 		this.buyButton.setAlpha(0.5);
+		this.ownerImage.setFrame(0);
 
 		if (itemData) {
 			// this.selectedItemImage.setTexture("apple");
@@ -271,6 +273,7 @@ export class Shop extends Phaser.GameObjects.Container {
 			if (itemData.price > 0) {
 				this.buyButton.enabled = true;
 				this.buyButton.setAlpha(1.0);
+				this.ownerImage.setFrame(1);
 			}
 		}
 		else {

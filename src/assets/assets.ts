@@ -30,9 +30,6 @@ import shop_background from "./images/backgrounds/shop_background.png";
 import shop_foreground from "./images/backgrounds/shop_foreground.png";
 import overworld_shop from "./images/backgrounds/overworld_shop.png";
 
-// NPCs
-import jbun from "./images/character/jbun.png";
-
 // Tree
 import tree from "./images/tree/tree.png";
 import tree_little from "./images/tree/tree_little.png";
@@ -86,9 +83,6 @@ const images: Asset[] = [
 	{ key: "sapling", path: sapling },
 	{ key: "rootline", path: rootline },
 
-	//NPCs
-	{ key: "jbun", path: jbun },
-
 	// Items
 	{ key: "apple", path: apple },
 	{ key: "dragonfruit", path: dragonfruit },
@@ -130,6 +124,9 @@ import meme_explosion from "./images/effects/meme_explosion.png";
 import dust_explosion from "./images/effects/dustyexplosion.png";
 import item_tag from "./images/ui/item_tag.png";
 
+// NPCs
+import jbun from "./images/character/jbun_spritesheet.png";
+
 const spritesheets: SpriteSheet[] = [
 	//UI with buttonstates
 	{ key: "audio", path: audio, width: 300, height: 300 },
@@ -140,6 +137,9 @@ const spritesheets: SpriteSheet[] = [
 	{ key: "green_magic", path: green_magic, width: 128, height: 128 },
 	{ key: "meme_explosion", path: meme_explosion, width: 200, height: 282 },
 	{ key: "dust_explosion", path: dust_explosion, width: 128, height: 128 },
+
+	// NPCs
+	{ key: "jbun", path: jbun, width: 517, height: 1016 },
 ];
 
 

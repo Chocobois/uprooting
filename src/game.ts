@@ -4,8 +4,8 @@ import { GameScene } from "./scenes/GameScene";
 
 const config: Phaser.Types.Core.GameConfig = {
 	type: Phaser.WEBGL,
-	width: 1920/2,
-	height: 1080/2,
+	width: 1920/4,
+	height: 1080/4,
 	// mipmapFilter: 'LINEAR_MIPMAP_LINEAR',
 	mipmapFilter: 'NEAREST',
 	pixelArt: true,
@@ -17,10 +17,6 @@ const config: Phaser.Types.Core.GameConfig = {
 		PreloadScene,
 		GameScene
 	],
-	plugins: {
-		global: [
-		]
-	}
 };
 
 const game = new Phaser.Game(config);
