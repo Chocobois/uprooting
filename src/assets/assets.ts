@@ -143,6 +143,7 @@ import m_main_menu from "./music/title.mp3";
 import m_first from "./music/first.mp3";
 import m_first_draw from "./music/first_draw.mp3";
 import m_first_end from "./music/first_end.mp3";
+import m_shop from "./music/shop.mp3";
 
 // SFX: Roots
 import r_grow from "./sounds/roots/grow.mp3";
@@ -154,6 +155,7 @@ const audios: Audio[] = [
 	{ key: "m_first", path: m_first, volume: 1 },
 	{ key: "m_first_draw", path: m_first_draw, volume: 1 },
 	{ key: "m_first_end", path: m_first_end, volume: 1 },
+	{ key: "m_shop", path: m_shop, volume: 1 },
 	{ key: "r_grow", path: r_grow, volume: 0.5 },
 	{ key: "r_place", path: r_place, volume: 1 },
 	{ key: "r_place_error", path: r_place_error, volume: 0.5 },
