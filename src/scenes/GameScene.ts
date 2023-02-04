@@ -115,6 +115,7 @@ export class GameScene extends BaseScene {
 		this.oneTimeEvents = {
 			growthStage1Sound: false,
 			growthStage2Sound: false,
+			wrongPlacementSound: false,
 		}
 	}
 
@@ -167,6 +168,15 @@ export class GameScene extends BaseScene {
 			}
 
 			const end = next ? next : start.clone().add(pointer.clone().subtract(this.currentNode).limit(DRAG_LIMIT));
+
+			const limitReached = !next && Math.abs(start.distance(end) - DRAG_LIMIT) < 1e-10;
+
+			if (limitReached && !this.oneTimeEvents.wrongPlacementSound) {
+				this.oneTimeEvents.wrongPlacementSound = true;
+				this.sound.play("r_place_error", { volume: 0.25 });
+			} else if (!limitReached) {
+				this.oneTimeEvents.wrongPlacementSound = false;
+			}
 
 			this.dragGraphics.beginPath();
 			this.dragGraphics.moveTo(start.x, start.y);
@@ -249,7 +259,7 @@ export class GameScene extends BaseScene {
 
 		this.drawRoot(newNode);
 
-//		this.sound.play("r_place", { volume: 1});
+		this.sound.play("r_place", { volume: 0.3, rate: 1 + Math.random() * 0.1 });
 
 		this.currentNode = newNode;
 	}
@@ -272,6 +282,7 @@ export class GameScene extends BaseScene {
 	onNodeDragStart(node: Node) {
 		this.currentNode = node;
 		this.musicState = MusicState.LayeredLoop;
+		this.oneTimeEvents.wrongPlacementSound = false;
 	}
 
 	onPointerUp(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]): void {

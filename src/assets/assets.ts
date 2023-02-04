@@ -48,7 +48,7 @@ import m_first_end from "../assets/music/first_end.mp3";
 
 /* SFX: Roots */
 import r_grow from "../assets/sounds/roots/grow.mp3";
-// import r_place from "../assets/sounds/roots/place.mp3";
+import r_place from "../assets/sounds/roots/place.mp3";
 import r_place_error from "../assets/sounds/roots/place_error.mp3";
 
 const audios: Audio[] = [
@@ -57,7 +57,7 @@ const audios: Audio[] = [
 	{ key: "m_first_draw", path: m_first_draw, volume: 1 },
 	{ key: "m_first_end", path: m_first_end, volume: 1 },
 	{ key: "r_grow", path: r_grow, volume: 0.5 },
-//	{ key: "r_place", path: r_place, volume: 1 },
+  	{ key: "r_place", path: r_place, volume: 1 },
 	{ key: "r_place_error", path: r_place_error, volume: 0.5 },
 ];
 
