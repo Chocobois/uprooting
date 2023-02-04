@@ -38,6 +38,9 @@ export class GameScene extends BaseScene {
 	public musicJingle: Music;
 	public musicVolume: number;
 
+	// Feel free to edit this ts declaration, it's supposed to be a k-v pair object
+	private oneTimeEvents: Record<string, boolean>;
+
 	constructor() {
 		super({key: "GameScene"});
 	}
@@ -108,6 +111,11 @@ export class GameScene extends BaseScene {
 
 		this.debugText = this.add.text(0, 0, "hello", { fontFamily: "Arial", fontSize: "32px", color: "#FFFFFF" });
 		// this.debugText.setOrigin(0.5, 2.0);
+
+		this.oneTimeEvents = {
+			growthStage1Sound: false,
+			growthStage2Sound: false,
+		}
 	}
 
 
@@ -120,8 +128,19 @@ export class GameScene extends BaseScene {
 		const totalScore = this.nodes[0].score
 		const treeSize = 100 + 1 * totalScore;
 		this.tree.setScale(treeSize / this.tree.width);
-		if (totalScore > 80) this.tree.setTexture("tree")
-		else if (totalScore > 20) this.tree.setTexture("tree_little"); /*, this.sound.play("r_grow") */
+		if (totalScore > 80) {
+			this.tree.setTexture("tree");
+			if (!this.oneTimeEvents.growthStage2Sound) {
+				this.oneTimeEvents.growthStage2Sound = true;
+				this.sound.play("r_grow", { volume: 0.4, rate: 1.00 });
+			}
+		} else if (totalScore > 20) {
+			this.tree.setTexture("tree_little");
+			if (!this.oneTimeEvents.growthStage1Sound) {
+				this.oneTimeEvents.growthStage1Sound = true;
+				this.sound.play("r_grow", { volume: 0.3, rate: 1.25 });
+			}
+		}
 
 
 		// Check mouse dragging
