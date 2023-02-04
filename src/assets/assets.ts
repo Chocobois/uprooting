@@ -26,8 +26,9 @@ interface Audio {
 import overworld from "./images/backgrounds/overworld.png";
 import overworld_bush from "./images/backgrounds/overworld_bush.png";
 import underground from "./images/backgrounds/underground.png";
-import testshop from "./images/backgrounds/emptybkg.png";
-import shopwall from "./images/backgrounds/rocksbkg.png";
+import shop_background from "./images/backgrounds/shop_background.png";
+import shop_foreground from "./images/backgrounds/shop_foreground.png";
+import overworld_shop from "./images/backgrounds/overworld_shop.png";
 
 // NPCs
 import jbun from "./images/character/jbun.png";
@@ -63,6 +64,9 @@ import prompt from "./images/ui/prompt.png";
 import surface_button from "./images/ui/surface_button.png";
 import music from "./images/ui/music.png";
 import audio from "./images/ui/audio.png";
+import shop_exit_sign from "./images/ui/shop_exit_sign.png";
+import shop_buy_button from "./images/ui/shop_buy_button.png";
+import shop_sold_out from "./images/ui/shop_sold_out.png";
 
 // Other
 import circle from "./images/circle.png";
@@ -72,8 +76,9 @@ const images: Asset[] = [
 	{ key: "overworld", path: overworld },
 	{ key: "overworld_bush", path: overworld_bush },
 	{ key: "underground", path: underground },
-	{ key: "testshop", path: testshop },
-	{ key: "shopwall", path: shopwall },
+	{ key: "shop_background", path: shop_background },
+	{ key: "shop_foreground", path: shop_foreground },
+	{ key: "overworld_shop", path: overworld_shop },
 
 	// Tree
 	{ key: "tree", path: tree },
@@ -107,6 +112,9 @@ const images: Asset[] = [
 	{ key: "energy_teter", path: energy_teter },
 	{ key: "prompt", path: prompt },
 	{ key: "surface_button", path: surface_button },
+	{ key: "shop_exit_sign", path: shop_exit_sign },
+	{ key: "shop_buy_button", path: shop_buy_button },
+	{ key: "shop_sold_out", path: shop_sold_out },
 
 	// Other
 	{ key: "circle", path: circle },
@@ -145,6 +153,7 @@ import m_main_menu from "./music/title.mp3";
 import m_first from "./music/first.mp3";
 import m_first_draw from "./music/first_draw.mp3";
 import m_first_end from "./music/first_end.mp3";
+import m_shop from "./music/shop.mp3";
 
 // SFX: Roots
 import r_grow from "./sounds/roots/grow.mp3";
@@ -156,6 +165,7 @@ const audios: Audio[] = [
 	{ key: "m_first", path: m_first, volume: 1 },
 	{ key: "m_first_draw", path: m_first_draw, volume: 1 },
 	{ key: "m_first_end", path: m_first_end, volume: 1 },
+	{ key: "m_shop", path: m_shop, volume: 1 },
 	{ key: "r_grow", path: r_grow, volume: 0.5 },
 	{ key: "r_place", path: r_place, volume: 1 },
 	{ key: "r_place_error", path: r_place_error, volume: 0.5 },
