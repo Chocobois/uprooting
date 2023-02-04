@@ -1,6 +1,7 @@
 import { BaseScene } from "./BaseScene";
 import { Music } from "./../components/Music";
 import { Node } from "./../components/Node";
+import { Tree } from "./../components/Tree";
 import GetShortestDistance from "phaser/src/geom/line/GetShortestDistance";
 
 const DRAG_LIMIT = 100;
@@ -15,11 +16,12 @@ enum MusicState {
 	Jingle
 }
 
-const MUSIC_VOLUME = 0.4;
+const MUSIC_VOLUME = 0 * 0.4;
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
-	private tree: Phaser.GameObjects.Image;
+
+	private tree: Tree;
 
 	private dragGraphics: Phaser.GameObjects.Graphics;
 	private rootsGraphics: Phaser.GameObjects.Graphics;
@@ -71,9 +73,8 @@ export class GameScene extends BaseScene {
 		this.background.setScale(1*this.W / this.background.width);
 		// this.fitToScreen(this.background);
 
-		this.tree = this.add.image(this.CX, this.CY+20, "sapling");
-		this.tree.setOrigin(0.5, 1.0);
-		this.tree.setScale(100 / this.tree.width);
+		this.tree = new Tree(this, this.CX, this.CY+20);
+		this.tree.on("levelUp", this.onTreeLevelUp, this);
 
 
 		// Graphics
@@ -88,7 +89,9 @@ export class GameScene extends BaseScene {
 		this.nodes = [];
 		this.addNode(this.CX, this.CY+30, true);
 
+
 		// Music
+
 		this.musicMuted = false; // TODO: Link up to mute button
 		this.sound.mute = false; // TODO: Link up to SFX button
 		this.musicVolume = MUSIC_VOLUME;
@@ -104,13 +107,21 @@ export class GameScene extends BaseScene {
 		this.musicDrawing.play();
 		this.musicState = MusicState.NormalLoop;
 
+
 		// Input
 
 		this.input.on("pointerup", this.onPointerUp, this);
 		this.input.on("wheel", this.onScroll, this);
 
-		this.debugText = this.add.text(0, 0, "hello", { fontFamily: "Arial", fontSize: "32px", color: "#FFFFFF" });
-		// this.debugText.setOrigin(0.5, 2.0);
+
+		// Debug
+
+		this.debugText = this.createText(0, 0, 40, "#000", "Debug text");
+		this.debugText.setStroke("#FFF", 5);
+		this.debugText.setScrollFactor(0);
+
+
+		// Events
 
 		this.oneTimeEvents = {
 			growthStage1Sound: false,
@@ -121,27 +132,16 @@ export class GameScene extends BaseScene {
 
 
 	update(time: number, delta: number) {
+
+		// Update game objects
+		this.tree.update(time, delta);
 		this.nodes.forEach(node => {
 			node.update(time, delta);
 		});
 
-		// Todo: Move this elsewhere
-		const totalScore = this.nodes[0].score
-		const treeSize = 100 + 1 * totalScore;
-		this.tree.setScale(treeSize / this.tree.width);
-		if (totalScore > 80) {
-			this.tree.setTexture("tree");
-			if (!this.oneTimeEvents.growthStage2Sound) {
-				this.oneTimeEvents.growthStage2Sound = true;
-				this.sound.play("r_grow", { volume: 0.4, rate: 1.00 });
-			}
-		} else if (totalScore > 20) {
-			this.tree.setTexture("tree_little");
-			if (!this.oneTimeEvents.growthStage1Sound) {
-				this.oneTimeEvents.growthStage1Sound = true;
-				this.sound.play("r_grow", { volume: 0.3, rate: 1.25 });
-			}
-		}
+		// Pass score to tree
+		this.tree.setTreeScore(this.totalScore);
+		this.debugText.setText(`Energy: ${this.tree.energy}`);
 
 
 		// Check mouse dragging
@@ -163,8 +163,10 @@ export class GameScene extends BaseScene {
 			this.dragGraphics.clear();
 			this.dragGraphics.lineStyle(5, next ? 0x00FF00 : 0xFF0000, 1.0);
 			
-			if (next && canDraw) {
-				this.addConnection(next);
+			if (this.tree.energy > this.currentNode.cost) {
+				if (next && canDraw) {
+					this.addConnection(next);
+				}
 			}
 
 			const end = next ? next : start.clone().add(pointer.clone().subtract(this.currentNode).limit(DRAG_LIMIT));
@@ -256,6 +258,7 @@ export class GameScene extends BaseScene {
 
 		// Add growth score
 		oldNode.addScore();
+		this.tree.energy -= newNode.rootDepth;
 
 		this.drawRoot(newNode);
 
@@ -276,6 +279,22 @@ export class GameScene extends BaseScene {
 		this.rootsGraphics.strokePath();
 
 		this.drawRoot(node.parent);
+	}
+
+	onTreeLevelUp(level: number) {
+		if (level == 1) {
+			if (!this.oneTimeEvents.growthStage1Sound) {
+				this.oneTimeEvents.growthStage1Sound = true;
+				this.sound.play("r_grow", { volume: 0.3, rate: 1.25 });
+			}
+		}
+
+		if (level == 2) {
+			if (!this.oneTimeEvents.growthStage2Sound) {
+				this.oneTimeEvents.growthStage2Sound = true;
+				this.sound.play("r_grow", { volume: 0.4, rate: 1.00 });
+			}
+		}
 	}
 
 
@@ -301,4 +320,9 @@ export class GameScene extends BaseScene {
 		this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
 	}
 	// onDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) {}
+
+
+	get totalScore() {
+		return this.nodes[0].score;
+	}
 }

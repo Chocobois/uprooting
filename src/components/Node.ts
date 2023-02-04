@@ -7,6 +7,7 @@ export class Node extends Button {
 	public parent: Node | null;
 	public children: Node[];
 	public score: number;
+	public rootDepth: number; // Distance from roots (number of linked parents)
 
 	constructor(scene: BaseScene, x: number, y: number, root: boolean=false) {
 		super(scene, x, y);
@@ -15,6 +16,7 @@ export class Node extends Button {
 		this.parent = null;
 		this.children = [];
 		this.score = 1;
+		this.rootDepth = 0;
 
 
 		this.image = this.scene.add.image(x, y, "circle");
@@ -40,6 +42,8 @@ export class Node extends Button {
 	addParent(node: Node) {
 		this.parent = node;
 		this.parent.addChild(node);
+
+		this.rootDepth = this.parent.rootDepth + 1; // Determine depth
 	}
 
 	addChild(node: Node) {
@@ -48,12 +52,13 @@ export class Node extends Button {
 		// If a node has more than 2 children, disable node interaction
 		if (this.children.length >= 2) {
 			this.image.input.enabled = false;
-			this.image.setTint(0xFFFFFF);
-			this.image.setAlpha(0.3);
+			this.image.setTint(0xB99578);
+			this.image.setAlpha(0.1);
 		}
 	}
 
-	addScore() {
+	// Recursively add +1 to every parent node. Return total sum.
+	addScore(): void {
 		this.score += 1;
 		if (this.parent) {
 			this.parent.addScore();
@@ -73,4 +78,10 @@ export class Node extends Button {
 	onDrag(pointer, dragX, dragY) {}
 
 	onDragEnd(pointer, dragX, dragY, dropped) {}
+
+
+	// How much does this node cost to expand from
+	get cost() {
+		return this.rootDepth;
+	}
 }
