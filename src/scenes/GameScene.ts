@@ -7,7 +7,8 @@ import { Underground } from "./../components/Underground";
 import { SurfaceButton } from "./../components/SurfaceButton";
 import { HarvestButton } from "./../components/HarvestButton";
 import GetShortestDistance from "phaser/src/geom/line/GetShortestDistance";
-import { MiniButton } from "../components/miniButton";
+import { MiniButton } from "../components/MiniButton";
+import { Shop, ItemType, ItemData } from "../components/Shop";
 
 
 enum GameState {
@@ -17,6 +18,7 @@ enum GameState {
 	HarvestingTree = "Harvesting tree",
 	HarvestCompleteCutscene = "Harvest complete cutscene",
 	SomeOtherCutsceneIdk = "Some other cutscene idk",
+	InsideShop = "Inside shop",
 }
 
 enum MusicState {
@@ -46,6 +48,7 @@ export class GameScene extends BaseScene {
 
 	// Manages item spawns underground
 	private underground: Underground;
+	private shop: Shop;
 
 	// UI
 	private returnToSurfaceButton: SurfaceButton;
@@ -106,6 +109,26 @@ export class GameScene extends BaseScene {
 		// Underground
 
 		this.underground = new Underground(this, this.SURFACE_Y, this.BEDROCK_Y);
+
+		this.shop = new Shop(this, 0.2 * this.W, this.SURFACE_Y);
+		this.shop.on("open", () => {
+			this.cameras.main.scrollY = 0;
+
+			if (this.state == GameState.GrowingRoots) {
+				this.shop.open();
+				this.state = GameState.InsideShop;
+			}
+		});
+		this.shop.on("close", () => {
+			this.state = GameState.GrowingRoots;
+		});
+		this.shop.on("buy", (itemData: ItemData) => {
+			if (itemData.type == ItemType.TreeEnergy) {
+				this.tree.addMaxEnergy(100);
+			}
+			// Add more shop item mechanics...
+			// Or break up into more emits
+		});
 
 
 		// Tree
@@ -190,6 +213,7 @@ export class GameScene extends BaseScene {
 		// this.debugText.setStroke("#000", 1*this.SCALE);
 		this.debugText.setLineSpacing(0);
 		this.debugText.setScrollFactor(0);
+		this.debugText.setDepth(1000000);
 
 
 		// Events
@@ -211,6 +235,7 @@ export class GameScene extends BaseScene {
 		// Update game objects
 		this.particles.update(time, delta);
 		this.underground.update(time, delta);
+		this.shop.update(time, delta);
 		this.tree.update(time, delta);
 		this.nodes.forEach(node => {
 			node.update(time, delta);
@@ -502,10 +527,14 @@ export class GameScene extends BaseScene {
 	}
 
 	onScroll(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) {
+		if (this.state != GameState.GrowingRoots) { return; }
+
 		this.cameras.main.scrollY += deltaY * this.SCALE;
 	}
 
 	onCameraDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number) {
+		if (this.state != GameState.GrowingRoots) { return; }
+
 		this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom * this.SCALE;
 		this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom * this.SCALE;
 	}
