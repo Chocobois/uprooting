@@ -86,6 +86,7 @@ export class GameScene extends BaseScene {
 
 		// Music
 		this.musicMuted = false; // TODO: Link up to mute button
+		this.sound.mute = false; // TODO: Link up to SFX button
 		this.musicVolume = MUSIC_VOLUME;
 		this.musicState = MusicState.Nothing;
 		
@@ -119,7 +120,7 @@ export class GameScene extends BaseScene {
 		const treeSize = 100 + 1 * totalScore;
 		this.tree.setScale(treeSize / this.tree.width);
 		if (totalScore > 80) this.tree.setTexture("tree")
-		else if (totalScore > 20) this.tree.setTexture("tree_little")
+		else if (totalScore > 20) this.tree.setTexture("tree_little"); /*, this.sound.play("r_grow") */
 
 
 		// Check mouse dragging
@@ -224,6 +225,8 @@ export class GameScene extends BaseScene {
 		oldNode.addScore();
 
 		this.drawRoot(newNode);
+
+		this.sound.play("r_place", { volume: 1});
 
 		this.currentNode = newNode;
 	}

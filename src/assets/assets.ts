@@ -62,9 +62,16 @@ const spritesheets: SpriteSheet[] = [];
 import u_attack_button from "../assets/sounds/ui/Attack_Button.mp3";
 import m_main_menu from "../assets/music/title.mp3";
 import m_slice from "../assets/sounds/misc/Slice.mp3";
+
+/* Music */
 import m_first from "../assets/music/first.mp3";
 import m_first_draw from "../assets/music/first_draw.mp3";
 import m_first_end from "../assets/music/first_end.mp3";
+
+/* SFX: Roots */
+import r_grow from "../assets/sounds/roots/grow.mp3";
+import r_place from "../assets/sounds/roots/place.mp3";
+import r_place_error from "../assets/sounds/roots/place_error.mp3";
 
 const audios: Audio[] = [
 	{ key: "u_attack_button", path: u_attack_button, volume: 1 },
@@ -73,6 +80,9 @@ const audios: Audio[] = [
 	{ key: "m_first", path: m_first, volume: 1 },
 	{ key: "m_first_draw", path: m_first_draw, volume: 1 },
 	{ key: "m_first_end", path: m_first_end, volume: 1 },
+	{ key: "r_grow", path: r_grow, volume: 0.5 },
+	{ key: "r_place", path: r_place, volume: 1 },
+	{ key: "r_place_error", path: r_place_error, volume: 0.5 },
 ];
 
 export {
