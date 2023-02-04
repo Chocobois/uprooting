@@ -2,7 +2,6 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  user-select: none;
   overflow: hidden;
 }
 
@@ -34,6 +33,7 @@ body {
   z-index: -10;
 	margin: auto;
   font-family: "Fredoka One", serif;
+  user-select: none;
 }
 
 /* fredoka-one-regular - latin */
