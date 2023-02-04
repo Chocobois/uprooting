@@ -26,7 +26,7 @@ body {
 	color: #eee;
 }
 
-.fontPreloader {
+.fontPreloader .fontGame {
 	display: flex;
   justify-content: center;
   align-items: center;
