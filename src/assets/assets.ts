@@ -39,14 +39,19 @@ import rootline from "../assets/images/tree/rootline.png";
 
 // Items
 import apple from "../assets/images/items/apple.png";
+import applecore from "../assets/images/items/applecore.png";
 import bone from "../assets/images/items/bone.png";
 import dragonfruit from "../assets/images/items/dragonfruit.png";
+import dragondragonfruit from "../assets/images/items/dragondragonfruit.png";
+import pear from "../assets/images/items/pear.png";
 
 // UI
 import fruit_upgrade from "../assets/images/ui/fruit_upgrade.png";
 import energy_teter from "../assets/images/ui/meter.png";
 import prompt from "../assets/images/ui/prompt.png";
 import surface_button from "../assets/images/ui/surface_button.png";
+import music from "../assets/images/ui/music.png";
+import audio from "../assets/images/ui/audio.png";
 
 // Other
 import circle from "../assets/images/circle.png";
@@ -71,6 +76,9 @@ const images: Asset[] = [
 	{ key: "apple", path: apple },
 	{ key: "bone", path: bone },
 	{ key: "dragonfruit", path: dragonfruit },
+	{ key: "dragondragonfruit", path: dragondragonfruit },
+	{ key: "applecore", path: applecore },
+	{ key: "pear", path: pear },
 
 	// UI
 	{ key: "fruit_upgrade", path: fruit_upgrade },
@@ -91,9 +99,13 @@ import green_magic from "../assets/images/effects/green_magic.png";
 import meme_explosion from "../assets/images/effects/meme_explosion.png";
 
 const spritesheets: SpriteSheet[] = [
+
+	{ key: "audio", path: audio, width: 300, height: 300 },
+	{ key: "music", path: music, width: 300, height: 300 },
+
 	// Effects
 	{ key: "green_magic", path: green_magic, width: 128, height: 128 },
-	{ key: "meme_explosion", path: meme_explosion,	width: 200,	height: 282 },
+	{ key: "meme_explosion", path: meme_explosion, width: 200, height: 282 },
 ];
 
 
@@ -119,7 +131,7 @@ const audios: Audio[] = [
 	{ key: "m_first_draw", path: m_first_draw, volume: 1 },
 	{ key: "m_first_end", path: m_first_end, volume: 1 },
 	{ key: "r_grow", path: r_grow, volume: 0.5 },
-  	{ key: "r_place", path: r_place, volume: 1 },
+	{ key: "r_place", path: r_place, volume: 1 },
 	{ key: "r_place_error", path: r_place_error, volume: 0.5 },
 ];
 
