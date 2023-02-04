@@ -10,7 +10,9 @@ export class Mineral extends Button {
 
 		this.size = 80;
 
-		this.image = this.scene.add.image(x, y, "bone");
+		const key = Phaser.Math.RND.pick(["bone", "apple"]);
+		this.image = this.scene.add.image(x, y, key);
+		this.image.setAngle(Phaser.Math.RND.between(0, 360));
 
 		// this.bindInteractive(this.image, true);
 		// const inputPadding = 40 / this.image.scaleX;
