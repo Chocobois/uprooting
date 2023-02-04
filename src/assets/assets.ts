@@ -33,6 +33,8 @@ import circle from "../assets/images/circle.png";
 import overworld from "../assets/images/overworld.png";
 import underground from "../assets/images/underground.png";
 import tree from "../assets/images/tree.png";
+import tree_little from "../assets/images/tree_little.png";
+import sapling from "../assets/images/sapling.png";
 
 
 const images: Asset[] = [
@@ -40,6 +42,8 @@ const images: Asset[] = [
 	{ key: "overworld",	path: overworld },
 	{ key: "underground",	path: underground },
 	{ key: "tree",	path: tree },
+	{ key: "tree_little",	path: tree_little },
+	{ key: "sapling",	path: sapling },
 
 	// Cover
 	{ key: "cover_background_orange",	path: cover_background_orange },

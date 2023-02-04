@@ -66,7 +66,7 @@ export class GameScene extends BaseScene {
 		this.background.setScale(1*this.W / this.background.width);
 		// this.fitToScreen(this.background);
 
-		this.tree = this.add.image(this.CX, this.CY+20, "tree");
+		this.tree = this.add.image(this.CX, this.CY+20, "sapling");
 		this.tree.setOrigin(0.5, 1.0);
 		this.tree.setScale(100 / this.tree.width);
 
@@ -114,8 +114,11 @@ export class GameScene extends BaseScene {
 		});
 
 		// Todo: Move this elsewhere
-		const treeSize = 100 + 1 * this.nodes[0].score;
+		const totalScore = this.nodes[0].score
+		const treeSize = 100 + 1 * totalScore;
 		this.tree.setScale(treeSize / this.tree.width);
+		if (totalScore > 80) this.tree.setTexture("tree")
+		else if (totalScore > 20) this.tree.setTexture("tree_little")
 
 
 		// Check mouse dragging
