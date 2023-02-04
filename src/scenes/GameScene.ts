@@ -4,7 +4,7 @@ import { Node } from "./../components/Node";
 import GetShortestDistance from "phaser/src/geom/line/GetShortestDistance";
 
 const DRAG_LIMIT = 100;
-const ANGLE_LIMIT = 9000; //Math.PI/2;
+const ANGLE_LIMIT = Math.PI/2;
 const PROXIMITY_LIMIT = DRAG_LIMIT/5;
 
 enum MusicState {
