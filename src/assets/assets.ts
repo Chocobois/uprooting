@@ -120,16 +120,18 @@ const images: Asset[] = [
 import green_magic from "./images/effects/green_magic.png";
 import meme_explosion from "./images/effects/meme_explosion.png";
 import dust_explosion from "./images/effects/dustyexplosion.png";
+import item_tag from "./images/effects/item_tag.png";
 
 const spritesheets: SpriteSheet[] = [
-
+	//UI with buttonstates
 	{ key: "audio", path: audio, width: 300, height: 300 },
 	{ key: "music", path: music, width: 300, height: 300 },
+	{ key: "item_tag", path: item_tag, width: 512, height: 512 },
 
 	// Effects
 	{ key: "green_magic", path: green_magic, width: 128, height: 128 },
 	{ key: "meme_explosion", path: meme_explosion, width: 200, height: 282 },
-	{ key: "dust_explosion", path: meme_explosion, width: 128, height: 128 },
+	{ key: "dust_explosion", path: dust_explosion, width: 128, height: 128 },
 ];
 
 
