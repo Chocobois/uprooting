@@ -9,9 +9,6 @@ import { HarvestButton } from "./../components/HarvestButton";
 import GetShortestDistance from "phaser/src/geom/line/GetShortestDistance";
 import { MiniButton } from "../components/miniButton";
 
-const DRAG_LIMIT = 100;
-const ANGLE_LIMIT = Math.PI / 2;
-const PROXIMITY_LIMIT = DRAG_LIMIT / 5;
 
 enum GameState {
 	None = "None",
@@ -96,13 +93,13 @@ export class GameScene extends BaseScene {
 
 		// Background
 
-		this.overworld = this.add.image(this.CX, this.SURFACE_Y, "overworld");
+		this.overworld = this.add.image(this.CX, this.SURFACE_Y + 10*this.SCALE, "overworld");
 		this.overworld.setOrigin(0.5, 1.0);
 		this.fitToScreen(this.overworld);
 
-		this.background = this.add.image(this.CX, this.SURFACE_Y - 20, "underground");
+		this.background = this.add.image(this.CX, this.SURFACE_Y - 20*this.SCALE, "underground");
 		this.background.setOrigin(0.5, 0);
-		this.background.setScale(1 * this.W / this.background.width);
+		this.background.setScale(2 * this.W / this.background.width);
 		// this.fitToScreen(this.background);
 
 
@@ -129,7 +126,7 @@ export class GameScene extends BaseScene {
 		this.currentNode = null;
 		this.deepestNodeY = 0;
 		this.nodes = [];
-		this.addNode(this.CX, this.SURFACE_Y + 10, true);
+		this.addNode(this.CX, this.SURFACE_Y + 10*this.SCALE, true);
 
 
 		// Particles
@@ -143,10 +140,10 @@ export class GameScene extends BaseScene {
 		this.returnToSurfaceButton = new SurfaceButton(this, this.CX, .1 * this.H);
 		this.returnToSurfaceButton.on("click", this.returnToSurface, this);
 
-		this.harvestButton = new HarvestButton(this, this.CX, .1 * this.H);
+		this.harvestButton = new HarvestButton(this, this.CX, 0.4*this.H);
 		// this.harvestButton.on("click", this.onHarvestComplete, this);
 
-		const buttonSize = 35;
+		const buttonSize = 35*this.SCALE;
 		this.musicButton = new MiniButton(this, this.W - 3.5 * buttonSize, 1.5 * buttonSize, "music")
 			.on("click", () => {
 				this.musicButton.toggle();
@@ -189,8 +186,9 @@ export class GameScene extends BaseScene {
 
 		// Debug
 
-		this.debugText = this.createText(0, 0, 40, "#000", "Debug text");
-		this.debugText.setStroke("#FFF", 5);
+		this.debugText = this.createText(0, 0, 60*this.SCALE, "#000", "Debug text");
+		// this.debugText.setStroke("#000", 1*this.SCALE);
+		this.debugText.setLineSpacing(0);
 		this.debugText.setScrollFactor(0);
 
 
@@ -250,12 +248,12 @@ export class GameScene extends BaseScene {
 		// If pointer at the top of the screen, move camera upwards
 		if (pointer.y < upperArea) {
 			const factor = 1 - pointer.y / upperArea;
-			this.cameras.main.scrollY -= maxScrollSpeed * factor;
+			this.cameras.main.scrollY -= maxScrollSpeed * factor * this.SCALE;
 		}
 		// If pointer at the bottom of the screen, move camera downwards
 		if (pointer.y > lowerArea) {
 			const factor = (pointer.y - lowerArea) / (this.H - lowerArea);
-			this.cameras.main.scrollY += maxScrollSpeed * factor;
+			this.cameras.main.scrollY += maxScrollSpeed * factor * this.SCALE;
 		}
 	}
 
@@ -267,6 +265,7 @@ export class GameScene extends BaseScene {
 
 	returnToSurface() {
 		this.state = GameState.ReturningToSurfaceCutscene;
+		this.returnToSurfaceButton.hide();
 
 		// Smooth camera transition
 		this.tweens.addCounter({
@@ -283,7 +282,6 @@ export class GameScene extends BaseScene {
 				// Reset camera limits
 				this.setDeepestNode(0);
 
-				this.returnToSurfaceButton.hide();
 				this.harvestButton.show();
 			}
 		});
@@ -330,10 +328,10 @@ export class GameScene extends BaseScene {
 			// Also, don't create anything if cursor is too far,
 			// to prevent placing extra segments accidentally
 			const distance = Phaser.Math.Distance.BetweenPoints(this.currentNode, pointer);
-			const canDraw = distance >= DRAG_LIMIT && distance < DRAG_LIMIT * 2;
+			const canDraw = distance >= this.DRAG_LIMIT && distance < this.DRAG_LIMIT * 2;
 
 			this.dragGraphics.clear();
-			this.dragGraphics.lineStyle(5, next ? 0x00FF00 : 0xFF0000, 1.0);
+			this.dragGraphics.lineStyle(5*this.SCALE, next ? 0x00FF00 : 0xFF0000, 1.0);
 
 			if (this.tree.energy > this.currentNode.cost) {
 				if (next && canDraw) {
@@ -345,9 +343,9 @@ export class GameScene extends BaseScene {
 				this.returnToSurfaceButton.show();
 			}
 
-			const end = next ? next : start.clone().add(pointer.clone().subtract(this.currentNode).limit(DRAG_LIMIT));
+			const end = next ? next : start.clone().add(pointer.clone().subtract(this.currentNode).limit(this.DRAG_LIMIT));
 
-			const limitReached = !next && Math.abs(start.distance(end) - DRAG_LIMIT) < 1e-10;
+			const limitReached = !next && Math.abs(start.distance(end) - this.DRAG_LIMIT) < 1e-10;
 
 			if (limitReached && !this.oneTimeEvents.wrongPlacementSound) {
 				this.oneTimeEvents.wrongPlacementSound = true;
@@ -374,7 +372,7 @@ export class GameScene extends BaseScene {
 
 		const start = new Phaser.Math.Vector2(this.currentNode.x, this.currentNode.y);
 		const vector = new Phaser.Math.Vector2(pointer);
-		vector.subtract(this.currentNode).limit(DRAG_LIMIT);
+		vector.subtract(this.currentNode).limit(this.DRAG_LIMIT);
 
 		// Check angles
 		const grandparent = this.currentNode.parent;
@@ -384,7 +382,7 @@ export class GameScene extends BaseScene {
 
 			const cos = prev.dot(vector) / (prev.length() * vector.length());
 
-			if (cos < Math.cos(ANGLE_LIMIT)) return null;
+			if (cos < Math.cos(this.ANGLE_LIMIT)) return null;
 		}
 
 		const end = start.clone().add(vector);
@@ -443,7 +441,7 @@ export class GameScene extends BaseScene {
 	drawRoot(node: Node) {
 		if (!node.parent) { return; }
 
-		const thickness = 3 + 4 * Math.sqrt(node.score);
+		const thickness = (3 + 4 * Math.sqrt(node.score)) * this.SCALE;
 		this.rootsGraphics.lineStyle(thickness, 0x795548, 1.0);
 		this.rootsGraphics.beginPath();
 		this.rootsGraphics.moveTo(node.parent.x, node.parent.y);
@@ -474,10 +472,10 @@ export class GameScene extends BaseScene {
 		if (this.state == GameState.HarvestingTree) {
 			this.tree.harvestCount -= 1;
 
-			this.particles.createGreenMagic(this.tree.x, this.tree.y - 150, 3, 1.0, false);
+			this.particles.createGreenMagic(this.tree.x, this.tree.y - 150*this.SCALE, 3*this.SCALE, 1.0, false);
 
 			if (this.tree.harvestCount <= 0) {
-				this.particles.createExplosion(this.tree.x, this.tree.y - 100, 2, 1.0, false);
+				this.particles.createExplosion(this.tree.x, this.tree.y - 100*this.SCALE, 2*this.SCALE, 1.0, false);
 				this.onHarvestComplete();
 			}
 		}
@@ -504,12 +502,29 @@ export class GameScene extends BaseScene {
 	}
 
 	onScroll(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) {
-		this.cameras.main.scrollY += deltaY;
+		this.cameras.main.scrollY += deltaY * this.SCALE;
 	}
 
 	onCameraDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number) {
-		this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom;
-		this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
+		this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom * this.SCALE;
+		this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom * this.SCALE;
+	}
+
+
+	get SCALE() {
+		return this.H / 1080;
+	}
+
+	get DRAG_LIMIT() {
+		return 0.1 * this.H;
+	}
+
+	get ANGLE_LIMIT() {
+		return Math.PI / 2;
+	}
+
+	get PROXIMITY_LIMIT() {
+		return this.DRAG_LIMIT / 5;
 	}
 
 

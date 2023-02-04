@@ -8,7 +8,7 @@ export class Mineral extends Button {
 	constructor(scene: BaseScene, x: number, y: number) {
 		super(scene, x, y);
 
-		this.size = Phaser.Math.RND.between(60, 120);
+		this.size = Phaser.Math.RND.between(60, 120) * this.scene.SCALE;
 
 		const key = Phaser.Math.RND.pick(["bone", "apple"]);
 		this.image = this.scene.add.image(x, y, key);

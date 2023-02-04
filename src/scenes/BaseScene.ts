@@ -54,10 +54,10 @@ export class BaseScene extends Phaser.Scene {
 	// Creates Phaser text object
 	createText(x: number=0, y: number=0, size: number=20, color: string="#FFF", text: string=""): Phaser.GameObjects.Text {
 		return this.add.text(x, y, text, {
-			fontFamily: "Fredoka One",
+			fontFamily: "fonmaru",
 			fontSize: Math.max(size, 1) + "px",
 			color: color
-		}).setLineSpacing(0.4*size);
+		}).setLineSpacing(0.4*size).setPadding(2);
 	}
 
 	// The image keeps its aspect ratio, but is resized to fit within the given dimension
@@ -70,6 +70,10 @@ export class BaseScene extends Phaser.Scene {
 		image.setScale(Math.min(this.W / image.width, this.H / image.height));
 	}
 
+
+	get SCALE(): number {
+		return 1;
+	}
 
 	// Returns width of screen
 	get W(): number {

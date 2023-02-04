@@ -13,7 +13,7 @@ export class SurfaceButton extends Button {
 		this.setDepth(1000);
 		this.setScrollFactor(0);
 
-		this.size = 0.2 * this.scene.W;
+		this.size = 0.4 * this.scene.W;
 
 		this.image = this.scene.add.image(0, 0, "surface_button");
 		this.image.setScale(this.size / this.image.width);
@@ -21,12 +21,12 @@ export class SurfaceButton extends Button {
 		this.image.setScrollFactor(0);
 		this.add(this.image);
 
-		this.text = this.scene.createText(0, 0, 34, "#111", "Return to surface");
+		this.text = this.scene.createText(0, 0, 60*this.scene.SCALE, "#111", "Return to surface");
 		this.text.setOrigin(0.5);
 		this.add(this.text);
 
 		this.bindInteractive(this.image, true);
-		const inputPadding = 40 / this.image.scaleX;
+		const inputPadding = 40 * this.scene.SCALE / this.image.scaleX;
 		this.image.input.hitArea.setTo(-inputPadding, -inputPadding, this.image.width+2*inputPadding, this.image.height+2*inputPadding);
 
 		this.hide();

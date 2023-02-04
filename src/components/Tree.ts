@@ -34,7 +34,7 @@ export class Tree extends Button {
 
 		// Make the tree clickable
 		this.bindInteractive(this.treeSprite);
-		const inputPadding = 40 / this.treeSprite.scaleX;
+		const inputPadding = 40 * this.scene.SCALE / this.treeSprite.scaleX;
 		this.treeSprite.input.hitArea.setTo(-inputPadding, -inputPadding, this.treeSprite.width+2*inputPadding, this.treeSprite.height+2*inputPadding);
 	}
 
@@ -56,7 +56,7 @@ export class Tree extends Button {
 	}
 
 	setTreeScore(score: number) {
-		const treeSize = 100 + 10 * score;
+		const treeSize = this.scene.H * (.1 + .01 * score);
 
 		this.treeSprite.setScale(treeSize / this.treeSprite.width);
 
