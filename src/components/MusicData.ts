@@ -23,5 +23,12 @@ export default {
 		offset: 0,
 		bpm: 0,
 		loop: false
+	},
+	'm_shop': {
+		offset: 41860/48000,
+		bpm: 86,
+		loop: true,
+		start: 41860/48000 + overlap,
+		end: 2854884/48000 + overlap,
 	}
 };
