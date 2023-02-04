@@ -2,8 +2,8 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  user-select: none;
   overflow: hidden;
+  user-select: none;
 }
 
 html, body {
@@ -26,7 +26,7 @@ body {
 	color: #eee;
 }
 
-.fontPreloader .fontGame {
+.fontPreloader {
 	display: flex;
   justify-content: center;
   align-items: center;
@@ -41,7 +41,7 @@ body {
   font-family: "Fredoka One";
   font-style: normal;
   font-weight: 400;
-  src: local(""),
+  src:
     url("./assets/fonts/fredoka-one-v13-latin-regular.woff2") format("woff2"),
     url("./assets/fonts/fredoka-one-v13-latin-regular.woff") format("woff");
 }
