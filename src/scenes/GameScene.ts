@@ -3,6 +3,7 @@ import { Music } from "./../components/Music";
 import { Node } from "./../components/Node";
 import { Tree } from "./../components/Tree";
 import { Underground } from "./../components/Underground";
+import { SurfaceButton } from "./../components/SurfaceButton";
 import GetShortestDistance from "phaser/src/geom/line/GetShortestDistance";
 
 const DRAG_LIMIT = 100;
@@ -33,6 +34,9 @@ export class GameScene extends BaseScene {
 
 	// Manages item spawns underground
 	private underground: Underground;
+
+	// UI
+	private returnToSurfaceButton: SurfaceButton;
 
 	// Debug
 	private debugText: Phaser.GameObjects.Text;
@@ -100,6 +104,14 @@ export class GameScene extends BaseScene {
 		this.addNode(this.CX, this.SURFACE_Y+10, true);
 
 
+		// UI
+
+		this.returnToSurfaceButton = new SurfaceButton(this, this.CX, .1*this.H);
+		this.returnToSurfaceButton.setDepth(1000);
+		this.returnToSurfaceButton.setScrollFactor(0);
+		this.returnToSurfaceButton.on("click", this.returnToSurface, this);
+
+
 		// Music
 
 		this.musicMuted = false; // TODO: Link up to mute button
@@ -137,7 +149,11 @@ export class GameScene extends BaseScene {
 			growthStage1Sound: false,
 			growthStage2Sound: false,
 			wrongPlacementSound: false,
+			outOfEnergy: false,
 		}
+
+
+		this.updateScore()
 	}
 
 
@@ -149,10 +165,10 @@ export class GameScene extends BaseScene {
 		this.nodes.forEach(node => {
 			node.update(time, delta);
 		});
+		this.returnToSurfaceButton.update(time, delta);
 
-		// Pass score to tree
-		this.tree.setTreeScore(this.totalScore);
-		this.debugText.setText(`Energy: ${this.tree.energy}`);
+		// Debug, move this to some ui thing
+		this.debugText.setText(`Energy: ${this.tree.energy}/${this.tree.maxEnergy}`);
 
 
 		// Move camera with mouse input
@@ -182,6 +198,10 @@ export class GameScene extends BaseScene {
 				if (next && canDraw) {
 					this.addConnection(next);
 				}
+			}
+			else if (!this.oneTimeEvents.outOfEnergy) {
+				this.oneTimeEvents.outOfEnergy = true;
+				this.returnToSurfaceButton.show();
 			}
 
 			const end = next ? next : start.clone().add(pointer.clone().subtract(this.currentNode).limit(DRAG_LIMIT));
@@ -231,6 +251,44 @@ export class GameScene extends BaseScene {
 		}
 	}
 
+	setDeepestNode(y: number) {
+		this.deepestNodeY = Math.max(y, this.deepestNodeY);
+		this.cameras.main.setBounds(0, 0, this.W, this.deepestNodeY + 0.6*this.H);
+	}
+
+	returnToSurface() {
+		// Add current score to growth
+		// Should be a whole sequence here instead and the shop thing, etc
+		this.tree.addMaxEnergy(this.totalScore);
+
+
+		// Destroy all nodes
+		this.currentNode = null;
+		this.nodes.forEach(node => {
+			node.destroy();
+		});
+		this.nodes = [];
+
+		this.dragGraphics.clear();
+		this.rootsGraphics.clear();
+
+
+		// Reset camera
+		this.cameras.main.scrollY = 0;
+		this.setDeepestNode(0);
+
+		this.returnToSurfaceButton.hide();
+		this.oneTimeEvents.outOfEnergy = false;
+
+
+		// Restart tree
+		this.addNode(this.CX, this.SURFACE_Y+10, true);
+		this.tree.reset();
+		this.updateScore();
+	}
+
+
+	/* Tree */
 
 	// Returns the position of next node to be created given the pointer's position
 	// If one can't be created, null is returned
@@ -283,9 +341,7 @@ export class GameScene extends BaseScene {
 		node.on("dragStart", this.onNodeDragStart, this);
 
 		this.nodes.push(node);
-
-		this.deepestNodeY = Math.max(y, this.deepestNodeY);
-		this.cameras.main.setBounds(0, 0, this.W, this.deepestNodeY + 0.4*this.H);
+		this.setDeepestNode(node.y);
 
 		return node;
 	}
@@ -306,6 +362,8 @@ export class GameScene extends BaseScene {
 		this.sound.play("r_place", { volume: 0.3, rate: 1 + Math.random() * 0.1 });
 
 		this.currentNode = newNode;
+
+		this.updateScore();
 	}
 
 	drawRoot(node: Node) {
@@ -338,6 +396,13 @@ export class GameScene extends BaseScene {
 		}
 	}
 
+	updateScore() {
+		// Pass score to tree
+		this.tree.setTreeScore(this.totalScore);
+	}
+
+
+	/* Input */
 
 	onNodeDragStart(node: Node) {
 		this.currentNode = node;
@@ -362,7 +427,7 @@ export class GameScene extends BaseScene {
 
 
 	get SURFACE_Y() {
-		return this.CY + 10;
+		return 0.8 * this.H;
 	}
 
 	get BEDROCK_Y() {

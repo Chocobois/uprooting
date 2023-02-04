@@ -6,6 +6,7 @@ export class Tree extends Button {
 
 	public level: number;
 	public energy: number;
+	public maxEnergy: number;
 
 	// Feel free to edit this ts declaration, it's supposed to be a k-v pair object
 	private oneTimeEvents: Record<string, boolean>;
@@ -18,7 +19,8 @@ export class Tree extends Button {
 
 		// Stats
 		this.level = 0;
-		this.energy = 1000;
+		this.energy = 100;
+		this.maxEnergy = 100;
 
 
 		// Tree sprite
@@ -36,9 +38,19 @@ export class Tree extends Button {
 
 	update(time: number, delta: number) {
 		// Click animation, no real use, maybe harvesting
-		this.treeSprite.setScale(1.0 - 0.1 * this.holdSmooth);
+		this.setScale(1.0 - 0.1 * this.holdSmooth);
 	}
 
+
+	addMaxEnergy(amount: number) {
+		this.maxEnergy += amount;
+	}
+
+	reset() {
+		this.level = 0;
+		this.energy = this.maxEnergy;
+		this.treeSprite.setTexture("sapling");
+	}
 
 	setTreeScore(score: number) {
 		const treeSize = 100 + 1 * score;

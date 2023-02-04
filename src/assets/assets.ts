@@ -41,6 +41,7 @@ import dragonfruit from "../assets/images/items/dragonfruit.png";
 import fruit_upgrade from "../assets/images/ui/fruit_upgrade.png";
 import energy_teter from "../assets/images/ui/meter.png";
 import prompt from "../assets/images/ui/prompt.png";
+import surface_button from "../assets/images/ui/surface_button.png";
 
 // Other
 import circle from "../assets/images/circle.png";
@@ -65,6 +66,7 @@ const images: Asset[] = [
 	{ key: "fruit_upgrade", path: fruit_upgrade },
 	{ key: "energy_teter", path: energy_teter },
 	{ key: "prompt", path: prompt },
+	{ key: "surface_button", path: surface_button },
 
 	// Other
 	{ key: "circle", path: circle },

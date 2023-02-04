@@ -19,8 +19,9 @@ export class Node extends Button {
 		this.rootDepth = 0;
 
 
-		this.image = this.scene.add.image(x, y, "circle");
+		this.image = this.scene.add.image(0, 0, "circle");
 		this.image.setScale((root ? 25 : 15) / this.image.width);
+		this.add(this.image);
 
 		this.bindInteractive(this.image, true);
 		const inputPadding = 40 / this.image.scaleX;

@@ -8,10 +8,11 @@ export class Mineral extends Button {
 	constructor(scene: BaseScene, x: number, y: number) {
 		super(scene, x, y);
 
-		this.size = 80;
+		this.size = Phaser.Math.RND.between(60, 120);
 
 		const key = Phaser.Math.RND.pick(["bone", "apple"]);
 		this.image = this.scene.add.image(x, y, key);
+		this.image.setScale(this.size / this.image.width);
 		this.image.setAngle(Phaser.Math.RND.between(0, 360));
 
 		// this.bindInteractive(this.image, true);
@@ -20,7 +21,6 @@ export class Mineral extends Button {
 	}
 
 	update(time: number, delta: number) {
-		const scale = 1.0 - 0.1 * this.holdSmooth;
-		this.image.setScale(scale * this.size / this.image.width);
+		this.setScale(1.0 - 0.1 * this.holdSmooth);
 	}
 }
