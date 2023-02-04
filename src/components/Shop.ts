@@ -115,14 +115,17 @@ export class Shop extends Phaser.GameObjects.Container {
 		}, this)
 
 		const jx = 0.61 * W;
-		const jy = 0.42 * H;
+		const jy = 0.67 * H;
 		const jh = 0.88 * H;
 		this.ownerButton = new Button(this.scene, jx, jy);
 		this.add(this.ownerButton);
 
 		this.ownerImage = this.scene.add.image(0, 0, "jbun");
+		this.ownerImage.setOrigin(0.5, 0.8);
 		this.ownerImage.setScale(jh / this.ownerImage.height);
 		this.ownerButton.add(this.ownerImage);
+
+		this.ownerButton.bindInteractive(this.ownerImage);
 
 
 		// Foreground
@@ -218,11 +221,12 @@ export class Shop extends Phaser.GameObjects.Container {
 		this.exitButton.setScale(1.0 - 0.1 * this.exitButton.holdSmooth);
 		this.buyButton.setScale(1.0 - 0.1 * this.buyButton.holdSmooth);
 
-		const jbunHold = 1.0 - 0.1 * this.ownerButton.holdSmooth;
+		const jbunHoldX = 1.0 + 0.2 * this.ownerButton.holdSmooth;
+		const jbunHoldY = 1.0 - 0.3 * this.ownerButton.holdSmooth;
 		const jbunSquish = 0.04;
 		this.ownerButton.setScale(
-			(1.0 + jbunSquish * Math.sin(time/200)) * jbunHold,
-			(1.0 + jbunSquish * Math.sin(-time/200)) * jbunHold
+			(1.0 + jbunSquish * Math.sin(time/200)) * jbunHoldX,
+			(1.0 + jbunSquish * Math.sin(-time/200)) * jbunHoldY
 		);
 
 		this.items.forEach(item => {
@@ -241,7 +245,7 @@ export class Shop extends Phaser.GameObjects.Container {
 		});
 	}
 
-	selectItem(item: ShopItem | null) {
+	selectItem(item: ShopItem | null, justPurchased: boolean = false) {
 		this.selectedItem = item;
 
 		// this.buyButton.input.enabled = false;
@@ -258,9 +262,14 @@ export class Shop extends Phaser.GameObjects.Container {
 			}
 		}
 		else {
-			// this.selectedItemImage.setTexture("bones");
-			this.selectedItemTitle.setText("None selected");
-			this.selectedItemDescription.setText("What are ya buying? What are ya selling? I don't know!");
+			if (justPurchased) {
+				this.selectedItemTitle.setText("Whatever");
+				this.selectedItemDescription.setText("Thanks for buying it!");
+			}
+			else {
+				this.selectedItemTitle.setText("None selected");
+				this.selectedItemDescription.setText("What are ya buying? What are ya selling? I don't know!");
+			}
 		}
 	}
 
@@ -273,6 +282,8 @@ export class Shop extends Phaser.GameObjects.Container {
 	}
 
 	upgradeShopItem(itemData: ItemData) {
+		const index = this.itemsForSale.indexOf(itemData);
+
 		if (itemData.type == ItemType.TreeEnergy) {
 			itemData.price = Math.round(itemData.price * 1.5);
 		}
@@ -281,7 +292,11 @@ export class Shop extends Phaser.GameObjects.Container {
 			itemData.image = "applecore";
 			// Go through a list...
 		}
+		if (itemData.type == ItemType.RockBreak) {
+			this.itemsForSale[index] = SOLD_OUT_ITEM;
+		}
 
+		this.selectItem(null, true);
 		this.updateItemsForSale();
 	}
 
