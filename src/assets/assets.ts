@@ -25,6 +25,7 @@ import underground from "../assets/images/underground.png";
 import tree from "../assets/images/tree.png";
 import tree_little from "../assets/images/tree_little.png";
 import sapling from "../assets/images/sapling.png";
+import green_magic from "../assets/images/greencurvy.png";
 
 
 const images: Asset[] = [
@@ -36,7 +37,10 @@ const images: Asset[] = [
 	{ key: "sapling",	path: sapling },
 ];
 
-const spritesheets: SpriteSheet[] = [];
+const spritesheets: SpriteSheet[] = [
+	{ key: "green_magic", path: green_magic, width: 128, height: 128 },
+];
+
 
 /* UI */
 import m_main_menu from "../assets/music/title.mp3";
