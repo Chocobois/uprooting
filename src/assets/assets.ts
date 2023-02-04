@@ -42,9 +42,6 @@ import fruit_upgrade from "../assets/images/ui/fruit_upgrade.png";
 import energy_teter from "../assets/images/ui/meter.png";
 import prompt from "../assets/images/ui/prompt.png";
 
-// Effects
-import green_magic from "../assets/images/effects/green_magic.png";
-
 // Other
 import circle from "../assets/images/circle.png";
 
@@ -69,9 +66,6 @@ const images: Asset[] = [
 	{ key: "energy_teter", path: energy_teter },
 	{ key: "prompt", path: prompt },
 
-	// Effects
-	{ key: "green_magic", path: green_magic },
-
 	// Other
 	{ key: "circle", path: circle },
 ];
@@ -80,7 +74,11 @@ const images: Asset[] = [
 
 /* Spritesheets */
 
+// Effects
+import green_magic from "../assets/images/effects/green_magic.png";
+
 const spritesheets: SpriteSheet[] = [
+	// Effects
 	{ key: "green_magic", path: green_magic, width: 128, height: 128 },
 ];
 
