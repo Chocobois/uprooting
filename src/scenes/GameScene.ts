@@ -43,6 +43,9 @@ export class GameScene extends BaseScene {
 	private currentNode: Node | null;
 	private nodes: Node[];
 	private deepestNodeY: number;
+
+	private lastPos: Phaser.Math.Vector2;
+
 	// Graphics for roots. Should be replaced as it's very inefficient.
 	private dragGraphics: Phaser.GameObjects.Graphics;
 	private rootsGraphics: Phaser.GameObjects.Graphics;
@@ -156,7 +159,7 @@ export class GameScene extends BaseScene {
 		this.deepestNodeY = 0;
 		this.nodes = [];
 		this.addNode(this.CX, this.SURFACE_Y + 10*this.SCALE, true);
-
+		this.lastPos = new Phaser.Math.Vector2(this.nodes[0].x, this.nodes[0].y);
 
 		// Particles
 
@@ -256,7 +259,7 @@ export class GameScene extends BaseScene {
 			// Move camera with mouse input
 			this.moveCamera();
 
-			this.handleRootDrawing();
+			this.handleRootDrawing(delta);
 		}
 
 		// Update music based on if the player is drawing a line
@@ -358,7 +361,7 @@ export class GameScene extends BaseScene {
 
 	/* Tree */
 
-	handleRootDrawing() {
+	handleRootDrawing(delta: number) {
 		const pointer = new Phaser.Math.Vector2(this.input.activePointer.x, this.input.activePointer.y);
 		pointer.y += this.cameras.main.scrollY;
 
@@ -366,26 +369,33 @@ export class GameScene extends BaseScene {
 			const start = new Phaser.Math.Vector2(this.currentNode.x, this.currentNode.y);
 			const next = this.nextNodePos(pointer);
 
+			if( next ) {
+				const nextPos = new Phaser.Math.Vector2(next.x, next.y);
+				this.lastPos = this.lastPos.lerp(nextPos, delta/100);
+			}
+
 			// Distance must be DRAG_LIMIT
 			// Also, don't create anything if cursor is too far,
 			// to prevent placing extra segments accidentally
 			const distance = Phaser.Math.Distance.BetweenPoints(this.currentNode, pointer);
-			const canDraw = distance >= this.DRAG_LIMIT && distance < this.DRAG_LIMIT * 2;
+			const canDraw = distance >= this.DRAG_LIMIT;
 
 			this.dragGraphics.clear();
 			this.dragGraphics.lineStyle(5*this.SCALE, next ? 0x00FF00 : 0xFF0000, 1.0);
 
+			const end = next ? next : start.clone().add(pointer.clone().subtract(this.currentNode).limit(this.DRAG_LIMIT));
+			const extended = end.distance(this.lastPos) < 3;
+
 			if (this.tree.energy > this.currentNode.cost) {
-				if (next && canDraw) {
+				if (next && canDraw && extended) {
 					this.addConnection(next);
+					this.lastPos = new Phaser.Math.Vector2(next.x, next.y);
 				}
 			}
 			else if (!this.oneTimeEvents.outOfEnergy) {
 				this.oneTimeEvents.outOfEnergy = true;
 				this.returnToSurfaceButton.show();
 			}
-
-			const end = next ? next : start.clone().add(pointer.clone().subtract(this.currentNode).limit(this.DRAG_LIMIT));
 
 			const limitReached = !next && Math.abs(start.distance(end) - this.DRAG_LIMIT) < 1e-10;
 
@@ -398,7 +408,7 @@ export class GameScene extends BaseScene {
 
 			this.dragGraphics.beginPath();
 			this.dragGraphics.moveTo(start.x, start.y);
-			this.dragGraphics.lineTo(end.x, end.y);
+			this.dragGraphics.lineTo(this.lastPos.x, this.lastPos.y);
 			this.dragGraphics.closePath();
 			this.dragGraphics.strokePath();
 		}
@@ -533,6 +543,7 @@ export class GameScene extends BaseScene {
 
 	onNodeDragStart(node: Node) {
 		this.currentNode = node;
+		this.lastPos = new Phaser.Math.Vector2(node.x, node.y);
 		this.musicState = MusicState.LayeredLoop;
 		this.oneTimeEvents.wrongPlacementSound = false;
 	}
