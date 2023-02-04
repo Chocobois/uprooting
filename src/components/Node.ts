@@ -28,7 +28,7 @@ export class Node extends Button {
 
 	update(time: number, delta: number) {
 		if (this.image.input.enabled) {
-			this.image.setTint(this.hold ? 0xFF0000 : this.hover ? 0xFF7700 : 0xFFFFFF);
+			this.image.setTint(this.hover ? 0xFF7700 : 0xB99578);
 		}
 	}
 
