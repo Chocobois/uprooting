@@ -2,6 +2,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 html, body {
@@ -14,6 +15,9 @@ html, body {
 }
 
 body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 	position: relative;
 	margin: 0;
 	padding: 0;
@@ -21,19 +25,15 @@ body {
 	color: #eee;
 }
 
-canvas {
-	display: block;
-	margin: auto;
-}
-
-.fontPreloader {
+.fontPreloader, .fontGame {
+	display: flex;
+  justify-content: center;
+  align-items: center;
   position: absolute;
-  left: -1000px;
-  visibility: hidden;
-}
-
-.fontGame {
+  z-index: -10;
+	margin: auto;
   font-family: "Fredoka One", serif;
+  user-select: none;
 }
 
 /* fredoka-one-regular - latin */
@@ -41,7 +41,7 @@ canvas {
   font-family: "Fredoka One";
   font-style: normal;
   font-weight: 400;
-  src: local(""),
+  src:
     url("./assets/fonts/fredoka-one-v13-latin-regular.woff2") format("woff2"),
     url("./assets/fonts/fredoka-one-v13-latin-regular.woff") format("woff");
 }
