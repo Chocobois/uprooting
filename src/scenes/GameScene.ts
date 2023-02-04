@@ -6,6 +6,7 @@ import GetShortestDistance from "phaser/src/geom/line/GetShortestDistance";
 const DRAG_LIMIT = 100;
 const ANGLE_LIMIT = Math.PI/2;
 const PROXIMITY_LIMIT = DRAG_LIMIT/5;
+const MIN_Y = 590;
 
 enum MusicState {
 	Nothing,
@@ -166,6 +167,8 @@ export class GameScene extends BaseScene {
 		const distance = Phaser.Math.Distance.BetweenPoints(this.currentNode, pointer);
 		if(distance < DRAG_LIMIT || distance >= DRAG_LIMIT*2) return null;
 
+		// Can't be above ground very far
+		if(pointer.y < MIN_Y) return null;
 
 		const start = new Phaser.Math.Vector2(this.currentNode.x, this.currentNode.y);
 		const vector = new Phaser.Math.Vector2(pointer);
