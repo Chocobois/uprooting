@@ -54,10 +54,9 @@ export class BaseScene extends Phaser.Scene {
 	// Creates Phaser text object
 	createText(x: number=0, y: number=0, size: number=20, color: string="#FFF", text: string=""): Phaser.GameObjects.Text {
 		return this.add.text(x, y, text, {
-			fontFamily: "VCR_OSD_MONO",
+			fontFamily: "PermanentMarker-Regular",
 			fontSize: Math.max(size*10, 1) + "px",
-			color: color,
-			fontStyle: "bold"
+			color: color
 		}).setLineSpacing(0.4*size).setPadding(2).setScale(0.1);
 	}
 
