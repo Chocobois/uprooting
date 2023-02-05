@@ -244,6 +244,7 @@ export class Shop extends Phaser.GameObjects.Container {
 				let item = new ShopItem(this.scene, x, y, itemSize);
 				item.on("click", () => {
 					this.selectItem(item.itemData);
+					this.scene.sound.play("s_click");
 				}, this);
 				this.add(item);
 				this.items.push(item);
@@ -327,9 +328,11 @@ export class Shop extends Phaser.GameObjects.Container {
 			const scene = this.scene as GameScene;
 			if( scene.money >= this.selectedItem.price[this.selectedItem.iteration-1] ) {
 				scene.money -= this.selectedItem.price[this.selectedItem.iteration-1]
+				this.scene.sound.play("s_buy");
 				this.emit("buy", this.selectedItem);
 				this.upgradeShopItem(this.selectedItem);
 			} else {
+				this.scene.sound.play("s_nofunds");
 				this.selectedItemTitle.setText("Shop owner");
 				this.selectedItemDescription.setText(
 					`You can't afford that!\nThe ${this.selectedItem.title[this.selectedItem.iteration-1].toLocaleLowerCase()}\nis ${this.selectedItem.price} gold.`
@@ -380,6 +383,7 @@ export class Shop extends Phaser.GameObjects.Container {
 
 	close() {
 		this.setVisible(false);
+		if (this.scene.time.now > 5) this.scene.sound.play("s_nofunds");
 		this.emit("close");
 	}
 }

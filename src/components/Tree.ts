@@ -2,7 +2,7 @@ import { BaseScene } from "../scenes/BaseScene";
 import { Button } from "./Button";
 
 export class Tree extends Button {
-	private treeSprite: Phaser.GameObjects.Image;
+	public treeSprite: Phaser.GameObjects.Image;
 
 	public level: number;
 	public energy: number;

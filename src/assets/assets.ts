@@ -196,10 +196,20 @@ import m_shop from "./music/shop.mp3";
 import r_grow from "./sounds/roots/grow.mp3";
 import r_place from "./sounds/roots/place.mp3";
 import r_place_error from "./sounds/roots/place_error.mp3";
+import r_collect from "./sounds/roots/collect.mp3";
+import r_splash from "./sounds/roots/splash.mp3";
+
+// SFX: Tree
+import t_branch_snap from "./sounds/tree/branch_snap.mp3";
+import t_chop_plant from "./sounds/tree/chop_plant.mp3";
+import t_rustle from "./sounds/tree/rustle.mp3";
 
 // Shop related
 import s_squish1 from "./sounds/shop/squish1.mp3";
 import s_squish2 from "./sounds/shop/squish2.mp3";
+import s_buy from "./sounds/shop/buy.mp3";
+import s_click from "./sounds/shop/click.mp3";
+import s_nofunds from "./sounds/shop/nofunds.mp3";
 
 const audios: Audio[] = [
 	{ key: "m_main_menu", path: m_main_menu },
@@ -210,8 +220,16 @@ const audios: Audio[] = [
 	{ key: "r_grow", path: r_grow, volume: 0.5 },
 	{ key: "r_place", path: r_place, volume: 1 },
 	{ key: "r_place_error", path: r_place_error, volume: 0.5 },
+	{ key: "r_collect", path: r_collect, volume: 1 },
+	{ key: "r_splash", path: r_splash, volume: 1 },
+	{ key: "t_branch_snap", path: t_branch_snap, volume: 0.5 },
+	{ key: "t_chop_plant", path: t_chop_plant, volume: 0.5 },
+	{ key: "t_rustle", path: t_rustle, volume: 0.5 },
 	{ key: "s_squish1", path: s_squish1, volume: 1 },
 	{ key: "s_squish2", path: s_squish2, volume: 1 },
+	{ key: "s_buy", path: s_buy, volume: 1 },
+	{ key: "s_click", path: s_click, volume: 1 },
+	{ key: "s_nofunds", path: s_nofunds, volume: 0.4 },
 ];
 
 

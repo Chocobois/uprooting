@@ -182,6 +182,7 @@ export class TitleScene extends BaseScene {
 		}
 
 		else if (!this.isStarting) {
+			this.sound.play("t_rustle", { volume: 0.3 });
 			// this.sound.play("m_slice", { volume: 0.3 });
 			// this.sound.play("u_attack_button", { volume: 0.5 });
 			// this.select2.play();

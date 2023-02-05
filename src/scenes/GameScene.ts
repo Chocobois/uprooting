@@ -274,6 +274,7 @@ export class GameScene extends BaseScene {
 				this.musicDrawing.mute = !this.musicDrawing.mute;
 				this.musicJingle.mute = !this.musicJingle.mute;
 				this.musicShop.mute = !this.musicShop.mute;
+				this.sound.play("s_click");
 			});
 
 		this.audioButton = new MiniButton(this, this.W - buttonSize, 1.5 * buttonSize, "audio")
@@ -502,6 +503,7 @@ export class GameScene extends BaseScene {
 	}
 
 	returnToSurface() {
+		this.sound.play("s_click");
 		this.state = GameState.ReturningToSurfaceCutscene;
 		this.returnToSurfaceButton.hide();
 		this.cameraSmoothY = 0;
@@ -591,6 +593,8 @@ export class GameScene extends BaseScene {
 			if (this.currentNode && collectible.points) {
 				this.currentNode.addScore(collectible.points);
 			}
+
+			this.sound.play("r_collect");
 
 			// Create sparkle effect
 			if (collectible.type == MineralType.applecore) {
@@ -823,7 +827,13 @@ export class GameScene extends BaseScene {
 
 			if (this.tree.harvestCount <= 0) {
 				this.particles.createExplosion(this.tree.x, this.tree.y - 100*this.SCALE, 2*this.SCALE, 1.0, false);
+				this.sound.play("t_chop_plant", {rate: 1 + 0.1 * Math.random()});
+				if (this.tree.treeSprite.texture.key != "sapling") {
+					this.sound.play("t_branch_snap", {rate: 1 + 0.1 * Math.random()});
+				}
 				this.onHarvestComplete();
+			} else {
+				this.sound.play("t_rustle", {rate: 1 + 0.1 * Math.random()});
 			}
 		}
 	}
