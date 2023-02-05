@@ -237,6 +237,8 @@ export class GameScene extends BaseScene {
 				this.sound.mute = !this.audioButton.active;
 			})
 
+		this.scrolling = false;
+		this.timeScrolling = 0;
 
 		// Music
 
@@ -313,7 +315,6 @@ export class GameScene extends BaseScene {
 
 		// Debug, move this to some ui thing
 		this.debugText.setText(`State: ${this.state}\nEnergy: ${this.tree.energy}/${this.tree.maxEnergy}`);
-
 
 		if (this.state == GameState.GrowingRoots) {
 			// Move camera with mouse input
@@ -590,7 +591,7 @@ export class GameScene extends BaseScene {
 
 		// Check proximity
 		const tooClose = this.nodes.some(node => {
-			if (!node.parent) return false;
+			if (!node.parent || node == this.currentNode) return false;
 
 			const otherLine = new Phaser.Geom.Line(node.parent.x, node.parent.y, node.x, node.y);
 			const distances = otherLine.getPoints(0, 0.25).map(point => new Phaser.Math.Vector2(point.x, point.y).distance(end));
