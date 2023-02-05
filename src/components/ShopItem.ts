@@ -50,7 +50,7 @@ export class ShopItem extends Button {
 	setItem(itemData: ItemData) {
 		this.itemData = itemData;
 
-		this.image.setTexture(itemData.image);
+		this.image.setTexture(itemData.image[itemData.iteration-1]);
 
 		const scale = (itemData.type == ItemType.SoldOut ? 0.5 : 0.9);
 		const origin = (itemData.type == ItemType.SoldOut ? 0.0 : 0.5);
@@ -62,7 +62,7 @@ export class ShopItem extends Button {
 
 	getPrice(): number {
 		if (this.itemData) {
-			return this.itemData.price;
+			return this.itemData.price[this.itemData.iteration-1];
 		}
 		return 0;
 	}

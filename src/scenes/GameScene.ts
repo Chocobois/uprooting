@@ -3,7 +3,7 @@ import { Music } from "./../components/Music";
 import { Particles } from "./../components/Particles";
 import { Node } from "./../components/Node";
 import { Tree } from "./../components/Tree";
-import { Underground } from "./../components/Underground";
+import { Underground, MineralType } from "./../components/Underground";
 import { Mineral } from "./../components/Mineral";
 import { SurfaceButton } from "./../components/SurfaceButton";
 import { HarvestButton } from "./../components/HarvestButton";
@@ -64,7 +64,7 @@ export class GameScene extends BaseScene {
 	private undergroundEdge: Phaser.GameObjects.Image;
 
 	// Tree
-	private tree: Tree;
+	public tree: Tree;
 	private currentNode: Node | null;
 	private nodes: Node[];
 	private deepestNodeY: number;
@@ -192,8 +192,13 @@ export class GameScene extends BaseScene {
 			}, 1300);
 		});
 		this.shop.on("buy", (itemData: ItemData) => {
+
 			if (itemData.type == ItemType.TreeEnergy) {
-				this.tree.addMaxEnergy(100);
+				this.tree.addMaxEnergy(itemData.value[itemData.iteration-1]);
+				this.tree.energy = this.tree.maxEnergy;
+			} else if (itemData.type == ItemType.RockBreak)
+			{
+				this.tree.strength += itemData.value[itemData.iteration-1];
 			}
 			// Add more shop item mechanics...
 			// Or break up into more emits
@@ -490,6 +495,10 @@ export class GameScene extends BaseScene {
 		});
 		// this.setCameraBounds(0, 0, this.W, 100000);
 		// this.cameras.main.setBounds(-0.5*this.W, -this.H, 2*this.W, 1000000);
+
+		if (this.totalScore > 5 && this.cameraSmoothY > this.H) {
+			this.returnToSurfaceButton.show();
+		}
 	}
 
 	returnToSurface() {
@@ -552,6 +561,8 @@ export class GameScene extends BaseScene {
 		});
 		this.nodes = [];
 
+		this.setDeepestNode(0);
+
 		this.dragGraphics.clear();
 		this.rootsGraphics.clear();
 		this.harvestButton.hide();
@@ -569,8 +580,25 @@ export class GameScene extends BaseScene {
 		this.underground.destroyMinerals(collectibles);
 
 		collectibles.forEach(collectible => {
-			this.textParticle(collectible.x, collectible.y-10, "Lime", `+1 ${collectible.properName}`, true,
+			let color = "Lime";
+			if (collectible.type == MineralType.applecore) {
+				color = "Red";
+			}
+
+			this.textParticle(collectible.x, collectible.y-10, color, `+1 ${collectible.properName}`, true,
 			250*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
+
+			if (this.currentNode && collectible.points) {
+				this.currentNode.addScore(collectible.points);
+			}
+
+			// Create sparkle effect
+			if (collectible.type == MineralType.applecore) {
+				this.particles.createBlueSparkle(collectible.x, collectible.y, 3*this.SCALE, 1.0, false);
+			}
+			else {
+				this.particles.createDustExplosion(collectible.x, collectible.y, 3*this.SCALE, 1.0, false);
+			}
 		});
 	}
 
@@ -862,6 +890,6 @@ export class GameScene extends BaseScene {
 	}
 
 	get totalScore() {
-		return this.nodes[0].score;
+		return this.nodes.length > 0 ? this.nodes[0].score : 0;
 	}
 }

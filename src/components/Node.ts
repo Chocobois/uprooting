@@ -59,10 +59,10 @@ export class Node extends Button {
 	}
 
 	// Recursively add +1 to every parent node. Return total sum.
-	addScore(): void {
-		this.score += 1;
+	addScore(value: number=1): void {
+		this.score += value;
 		if (this.parent) {
-			this.parent.addScore();
+			this.parent.addScore(value);
 		}
 	}
 
