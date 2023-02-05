@@ -45,7 +45,7 @@ export class GameScene extends BaseScene {
 	private nodes: Node[];
 	private deepestNodeY: number;
 
-	private lastPos: Phaser.Math.Vector2;
+	private dragPos: Phaser.Math.Vector2;
 
 	// Graphics for roots. Should be replaced as it's very inefficient.
 	private dragGraphics: Phaser.GameObjects.Graphics;
@@ -165,7 +165,7 @@ export class GameScene extends BaseScene {
 		this.deepestNodeY = 0;
 		this.nodes = [];
 		this.addNode(this.CX, this.SURFACE_Y + 10*this.SCALE, true);
-		this.lastPos = new Phaser.Math.Vector2(this.nodes[0].x, this.nodes[0].y);
+		this.dragPos = new Phaser.Math.Vector2(this.nodes[0].x, this.nodes[0].y);
 
 		// Particles
 
@@ -377,27 +377,28 @@ export class GameScene extends BaseScene {
 			const start = new Phaser.Math.Vector2(this.currentNode.x, this.currentNode.y);
 			const next = this.nextNodePos(pointer);
 
-			if( next ) {
-				const nextPos = new Phaser.Math.Vector2(next.x, next.y);
-				this.lastPos = this.lastPos.lerp(nextPos, delta/100);
-			}
-
 			// Distance must be DRAG_LIMIT
-			// Also, don't create anything if cursor is too far,
-			// to prevent placing extra segments accidentally
 			const distance = Phaser.Math.Distance.BetweenPoints(this.currentNode, pointer);
 			const canDraw = distance >= this.DRAG_LIMIT;
 
-			this.dragGraphics.clear();
-			this.dragGraphics.lineStyle(5*this.SCALE, next ? 0x00FF00 : 0xFF0000, 1.0);
-
 			const end = next ? next : start.clone().add(pointer.clone().subtract(this.currentNode).limit(this.DRAG_LIMIT));
-			const extended = end.distance(this.lastPos) < 4;
+			const extended = end.distance(this.dragPos) < 4;
+
+			// Check minerals
+			const line = new Phaser.Geom.Line(start.x, start.y, end.x, end.y);
+			const mineralIntersects = this.underground.getIntersectedMinerals(line);
+			const touchingObstacle = mineralIntersects.some(mineral => mineral.obstacle);
+			const nextValid = next && !touchingObstacle;
+
+			this.dragPos = this.dragPos.lerp(end, delta/100);
 
 			if (this.tree.energy > this.currentNode.cost) {
-				if (next && canDraw) {
+				if (nextValid && canDraw) {
 					this.addConnection(next);
-					this.lastPos = new Phaser.Math.Vector2(next.x, next.y);
+					this.dragPos = new Phaser.Math.Vector2(next.x, next.y);
+
+					// Remove collectible minerals
+					this.underground.destroyMinerals(mineralIntersects.filter(mineral => mineral.collectible));
 				}
 			}
 			else if (!this.oneTimeEvents.outOfEnergy) {
@@ -405,7 +406,7 @@ export class GameScene extends BaseScene {
 				this.returnToSurfaceButton.show();
 			}
 
-			const limitReached = !next && Math.abs(start.distance(end) - this.DRAG_LIMIT) < 1e-10;
+			const limitReached = !nextValid && canDraw;
 
 			if (limitReached && !this.oneTimeEvents.wrongPlacementSound) {
 				this.oneTimeEvents.wrongPlacementSound = true;
@@ -414,9 +415,11 @@ export class GameScene extends BaseScene {
 				this.oneTimeEvents.wrongPlacementSound = false;
 			}
 
+			this.dragGraphics.clear();
+			this.dragGraphics.lineStyle(5*this.SCALE, nextValid ? 0x00FF00 : 0xFF0000, 1.0);
 			this.dragGraphics.beginPath();
 			this.dragGraphics.moveTo(start.x, start.y);
-			this.dragGraphics.lineTo(this.lastPos.x, this.lastPos.y);
+			this.dragGraphics.lineTo(this.dragPos.x, this.dragPos.y);
 			this.dragGraphics.closePath();
 			this.dragGraphics.strokePath();
 		}
@@ -450,7 +453,7 @@ export class GameScene extends BaseScene {
 		// Check intersections and proximity (latter is not implemented yet)
 		const line = new Phaser.Geom.Line(start.x, start.y, end.x, end.y);
 
-		const anyEncroaching = this.nodes.some(node => {
+		const anyEncroachingNodes = this.nodes.some(node => {
 			if (!node.parent || node == this.currentNode || node.parent == this.currentNode) return false;
 
 			const otherLine = new Phaser.Geom.Line(node.parent.x, node.parent.y, node.x, node.y);
@@ -461,7 +464,7 @@ export class GameScene extends BaseScene {
 			return intersects;
 		});
 
-		if (anyEncroaching) return null;
+		if (anyEncroachingNodes) return null;
 
 		return end;
 	}
@@ -554,7 +557,7 @@ export class GameScene extends BaseScene {
 
 	onNodeDragStart(node: Node) {
 		this.currentNode = node;
-		this.lastPos = new Phaser.Math.Vector2(node.x, node.y);
+		this.dragPos = new Phaser.Math.Vector2(node.x, node.y);
 		this.musicState = MusicState.LayeredLoop;
 		this.oneTimeEvents.wrongPlacementSound = false;
 	}

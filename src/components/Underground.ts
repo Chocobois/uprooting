@@ -24,13 +24,15 @@ export enum MineralType {
 	Watercave = "watercave",
 }
 
-interface MineralRange {
+export interface MineralRange {
 	type: MineralType, // Which item to spawn
 	centerDepth: number; // Y-coord where spawns are at max
 	centerRadius: number; // Y-distance from center. Odds reduces the further away from center they are.
 	odds: number; // Chance of attempted spawning
 	collisionRadius: number; // Radius for collision
 	spacingRadius: number; // Personal space radius needed to stay away from other items
+	collectible: boolean; // Is this collectible by dragging a branch on it?
+	obstacle: boolean; // Does it block growth?
 }
 
 const MINERALS: MineralRange[] = [
@@ -39,24 +41,30 @@ const MINERALS: MineralRange[] = [
 		centerDepth: 2000,
 		centerRadius: 3000,
 		odds: 0.04,
-		collisionRadius: 30,
+		collisionRadius: 15,
 		spacingRadius: 200,
+		collectible: true,
+		obstacle: false
 	},
 	{
 		type: MineralType.Bones,
 		centerDepth: 5000,
 		centerRadius: 4000,
 		odds: 0.02,
-		collisionRadius: 30,
+		collisionRadius: 20,
 		spacingRadius: 100,
+		collectible: false,
+		obstacle: true
 	},
 	{
 		type: MineralType.Ruby,
 		centerDepth: 8000,
 		centerRadius: 4000,
 		odds: 0.06,
-		collisionRadius: 30,
+		collisionRadius: 20,
 		spacingRadius: 250,	
+		collectible: true,
+		obstacle: false
 	},
 ];
 
@@ -134,20 +142,18 @@ export class Underground extends Phaser.GameObjects.Container {
 
 			if (Math.random() < odds) {
 				this.addMineral(
-					mineralRange.type,
+					mineralRange,
 					this.left + (this.right - this.left) * Math.random(),
-					this.currentY,
-					mineralRange.spacingRadius * this.scene.SCALE,
-					mineralRange.collisionRadius,
+					this.currentY
 				);
 			}
 		});
 
 	}
 
-	addMineral(type: MineralType, x: number, y: number, spacingRadius: number, collisionRadius: number) {
-		if (this.hasFreeSpace(x, y, spacingRadius)) {
-			let mineral = new Mineral(this.scene, x, y, type, spacingRadius, collisionRadius);
+	addMineral(params: MineralRange, x: number, y: number) {
+		if (this.hasFreeSpace(x, y, params.spacingRadius)) {
+			let mineral = new Mineral(this.scene, params, x, y);
 
 			this.add(mineral);
 			this.items.push(mineral);
@@ -161,5 +167,18 @@ export class Underground extends Phaser.GameObjects.Container {
 			}
 		}
 		return true;
+	}
+
+	getIntersectedMinerals(line: Phaser.Geom.Line): Mineral[] {
+		return this.items.filter(item => {
+			const circle = new Phaser.Geom.Circle(item.x, item.y, item.collisionRadius);
+			return Phaser.Geom.Intersects.LineToCircle(line, circle);
+		});
+	}
+
+	destroyMinerals(minerals: Mineral[]) {
+		const other = this.items.filter(item => minerals.indexOf(item) == -1);
+		minerals.forEach(mineral => mineral.destroy());
+		this.items = other;
 	}
 }
