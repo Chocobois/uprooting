@@ -199,6 +199,9 @@ export class GameScene extends BaseScene {
 			} else if (itemData.type == ItemType.RockBreak)
 			{
 				this.tree.strength += itemData.value[itemData.iteration-1];
+			} else if (itemData.type == ItemType.FruitUpgrade)
+			{
+				this.tree.basevalue = itemData.value[itemData.iteration-1];
 			}
 			// Add more shop item mechanics...
 			// Or break up into more emits
@@ -594,7 +597,7 @@ export class GameScene extends BaseScene {
 
 			// Create sparkle effect
 			if (collectible.type == MineralType.applecore) {
-				this.particles.createGreenMagic(collectible.x, collectible.y, (collectible.collisionRadius/35)*6*this.SCALE, 1.0, false);
+				this.particles.createGreenMagic(collectible.x, collectible.y, (collectible.collisionRadius/35)*3.5*this.SCALE, 1.0, false);
 			}
 			else if (collectible.type == MineralType.emerald || collectible.type == MineralType.ruby || collectible.type == MineralType.diamond || collectible.type == MineralType.ancient_diamond)
 			{
