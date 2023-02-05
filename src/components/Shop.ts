@@ -1,3 +1,4 @@
+import { GameScene } from './../scenes/GameScene';
 import { BaseScene } from "../scenes/BaseScene";
 import { Button } from "./Button";
 import { ShopItem } from "./ShopItem";
@@ -71,7 +72,7 @@ export class Shop extends Phaser.GameObjects.Container {
 			{
 				type: ItemType.TreeEnergy,
 				image: "sapling",
-				title: "Fruit Upgrade",
+				title: "Root Upgrade",
 				description: "Increase your root energy",
 				price: 10,
 			},
@@ -297,9 +298,20 @@ export class Shop extends Phaser.GameObjects.Container {
 		if (!this.buyButton.enabled) { return; }
 
 		if (this.selectedItem) {
-			this.emit("buy", this.selectedItem);
-
-			this.upgradeShopItem(this.selectedItem);
+			const scene = this.scene as GameScene;
+			if( scene.money >= this.selectedItem.price ) {
+				scene.money -= this.selectedItem.price
+				this.emit("buy", this.selectedItem);
+				this.upgradeShopItem(this.selectedItem);
+			} else {
+				this.selectedItemTitle.setText("Shop owner");
+				this.selectedItemDescription.setText(
+					`You can't afford that!\nThe ${this.selectedItem.title.toLocaleLowerCase()}\nis${this.selectedItem.price} gold.`
+				);
+				this.selectedItem = null;
+				this.buyButton.enabled = false;
+				this.buyButton.setAlpha(0.5);
+			}
 		}
 	}
 
