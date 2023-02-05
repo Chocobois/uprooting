@@ -868,6 +868,6 @@ export class GameScene extends BaseScene {
 	}
 
 	get totalScore() {
-		return this.nodes[0].score;
+		return this.nodes.length > 0 ? this.nodes[0].score : 0;
 	}
 }
