@@ -573,8 +573,6 @@ export class GameScene extends BaseScene {
 
 		if (intersecting) return InvalidNodeReason.SelfIntersecting;
 
-		var min = Infinity;
-
 		// Check proximity
 		const tooClose = this.nodes.some(node => {
 			if (!node.parent) return false;
@@ -583,12 +581,9 @@ export class GameScene extends BaseScene {
 			const distances = otherLine.getPoints(0, 0.25).map(point => new Phaser.Math.Vector2(point.x, point.y).distance(end));
 
 			const dist = distances.reduce((a,c) => Math.min(a,c), Infinity);
-			min = Math.min(min, dist);
 
 			return dist <= this.PROXIMITY_LIMIT;
 		});
-
-		this.debugText.setText(`${min}`)
 
 		if (tooClose) return InvalidNodeReason.TooClose;
 
