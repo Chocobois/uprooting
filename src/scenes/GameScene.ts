@@ -65,6 +65,7 @@ export class GameScene extends BaseScene {
 
 	// Tree
 	public tree: Tree;
+	private firstNode: Node | null;
 	private currentNode: Node | null;
 	private nodes: Node[];
 	private deepestNodeY: number;
@@ -74,7 +75,8 @@ export class GameScene extends BaseScene {
 
 	// Graphics for roots. Should be replaced as it's very inefficient.
 	private dragGraphics: Phaser.GameObjects.Graphics;
-	private rootsGraphics: Phaser.GameObjects.Graphics;
+	private rootsBackGraphics: Phaser.GameObjects.Graphics;
+	private rootsFrontGraphics: Phaser.GameObjects.Graphics;
 
 	// Manages item spawns underground
 	private underground: Underground;
@@ -243,8 +245,12 @@ export class GameScene extends BaseScene {
 
 		// Graphics
 
-		this.rootsGraphics = this.add.graphics();
+		this.rootsBackGraphics = this.add.graphics();
+		this.rootsFrontGraphics = this.add.graphics();
 		this.dragGraphics = this.add.graphics();
+		this.rootsBackGraphics.setAlpha(0.8);
+		// this.rootsBackGraphics.setBlendMode(Phaser.BlendModes.ADD);
+
 		this.textParticles = new TextParticle(this);
 
 
@@ -253,7 +259,7 @@ export class GameScene extends BaseScene {
 		this.currentNode = null;
 		this.deepestNodeY = 0;
 		this.nodes = [];
-		this.addNode(this.CX, this.SURFACE_Y + 10*this.SCALE, true);
+		this.firstNode = this.addNode(this.CX, this.SURFACE_Y + 10*this.SCALE, true);
 		this.dragPos = new Phaser.Math.Vector2(this.nodes[0].x, this.nodes[0].y);
 
 		// Particles
@@ -351,6 +357,9 @@ export class GameScene extends BaseScene {
 
 
 	update(time: number, delta: number) {
+
+		// This is actually possible now. Could be optimized if it's called whenever camera is moved. Still, it's cheap enough now.
+		this.drawAllRoots();
 
 		// Smooth camera movement
 		if (this.state == GameState.GrowingRoots) {
@@ -572,12 +581,13 @@ export class GameScene extends BaseScene {
 		this.setDeepestNode(0);
 
 		this.dragGraphics.clear();
-		this.rootsGraphics.clear();
+		this.rootsBackGraphics.clear();
+		this.rootsFrontGraphics.clear();
 		this.harvestButton.hide();
 
 
 		// Restart tree
-		this.addNode(this.CX, this.SURFACE_Y + 10, true);
+		this.firstNode = this.addNode(this.CX, this.SURFACE_Y + 10, true);
 		this.tree.reset();
 		this.underground.reset();
 		this.updateScore();
@@ -661,7 +671,7 @@ export class GameScene extends BaseScene {
 			const line = new Phaser.Geom.Line(start.x, start.y, end.x, end.y);
 			const mineralIntersects = this.underground.getIntersectedMinerals(line);
 			const touchingObstacle = mineralIntersects.some((mineral => mineral.hardness > this.tree.strength));
-			const canAfford = this.tree.energy > this.currentNode.cost;
+			const canAfford = this.tree.energy >= this.currentNode.cost;
 			this.validDrawing = !!next && !touchingObstacle && canAfford;
 
 			const invalidReason = nextPosResult instanceof Phaser.Math.Vector2
@@ -674,7 +684,7 @@ export class GameScene extends BaseScene {
 
 			this.dragPos = this.dragPos.lerp(end, delta/100);
 
-			if (this.tree.energy > this.currentNode.cost) {
+			if (this.tree.energy >= this.currentNode.cost) {
 				if (next && this.validDrawing && canDraw) {
 					this.addConnection(next);
 					this.dragPos = new Phaser.Math.Vector2(next.x, next.y);
@@ -786,43 +796,87 @@ export class GameScene extends BaseScene {
 		// Add growth score
 		oldNode.addScore();
 		this.score += 1;
-		this.tree.energy -= newNode.rootDepth;
+		this.tree.energy -= oldNode.cost;
 
-		this.drawRoot(newNode);
+		this.nodes.forEach(node => {
+			if (node.cost > this.tree.energy) {
+				node.disable();
+			}
+		});
 
 		this.sound.play("r_place", { volume: 0.3, rate: 1 + Math.random() * 0.1 });
 
-		this.textParticle(newNode.x+5, newNode.y-5, "Yellow", `-${newNode.rootDepth}`, undefined, 150 * this.SCALE);
+		this.textParticle(newNode.x+5, newNode.y-5, "Yellow", `-${oldNode.cost}`, undefined, 150 * this.SCALE);
 
 		this.currentNode = newNode;
 
 		this.updateScore();
 	}
 
-	drawRoot(node: Node) {
+	drawAllRoots() {
+		if (this.nodes.length == 0) { return; }
+
+		this.rootsBackGraphics.clear();
+		this.rootsFrontGraphics.clear();
+
+		if (this.firstNode) {
+			const thickness = 50 * this.SCALE;
+			const border = 16 * this.SCALE;
+			this.rootsBackGraphics.fillStyle(0x3e2723, 1.0);
+			this.rootsBackGraphics.fillCircle(Math.round(this.firstNode.x), Math.round(this.firstNode.y), (thickness + border)/2);
+			this.rootsFrontGraphics.fillStyle(0x795548, 1.0);
+			this.rootsFrontGraphics.fillCircle(this.firstNode.x, this.firstNode.y, thickness/2);
+		}
+
+
+		this.nodes.forEach(node => {
+			this.drawRoot(node);
+		});
+	}
+
+	drawRoot(node: Node): void {
 		if (!node.parent) { return; }
 
+		// Culling check
 		const parentY = node.parent.y;
 		const currentY = node.y;
 		const cameraY = this.cameras.main.scrollY - 20;
 		const bottomY = cameraY + this.H + 40;
-		if(cameraY < parentY && cameraY < currentY && bottomY > parentY && bottomY > currentY){
+		if (cameraY < parentY && cameraY < currentY && bottomY > parentY && bottomY > currentY) {
 
-			// const thickness = (3 + 4 * Math.sqrt(node.score)) * this.SCALE;
+			// https://www.desmos.com/calculator/s0kxcaovyr
 			let minSize = 3;
 			let thickness = 30 * Math.log10(0.2 * node.score + Math.exp(1/minSize));
 			thickness *= this.SCALE;
+			// const thickness = (3 + 4 * Math.sqrt(node.score)) * this.SCALE;
 
-			this.rootsGraphics.lineStyle(thickness, 0x795548, 1.0);
-			this.rootsGraphics.beginPath();
-			this.rootsGraphics.moveTo(node.parent.x, node.parent.y);
-			this.rootsGraphics.lineTo(node.x, node.y);
-			this.rootsGraphics.closePath();
-			this.rootsGraphics.strokePath();
+
+			// Hahaha, more drawing complexity!
+
+			const border = 16 * this.SCALE;
+			this.rootsBackGraphics.lineStyle(thickness + border, 0x3e2723, 1.0);
+			this.rootsBackGraphics.beginPath();
+			this.rootsBackGraphics.moveTo(node.parent.x, node.parent.y);
+			this.rootsBackGraphics.lineTo(node.x, node.y);
+			this.rootsBackGraphics.closePath();
+			this.rootsBackGraphics.strokePath();
+
+			this.rootsBackGraphics.fillStyle(0x3e2723, 1.0);
+			this.rootsBackGraphics.fillCircle(node.x, node.y, (thickness + border)/2);
+
+			this.rootsFrontGraphics.lineStyle(thickness, 0x795548, 1.0);
+			this.rootsFrontGraphics.beginPath();
+			this.rootsFrontGraphics.moveTo(node.parent.x, node.parent.y);
+			this.rootsFrontGraphics.lineTo(node.x, node.y);
+			this.rootsFrontGraphics.closePath();
+			this.rootsFrontGraphics.strokePath();
+
+			this.rootsFrontGraphics.fillStyle(0x795548, 1.0);
+			this.rootsFrontGraphics.fillCircle(node.x, node.y, thickness/2);
 		}
 
 
-		this.drawRoot(node.parent);
+		// this.drawRoot(node.parent);
 	}
 
 	onTreeLevelUp(level: number) {

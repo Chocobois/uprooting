@@ -16,11 +16,11 @@ export class Node extends Button {
 		this.parent = null;
 		this.children = [];
 		this.score = 1;
-		this.rootDepth = 0;
+		this.rootDepth = 1;
 
 
 		this.image = this.scene.add.image(0, 0, "circle");
-		this.image.setScale((root ? 40 : 15)*this.scene.SCALE / this.image.width);
+		this.image.setScale((root ? 48 : 16)*this.scene.SCALE / this.image.width);
 		this.add(this.image);
 
 		this.bindInteractive(this.image, true);
@@ -52,9 +52,7 @@ export class Node extends Button {
 
 		// If a node has more than 2 children, disable node interaction
 		if (this.children.length >= 2) {
-			this.image.input.enabled = false;
-			this.image.setTint(0xB99578);
-			this.image.setAlpha(0.1);
+			this.disable();
 		}
 	}
 
@@ -64,6 +62,13 @@ export class Node extends Button {
 		if (this.parent) {
 			this.parent.addScore(value);
 		}
+	}
+
+
+	disable() {
+		this.image.input.enabled = false;
+		this.image.setTint(0x000000);
+		this.image.setAlpha(0.2);
 	}
 
 
