@@ -15,7 +15,7 @@ interface SpriteSheet {
 interface Audio {
 	key: string;
 	path: string;
-	volume: number;
+	volume?: number;
 	rate?: number;
 }
 
@@ -54,6 +54,7 @@ import emerald from "./images/items/emerald.png";
 import diamond from "./images/items/diamond.png";
 import platinum from "./images/items/platinum.png";
 import badrock from "./images/items/hasty_rock.png";
+import watercave from "./images/items/watercave.png";
 
 // UI
 import fruit_upgrade from "./images/ui/fruit_upgrade.png";
@@ -101,6 +102,7 @@ const images: Asset[] = [
 	{ key: "emerald", path: emerald },
 	{ key: "diamond", path: diamond },
 	{ key: "platinum", path: platinum },
+	{ key: "watercave1", path: watercave },
 	{ key: "badrock", path: badrock },
 
 	// UI
@@ -166,11 +168,11 @@ import r_place from "./sounds/roots/place.mp3";
 import r_place_error from "./sounds/roots/place_error.mp3";
 
 const audios: Audio[] = [
-	{ key: "m_main_menu", path: m_main_menu, volume: 1 },
-	{ key: "m_first", path: m_first, volume: 1 },
-	{ key: "m_first_draw", path: m_first_draw, volume: 1 },
-	{ key: "m_first_end", path: m_first_end, volume: 1 },
-	{ key: "m_shop", path: m_shop, volume: 1 },
+	{ key: "m_main_menu", path: m_main_menu },
+	{ key: "m_first", path: m_first },
+	{ key: "m_first_draw", path: m_first_draw },
+	{ key: "m_first_end", path: m_first_end },
+	{ key: "m_shop", path: m_shop },
 	{ key: "r_grow", path: r_grow, volume: 0.5 },
 	{ key: "r_place", path: r_place, volume: 1 },
 	{ key: "r_place_error", path: r_place_error, volume: 0.5 },

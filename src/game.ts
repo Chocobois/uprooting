@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { PreloadScene } from "./scenes/PreloadScene";
 import { GameScene } from "./scenes/GameScene";
 
+
 const config: Phaser.Types.Core.GameConfig = {
 	type: Phaser.WEBGL,
 	width: 1920/4,

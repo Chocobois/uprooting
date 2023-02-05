@@ -9,6 +9,7 @@ import { HarvestButton } from "./../components/HarvestButton";
 import GetShortestDistance from "phaser/src/geom/line/GetShortestDistance";
 import { MiniButton } from "../components/MiniButton";
 import { Shop, ItemType, ItemData } from "../components/Shop";
+import { TextParticle } from "../components/TextParticle";
 
 
 enum GameState {
@@ -25,6 +26,7 @@ enum MusicState {
 	Nothing,
 	NormalLoop,
 	LayeredLoop,
+	Shop,
 	Jingle
 }
 
@@ -43,6 +45,9 @@ export class GameScene extends BaseScene {
 	private currentNode: Node | null;
 	private nodes: Node[];
 	private deepestNodeY: number;
+
+	private lastPos: Phaser.Math.Vector2;
+
 	// Graphics for roots. Should be replaced as it's very inefficient.
 	private dragGraphics: Phaser.GameObjects.Graphics;
 	private rootsGraphics: Phaser.GameObjects.Graphics;
@@ -63,6 +68,7 @@ export class GameScene extends BaseScene {
 
 	// Particles
 	public particles: Particles;
+	public textParticles: TextParticle;
 
 	// Music
 	public musicMuted: boolean;
@@ -70,6 +76,7 @@ export class GameScene extends BaseScene {
 	public musicNormal: Music;
 	public musicDrawing: Music;
 	public musicJingle: Music;
+	public musicShop: Music;
 	public musicVolume: number;
 
 	// Feel free to edit this ts declaration, it's supposed to be a k-v pair object
@@ -107,27 +114,37 @@ export class GameScene extends BaseScene {
 		this.overworldBush.setScrollFactor(0.8);
 		this.fitToScreen(this.overworldBush);
 
-		this.background = this.add.image(this.CX, this.SURFACE_Y - 20*this.SCALE, "underground");
-		this.background.setOrigin(0.5, 0);
-		this.background.setScale(2 * this.W / this.background.width);
 		// this.fitToScreen(this.background);
 
-
-		// Underground
-
-		this.underground = new Underground(this, this.SURFACE_Y, this.BEDROCK_Y);
-
-		this.shop = new Shop(this, 0.2 * this.W, this.SURFACE_Y);
+		this.shop = new Shop(this, 0.2 * this.W, this.SURFACE_Y+192*this.SCALE );
 		this.shop.on("open", () => {
 			this.cameras.main.scrollY = 0;
 
 			if (this.state == GameState.GrowingRoots) {
 				this.shop.open();
 				this.state = GameState.InsideShop;
+				this.musicState = MusicState.Shop;
+				this.musicNormal.stop();
+				this.musicDrawing.stop();
+				this.musicShop.play();
 			}
 		});
 		this.shop.on("close", () => {
 			this.state = GameState.GrowingRoots;
+			
+			this.musicShop.stop();
+			this.sound.play("m_shop", {
+				name: "shopEnding",
+				start: 3308100/48000, // 495095
+				duration: 1,
+				config: { volume: this.musicShop.volume }
+			})
+			
+			setTimeout(() => {
+				this.musicState = MusicState.NormalLoop;
+				this.musicNormal.play();
+				this.musicDrawing.play();
+			}, 1300);
 		});
 		this.shop.on("buy", (itemData: ItemData) => {
 			if (itemData.type == ItemType.TreeEnergy) {
@@ -136,6 +153,16 @@ export class GameScene extends BaseScene {
 			// Add more shop item mechanics...
 			// Or break up into more emits
 		});
+
+
+		// Underground
+		this.background = this.add.image(this.CX, this.SURFACE_Y - 20*this.SCALE, "underground");
+		this.background.setOrigin(0.5, 0);
+		this.background.setScale(2 * this.W / this.background.width);
+
+
+		// The underground mineral spawner
+		this.underground = new Underground(this, this.SURFACE_Y, this.BEDROCK_Y);
 
 
 		// Tree
@@ -149,6 +176,7 @@ export class GameScene extends BaseScene {
 
 		this.rootsGraphics = this.add.graphics();
 		this.dragGraphics = this.add.graphics();
+		this.textParticles = new TextParticle(this);
 
 
 		// Root nodes
@@ -157,7 +185,7 @@ export class GameScene extends BaseScene {
 		this.deepestNodeY = 0;
 		this.nodes = [];
 		this.addNode(this.CX, this.SURFACE_Y + 10*this.SCALE, true);
-
+		this.lastPos = new Phaser.Math.Vector2(this.nodes[0].x, this.nodes[0].y);
 
 		// Particles
 
@@ -181,6 +209,7 @@ export class GameScene extends BaseScene {
 				this.musicNormal.mute = !this.musicNormal.mute;
 				this.musicDrawing.mute = !this.musicDrawing.mute;
 				this.musicJingle.mute = !this.musicJingle.mute;
+				this.musicShop.mute = !this.musicShop.mute;
 			});
 
 		this.audioButton = new MiniButton(this, this.W - buttonSize, 1.5 * buttonSize, "audio")
@@ -202,6 +231,7 @@ export class GameScene extends BaseScene {
 		this.musicNormal = new Music(this, 'm_first', { volume: this.musicMuted ? 0 : this.musicVolume });
 		this.musicDrawing = new Music(this, 'm_first_draw', { volume: 0 });
 		this.musicJingle = new Music(this, 'm_first_end', { volume: this.musicMuted ? 0 : this.musicVolume });
+		this.musicShop = new Music(this, 'm_shop', { volume: 0 });
 
 		this.musicNormal.play();
 		this.musicDrawing.play();
@@ -241,6 +271,7 @@ export class GameScene extends BaseScene {
 
 		// Update game objects
 		this.particles.update(time, delta);
+		this.textParticles.update(time, delta);
 		this.underground.update(time, delta);
 		this.shop.update(time, delta);
 		this.tree.update(time, delta);
@@ -248,6 +279,7 @@ export class GameScene extends BaseScene {
 			node.update(time, delta);
 		});
 		this.returnToSurfaceButton.update(time, delta);
+		this.updateMusic(time, delta);
 
 		// Debug, move this to some ui thing
 		this.debugText.setText(`State: ${this.state}\nEnergy: ${this.tree.energy}/${this.tree.maxEnergy}`);
@@ -257,14 +289,56 @@ export class GameScene extends BaseScene {
 			// Move camera with mouse input
 			this.moveCamera();
 
-			this.handleRootDrawing();
+			this.handleRootDrawing(delta);
 		}
+	}
 
-		// Update music based on if the player is drawing a line
 
-		this.musicDrawing.volume = this.musicMuted ? 0 : (
-			(this.musicState == MusicState.LayeredLoop) ? this.musicVolume : 0.00001
-		)
+	updateMusic(time, delta /* , newState?: MusicState */ ) {
+
+		/* if (newState) this.musicState = newState; */
+
+		switch (this.musicState) {
+			case MusicState.NormalLoop:
+			case MusicState.LayeredLoop:
+
+				this.musicNormal.volume = this.musicMuted ? 0 : this.musicVolume;
+				this.musicShop.volume = 0;
+
+				// Update music based on if the player is drawing a line
+
+				const targetVolume = this.musicMuted ? 0 : (
+					(this.musicState == MusicState.LayeredLoop) ? this.musicVolume : 0.00001
+				)
+
+				const volumeSame = Math.abs(this.musicDrawing.volume - targetVolume) <= 1e-4;
+
+				if (!volumeSame) {
+					const volumeStep = (this.musicDrawing.volume < targetVolume) ? 1 : -1;
+					this.musicDrawing.volume += (volumeStep / delta) / 5;
+				}
+
+				else if (this.musicDrawing.volume < 0) { this.musicDrawing.volume = 0; }
+
+				// If the drawing music plays for a split second after starting the game, it's an autoplay issue	
+
+				break;
+		
+			case MusicState.Shop:
+
+				this.musicNormal.volume = 0;
+				this.musicDrawing.volume = 0;
+				this.musicShop.volume = this.musicMuted ? 0 : (this.musicVolume * 0.6);
+
+				break;
+
+			case MusicState.Jingle:
+				break;
+
+			case MusicState.Nothing:
+			default:
+				break;
+		}
 	}
 
 
@@ -342,13 +416,14 @@ export class GameScene extends BaseScene {
 		// Restart tree
 		this.addNode(this.CX, this.SURFACE_Y + 10, true);
 		this.tree.reset();
+		this.underground.reset();
 		this.updateScore();
 	}
 
 
 	/* Tree */
 
-	handleRootDrawing() {
+	handleRootDrawing(delta: number) {
 		const pointer = new Phaser.Math.Vector2(this.input.activePointer.x, this.input.activePointer.y);
 		pointer.y += this.cameras.main.scrollY;
 
@@ -356,26 +431,33 @@ export class GameScene extends BaseScene {
 			const start = new Phaser.Math.Vector2(this.currentNode.x, this.currentNode.y);
 			const next = this.nextNodePos(pointer);
 
+			if( next ) {
+				const nextPos = new Phaser.Math.Vector2(next.x, next.y);
+				this.lastPos = this.lastPos.lerp(nextPos, delta/100);
+			}
+
 			// Distance must be DRAG_LIMIT
 			// Also, don't create anything if cursor is too far,
 			// to prevent placing extra segments accidentally
 			const distance = Phaser.Math.Distance.BetweenPoints(this.currentNode, pointer);
-			const canDraw = distance >= this.DRAG_LIMIT && distance < this.DRAG_LIMIT * 2;
+			const canDraw = distance >= this.DRAG_LIMIT;
 
 			this.dragGraphics.clear();
 			this.dragGraphics.lineStyle(5*this.SCALE, next ? 0x00FF00 : 0xFF0000, 1.0);
 
+			const end = next ? next : start.clone().add(pointer.clone().subtract(this.currentNode).limit(this.DRAG_LIMIT));
+			const extended = end.distance(this.lastPos) < 4;
+
 			if (this.tree.energy > this.currentNode.cost) {
 				if (next && canDraw) {
 					this.addConnection(next);
+					this.lastPos = new Phaser.Math.Vector2(next.x, next.y);
 				}
 			}
 			else if (!this.oneTimeEvents.outOfEnergy) {
 				this.oneTimeEvents.outOfEnergy = true;
 				this.returnToSurfaceButton.show();
 			}
-
-			const end = next ? next : start.clone().add(pointer.clone().subtract(this.currentNode).limit(this.DRAG_LIMIT));
 
 			const limitReached = !next && Math.abs(start.distance(end) - this.DRAG_LIMIT) < 1e-10;
 
@@ -388,7 +470,7 @@ export class GameScene extends BaseScene {
 
 			this.dragGraphics.beginPath();
 			this.dragGraphics.moveTo(start.x, start.y);
-			this.dragGraphics.lineTo(end.x, end.y);
+			this.dragGraphics.lineTo(this.lastPos.x, this.lastPos.y);
 			this.dragGraphics.closePath();
 			this.dragGraphics.strokePath();
 		}
@@ -465,6 +547,9 @@ export class GameScene extends BaseScene {
 
 		this.sound.play("r_place", { volume: 0.3, rate: 1 + Math.random() * 0.1 });
 
+		const text = this.createText(newNode.x+5, newNode.y-5, 40*this.SCALE, "Yellow", `-${newNode.rootDepth}`)
+		this.textParticles.push(text, 1.5, true);
+
 		this.currentNode = newNode;
 
 		this.updateScore();
@@ -523,6 +608,7 @@ export class GameScene extends BaseScene {
 
 	onNodeDragStart(node: Node) {
 		this.currentNode = node;
+		this.lastPos = new Phaser.Math.Vector2(node.x, node.y);
 		this.musicState = MusicState.LayeredLoop;
 		this.oneTimeEvents.wrongPlacementSound = false;
 	}
@@ -530,7 +616,7 @@ export class GameScene extends BaseScene {
 	onPointerUp(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]): void {
 		this.currentNode = null;
 		this.dragGraphics.clear();
-		this.musicState = MusicState.NormalLoop;
+		if (this.state != GameState.InsideShop) this.musicState = MusicState.NormalLoop;
 	}
 
 	onScroll(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) {
