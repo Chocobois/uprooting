@@ -114,9 +114,7 @@ export class GameScene extends BaseScene {
 
 		// this.fitToScreen(this.background);
 
-		this.underground = new Underground(this, this.SURFACE_Y, this.BEDROCK_Y);
-
-		this.shop = new Shop(this, 0.2 * this.W, this.SURFACE_Y+48);
+		this.shop = new Shop(this, 0.2 * this.W, this.SURFACE_Y+192*this.SCALE );
 		this.shop.on("open", () => {
 			this.cameras.main.scrollY = 0;
 
@@ -143,6 +141,7 @@ export class GameScene extends BaseScene {
 		this.background.setScale(2 * this.W / this.background.width);
 
 
+		// The underground mineral spawner
 		this.underground = new Underground(this, this.SURFACE_Y, this.BEDROCK_Y);
 
 
@@ -494,7 +493,7 @@ export class GameScene extends BaseScene {
 
 		this.sound.play("r_place", { volume: 0.3, rate: 1 + Math.random() * 0.1 });
 
-		const text = this.createText(newNode.x+5, newNode.y-5, 10, "Yellow", `-${newNode.rootDepth}`)
+		const text = this.createText(newNode.x+5, newNode.y-5, 40*this.SCALE, "Yellow", `-${newNode.rootDepth}`)
 		this.textParticles.push(text, 1.5, true);
 
 		this.currentNode = newNode;
