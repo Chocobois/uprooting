@@ -20,7 +20,7 @@ export class Node extends Button {
 
 
 		this.image = this.scene.add.image(0, 0, "circle");
-		this.image.setScale((root ? 25 : 15)*this.scene.SCALE / this.image.width);
+		this.image.setScale((root ? 40 : 15)*this.scene.SCALE / this.image.width);
 		this.add(this.image);
 
 		this.bindInteractive(this.image, true);
