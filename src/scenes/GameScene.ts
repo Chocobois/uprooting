@@ -364,6 +364,7 @@ export class GameScene extends BaseScene {
 		// Smooth camera movement
 		if (this.state == GameState.GrowingRoots) {
 			this.cameras.main.scrollY += 0.3 * (this.cameraSmoothY - this.cameras.main.scrollY);
+			this.undergroundEdge.y = Math.max(this.undergroundEdge.y, this.cameras.main.scrollY + this.H);
 		}
 
 		// Update game objects
@@ -500,14 +501,6 @@ export class GameScene extends BaseScene {
 		if (y == 0) { this.deepestNodeY = 0; }
 		this.deepestNodeY = Math.max(y, this.deepestNodeY);
 		this.setCameraBounds(0, 0, this.W, this.deepestNodeY + 0.6 * this.H);
-		// this.undergroundEdge.setY(this.cameraBounds.height);
-		this.tweens.addCounter({
-			from: this.undergroundEdge.y,
-			to: Math.max(this.cameraBounds.height, 1.5*this.H),
-			duration: 500,
-			ease: "Quad",
-			onUpdate: (tween) => this.undergroundEdge.setY(tween.getValue())
-		});
 		// this.setCameraBounds(0, 0, this.W, 100000);
 		// this.cameras.main.setBounds(-0.5*this.W, -this.H, 2*this.W, 1000000);
 
@@ -579,6 +572,7 @@ export class GameScene extends BaseScene {
 		this.nodes = [];
 
 		this.setDeepestNode(0);
+		this.undergroundEdge.y = this.cameraBounds.height;
 
 		this.dragGraphics.clear();
 		this.rootsBackGraphics.clear();
