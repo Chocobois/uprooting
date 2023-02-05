@@ -9,6 +9,7 @@ import { HarvestButton } from "./../components/HarvestButton";
 import GetShortestDistance from "phaser/src/geom/line/GetShortestDistance";
 import { MiniButton } from "../components/MiniButton";
 import { Shop, ItemType, ItemData } from "../components/Shop";
+import { TextParticle } from "../components/TextParticle";
 
 
 enum GameState {
@@ -63,6 +64,7 @@ export class GameScene extends BaseScene {
 
 	// Particles
 	public particles: Particles;
+	public textParticles: TextParticle;
 
 	// Music
 	public musicMuted: boolean;
@@ -148,6 +150,7 @@ export class GameScene extends BaseScene {
 
 		this.rootsGraphics = this.add.graphics();
 		this.dragGraphics = this.add.graphics();
+		this.textParticles = new TextParticle(this);
 
 
 		// Root nodes
@@ -240,6 +243,7 @@ export class GameScene extends BaseScene {
 
 		// Update game objects
 		this.particles.update(time, delta);
+		this.textParticles.update(time, delta);
 		this.underground.update(time, delta);
 		this.shop.update(time, delta);
 		this.tree.update(time, delta);
@@ -474,6 +478,9 @@ export class GameScene extends BaseScene {
 		this.drawRoot(newNode);
 
 		this.sound.play("r_place", { volume: 0.3, rate: 1 + Math.random() * 0.1 });
+
+		const text = this.createText(newNode.x+5, newNode.y-5, 10, "Yellow", `-${newNode.rootDepth}`)
+		this.textParticles.push(text, 1.5, true);
 
 		this.currentNode = newNode;
 
