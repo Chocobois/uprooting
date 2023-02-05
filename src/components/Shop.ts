@@ -42,6 +42,7 @@ export class Shop extends Phaser.GameObjects.Container {
 
 	// Overworld
 	private overworldShop: Button;
+	private overworldShopScale: number;
 
 	// Overlay popup
 	private background: Phaser.GameObjects.Image;
@@ -103,6 +104,7 @@ export class Shop extends Phaser.GameObjects.Container {
 		// Overworld
 
 		// House
+		this.overworldShopScale = 0;
 		this.overworldShop = new Button(this.scene, x, y);
 		let house = this.scene.add.image(0, 0, "overworld_shop");
 		house.setScrollFactor(0.9);
@@ -114,6 +116,7 @@ export class Shop extends Phaser.GameObjects.Container {
 		this.overworldShop.on("click", () => {
 			this.emit("open");
 		});
+		this.overworldShop.setVisible(false);
 
 
 		// Overlay shop
@@ -238,7 +241,7 @@ export class Shop extends Phaser.GameObjects.Container {
 	}
 
 	update(time: number, delta: number) {
-		this.overworldShop.setScale(1.0 - 0.1 * this.overworldShop.holdSmooth);
+		this.overworldShop.setScale(this.overworldShopScale - 0.1 * this.overworldShop.holdSmooth);
 		this.exitButton.setScale(1.0 - 0.1 * this.exitButton.holdSmooth);
 		this.buyButton.setScale(1.0 - 0.1 * this.buyButton.holdSmooth * (this.buyButton.enabled ? 1 : 0));
 
@@ -337,6 +340,19 @@ export class Shop extends Phaser.GameObjects.Container {
 
 		this.selectItem(null, true);
 		this.updateItemsForSale();
+	}
+
+
+	activateOverworldShop() {
+		this.overworldShop.setVisible(true);
+
+		this.scene.tweens.add({
+			targets: this,
+			overworldShopScale: { from: 0, to: 1 },
+			ease: 'Back.Out',
+			duration: 700,
+			delay: 500
+		});
 	}
 
 

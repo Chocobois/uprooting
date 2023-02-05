@@ -315,6 +315,7 @@ export class GameScene extends BaseScene {
 			growthStage2Sound: false,
 			wrongPlacementSound: false,
 			outOfEnergy: false,
+			spawnShop: false,
 		}
 
 
@@ -498,6 +499,11 @@ export class GameScene extends BaseScene {
 		this.oneTimeEvents.outOfEnergy = false;
 		this.oneTimeEvents.growthStage1Sound = false;
 		this.oneTimeEvents.growthStage2Sound = false;
+
+		if (!this.oneTimeEvents.spawnShop) {
+			this.oneTimeEvents.spawnShop = true;
+			this.shop.activateOverworldShop();
+		}
 
 		// Add current score to growth
 		// Should be a whole sequence here instead and the shop thing, etc
@@ -708,13 +714,20 @@ export class GameScene extends BaseScene {
 	drawRoot(node: Node) {
 		if (!node.parent) { return; }
 
-		const thickness = (3 + 4 * Math.sqrt(node.score)) * this.SCALE;
-		this.rootsGraphics.lineStyle(thickness, 0x795548, 1.0);
-		this.rootsGraphics.beginPath();
-		this.rootsGraphics.moveTo(node.parent.x, node.parent.y);
-		this.rootsGraphics.lineTo(node.x, node.y);
-		this.rootsGraphics.closePath();
-		this.rootsGraphics.strokePath();
+		const parentY = node.parent.y;
+		const currentY = node.y;
+		const cameraY = this.cameras.main.scrollY - 20;
+		const bottomY = cameraY + this.H + 40;
+		if(cameraY < parentY && cameraY < currentY && bottomY > parentY && bottomY > currentY){
+			const thickness = (3 + 4 * Math.sqrt(node.score)) * this.SCALE;
+			this.rootsGraphics.lineStyle(thickness, 0x795548, 1.0);
+			this.rootsGraphics.beginPath();
+			this.rootsGraphics.moveTo(node.parent.x, node.parent.y);
+			this.rootsGraphics.lineTo(node.x, node.y);
+			this.rootsGraphics.closePath();
+			this.rootsGraphics.strokePath();
+		}
+
 
 		this.drawRoot(node.parent);
 	}
@@ -736,7 +749,9 @@ export class GameScene extends BaseScene {
 	}
 
 	onTreeClick() {
-		if (this.state == GameState.HarvestingTree) {
+		if (this.state == GameState.HarvestingTree || (this.state == GameState.GrowingRoots && this.totalScore > 10)) {
+			this.moveSmoothCamera(-this.cameraSmoothY);
+
 			this.tree.harvestCount -= 1;
 			this.money += this.totalScore;
 

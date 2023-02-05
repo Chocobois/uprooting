@@ -18,7 +18,7 @@ export class ShopItem extends Button {
 
 		this.background = this.scene.add.image(0, 0, "fruit_upgrade");
 		this.background.setScale(this.size / this.background.width);
-		this.background.setAlpha(0.01);
+		this.background.setTint(0xbbbbbb);
 		this.add(this.background);
 
 		this.image = this.scene.add.image(0, 0, "fruit_upgrade");
@@ -31,16 +31,18 @@ export class ShopItem extends Button {
 	}
 
 	update(time: number, delta: number, isSelected: boolean) {
-		let wobble = 0.005*this.scene.H * Math.sin((time+this.x+2*this.y)/300);
-		this.y = this.originalY + wobble;
+		if (this.available) {
+			let wobble = 0.005*this.scene.H * Math.sin((time+this.x+2*this.y)/300);
+			this.y = this.originalY + wobble;
+		}
 
 		this.setScale(1.0 - 0.1 * this.holdSmooth);
 
 		if (isSelected) {
-			this.setAlpha(0.75 + 0.25 * Math.sin(time/100));
+			this.image.setAlpha(0.75 + 0.25 * Math.sin(time/100));
 		}
 		else {
-			this.setAlpha(1.0);
+			this.image.setAlpha(1.0);
 		}
 	}
 
@@ -50,11 +52,12 @@ export class ShopItem extends Button {
 
 		this.image.setTexture(itemData.image);
 
-		const scale = (itemData.type == ItemType.SoldOut ? 0.5 : 1.0);
+		const scale = (itemData.type == ItemType.SoldOut ? 0.5 : 0.9);
 		const origin = (itemData.type == ItemType.SoldOut ? 0.0 : 0.5);
 		this.image.setScale(scale * this.size / this.image.width);
 		this.image.setOrigin(0.5, origin);
 
+		this.background.setVisible(this.available);
 	}
 
 	getPrice(): number {
@@ -62,5 +65,9 @@ export class ShopItem extends Button {
 			return this.itemData.price;
 		}
 		return 0;
+	}
+
+	get available(): boolean {
+		return !!this.itemData && this.itemData.type != ItemType.SoldOut;
 	}
 }

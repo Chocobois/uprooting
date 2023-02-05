@@ -1,5 +1,5 @@
 {
-  "applicationId": "chocobois-ggj2023",
+  "applicationId": "rerooted-chocobois-ggj2023",
   "version": "1.0.0",
   "defaultMode": "window",
   "port": 0,
@@ -18,7 +18,7 @@
   ],
   "modes": {
     "window": {
-      "title": "Chocobois GGJ2023",
+      "title": "Rerooted - Chocobois Global Game Jam 2023",
       "width": 960,
       "height": 570,
       "minWidth": 960,
@@ -35,7 +35,7 @@
     }
   },
   "cli": {
-    "binaryName": "Chocobois-GGJ2023",
+    "binaryName": "Rerooted-GGJ2023",
     "resourcesPath": "/dist/",
     "clientLibrary": "/src/neutralino.js",
     "binaryVersion": "4.9.0",
