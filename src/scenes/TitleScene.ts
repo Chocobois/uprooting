@@ -12,6 +12,7 @@ HeXaGoN
 @MatoCookies
 Lumie
 @Dreedawott
+Frassy
 Luxi`;
 
 const creditsRight = `
@@ -23,6 +24,7 @@ art
 music & code
 art & code
 art
+ideas
 testing`;
 
 
@@ -71,18 +73,18 @@ export class TitleScene extends BaseScene {
 
 		this.background.setVisible(false);
 		this.background.setAlpha(0);
-		this.background.y += 1000;
-		this.foreground.y += 200;
+		this.background.y += 4*1000*this.SCALE;
+		this.foreground.y += 4*250*this.SCALE;
 
 
-		this.title = this.createText(0.3*this.W, 0.75*this.H, 150*this.SCALE, "#000", "Fire and Dice");
+		this.title = this.createText(0.25*this.W, 0.7*this.H, 150*this.SCALE, "#000", "Root...?");
 		this.title.setOrigin(0.5);
 		this.title.setStroke("#FFF", 40*8*this.SCALE);
 		this.title.setPadding(2*40*8*this.SCALE);
 		this.title.setVisible(false);
 		this.title.setAlpha(0);
 
-		this.subtitle = this.createText(0.3*this.W, 0.91*this.H, 3*35*this.SCALE, "#000", "Tap to start");
+		this.subtitle = this.createText(0.25*this.W, 0.87*this.H, 120*this.SCALE, "#000", "Tap to start");
 		this.subtitle.setOrigin(0.5);
 		this.subtitle.setStroke("#FFF", 40*3*this.SCALE);
 		this.subtitle.setPadding(2*40*2*this.SCALE);
