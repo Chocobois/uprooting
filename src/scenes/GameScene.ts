@@ -539,6 +539,8 @@ export class GameScene extends BaseScene {
 		});
 		this.nodes = [];
 
+		this.setDeepestNode(0);
+
 		this.dragGraphics.clear();
 		this.rootsGraphics.clear();
 		this.harvestButton.hide();
