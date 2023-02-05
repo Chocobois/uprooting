@@ -362,7 +362,7 @@ export class GameScene extends BaseScene {
 		const pointer = this.input.activePointer;
 		const upperArea = 0.10 * this.H; // Upper 10% of the screen
 		const lowerArea = this.H - 0.30 * this.H; // Lower 30% of the screen
-		const maxScrollSpeed = 20;
+		const maxScrollSpeed = 5;
 
 		// If pointer at the top of the screen, move camera upwards
 		if (pointer.y < upperArea && this.validDrawing) {
