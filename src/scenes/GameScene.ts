@@ -149,7 +149,7 @@ export class GameScene extends BaseScene {
 		// this.fitToScreen(this.background);
 
 		// Money
-		this.money = 9999990;
+		this.money = 0;
 
 		this.hud = new HUD(this);
 
@@ -473,6 +473,10 @@ export class GameScene extends BaseScene {
 		});
 		// this.setCameraBounds(0, 0, this.W, 100000);
 		// this.cameras.main.setBounds(-0.5*this.W, -this.H, 2*this.W, 1000000);
+
+		if (this.totalScore > 5 && this.cameraSmoothY > this.H) {
+			this.returnToSurfaceButton.show();
+		}
 	}
 
 	returnToSurface() {

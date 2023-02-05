@@ -34,6 +34,7 @@ export class SurfaceButton extends Button {
 
 	update(time: number, delta: number) {
 		this.setScale(1.0 - 0.1 * this.holdSmooth);
+		this.setAlpha((this.scene.cameras.main.scrollY - 1*this.scene.H) / this.scene.H*4);
 	}
 
 
