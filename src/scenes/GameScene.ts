@@ -739,7 +739,7 @@ export class GameScene extends BaseScene {
 	}
 
 	onTreeClick() {
-		if (this.state == GameState.GrowingRoots || this.state == GameState.HarvestingTree) {
+		if (this.state == GameState.HarvestingTree || (this.state == GameState.GrowingRoots && this.totalScore > 10)) {
 			this.moveSmoothCamera(-this.cameraSmoothY);
 
 			this.tree.harvestCount -= 1;
