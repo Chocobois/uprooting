@@ -58,6 +58,12 @@ import watercave from "./images/items/watercave.png";
 import coin from "./images/items/coin.png";
 import energy from "./images/items/energy.png";
 
+// Titlescreen
+import title from "./images/titlescreen/title.png";
+import foreground from "./images/titlescreen/foreground.png";
+import background from "./images/titlescreen/background.png";
+import skybackground from "./images/titlescreen/skybackground.png";
+
 // UI
 import fruit_upgrade from "./images/ui/fruit_upgrade.png";
 import energy_teter from "./images/ui/meter.png";
@@ -108,6 +114,12 @@ const images: Asset[] = [
 	{ key: "badrock", path: badrock },
 	{ key: "coin", path: coin },
 	{ key: "energy", path: energy },
+
+	// Titlescreen
+	{ key: "title", path: title },
+	{ key: "foreground", path: foreground },
+	{ key: "background", path: background },
+	{ key: "skybackground", path: skybackground },
 
 	// UI
 	{ key: "fruit_upgrade", path: fruit_upgrade },
