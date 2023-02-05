@@ -698,13 +698,20 @@ export class GameScene extends BaseScene {
 	drawRoot(node: Node) {
 		if (!node.parent) { return; }
 
-		const thickness = (3 + 4 * Math.sqrt(node.score)) * this.SCALE;
-		this.rootsGraphics.lineStyle(thickness, 0x795548, 1.0);
-		this.rootsGraphics.beginPath();
-		this.rootsGraphics.moveTo(node.parent.x, node.parent.y);
-		this.rootsGraphics.lineTo(node.x, node.y);
-		this.rootsGraphics.closePath();
-		this.rootsGraphics.strokePath();
+		const parentY = node.parent.y;
+		const currentY = node.y;
+		const cameraY = this.cameras.main.scrollY - 20;
+		const bottomY = cameraY + this.H + 40;
+		if(cameraY < parentY && cameraY < currentY && bottomY > parentY && bottomY > currentY){
+			const thickness = (3 + 4 * Math.sqrt(node.score)) * this.SCALE;
+			this.rootsGraphics.lineStyle(thickness, 0x795548, 1.0);
+			this.rootsGraphics.beginPath();
+			this.rootsGraphics.moveTo(node.parent.x, node.parent.y);
+			this.rootsGraphics.lineTo(node.x, node.y);
+			this.rootsGraphics.closePath();
+			this.rootsGraphics.strokePath();
+		}
+
 
 		this.drawRoot(node.parent);
 	}
