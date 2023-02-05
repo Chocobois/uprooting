@@ -64,7 +64,7 @@ export class GameScene extends BaseScene {
 	private undergroundEdge: Phaser.GameObjects.Image;
 
 	// Tree
-	private tree: Tree;
+	public tree: Tree;
 	private currentNode: Node | null;
 	private nodes: Node[];
 	private deepestNodeY: number;
@@ -149,7 +149,7 @@ export class GameScene extends BaseScene {
 		// this.fitToScreen(this.background);
 
 		// Money
-		this.money = 0;
+		this.money = 9999990;
 
 		this.hud = new HUD(this);
 
@@ -164,6 +164,7 @@ export class GameScene extends BaseScene {
 				this.musicState = MusicState.Shop;
 				this.musicNormal.stop();
 				this.musicDrawing.stop();
+				this.musicJingle.stop();
 				this.musicShop.play();
 			}
 		});
@@ -185,9 +186,14 @@ export class GameScene extends BaseScene {
 			}, 1300);
 		});
 		this.shop.on("buy", (itemData: ItemData) => {
+
 			if (itemData.type == ItemType.TreeEnergy) {
-				this.tree.addMaxEnergy(100);
+				this.tree.addMaxEnergy(itemData.value[itemData.iteration-1]);
+			} else if (itemData.type == ItemType.RockBreak)
+			{
+				this.tree.strength += itemData.value[itemData.iteration-1];
 			}
+			itemData.iteration++;
 			// Add more shop item mechanics...
 			// Or break up into more emits
 		});
@@ -503,6 +509,19 @@ export class GameScene extends BaseScene {
 		if (!this.oneTimeEvents.spawnShop) {
 			this.oneTimeEvents.spawnShop = true;
 			this.shop.activateOverworldShop();
+			this.musicState = MusicState.Jingle;
+			this.musicNormal.stop();
+			this.musicDrawing.stop();
+			this.musicJingle.play();
+			setTimeout(() => {
+				this.musicNormal = new Music(this, 'm_first', { volume: this.musicMuted ? 0 : this.musicVolume });
+				this.musicDrawing = new Music(this, 'm_first_draw', { volume: 0 });
+				if (this.musicState == MusicState.Jingle) {
+					this.musicState = MusicState.NormalLoop;
+					this.musicNormal.play();
+					this.musicDrawing.play();
+				}
+			}, this.musicJingle.duration * 1000);
 		}
 
 		// Add current score to growth

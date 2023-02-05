@@ -24,7 +24,7 @@ export class Tree extends Button {
 		this.maxEnergy = 100;
 		this.energy = this.maxEnergy;
 		this.harvestCount = 3;
-		this.strength = 3;
+		this.strength = 1;
 
 
 		// Tree sprite
