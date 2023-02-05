@@ -783,7 +783,7 @@ export class GameScene extends BaseScene {
 		const cameraY = this.cameras.main.scrollY - 20;
 		const bottomY = cameraY + this.H + 40;
 		if(cameraY < parentY && cameraY < currentY && bottomY > parentY && bottomY > currentY){
-			const thickness = (3 + 4 * Math.sqrt(node.score)) * this.SCALE;
+			const thickness = (3 + 4 * Math.sqrt(node.score > 25 ? 25 : node.score)) * this.SCALE;
 			this.rootsGraphics.lineStyle(thickness, 0x795548, 1.0);
 			this.rootsGraphics.beginPath();
 			this.rootsGraphics.moveTo(node.parent.x, node.parent.y);

@@ -58,7 +58,7 @@ export class Tree extends Button {
 	}
 
 	setTreeScore(score: number) {
-		const treeSize = this.scene.H * (.1 + .01 * score);
+		const treeSize = this.scene.H * (.1 + (score > 500 ? (5 + 0.0001*score) : (.01 * score)));
 
 		this.treeSprite.setScale(treeSize / this.treeSprite.width);
 		const inputPadding = 40 * this.scene.SCALE / this.treeSprite.scaleX;
