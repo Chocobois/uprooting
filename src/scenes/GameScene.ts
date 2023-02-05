@@ -584,11 +584,14 @@ export class GameScene extends BaseScene {
 
 		collectibles.forEach(collectible => {
 			let color = "Lime";
-			if (collectible.type == MineralType.applecore) {
+			if (collectible.points > 200) {
 				color = "Red";
+			} else if (collectible.points > 1000)
+			{
+				color = "Blue"
 			}
 
-			this.textParticle(collectible.x, collectible.y-10, color, `+1 ${collectible.properName}`, true,
+			this.textParticle(collectible.x, collectible.y-10, color, `${collectible.properName} +${collectible.points}!`, true,
 			250*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
 
 			if (this.currentNode && collectible.points) {

@@ -52,6 +52,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 300,
 		spacingRadius: 165,
 		collectible: true,
+		points: 1337,
 		hardness: 9
 	},
 	{
@@ -63,6 +64,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 120,
 		spacingRadius: 300,
 		collectible: true,
+		points: 2,
 		hardness: 1
 	},
 	{
@@ -74,6 +76,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 70,
 		spacingRadius: 100,
 		collectible: true,
+		points: 4,
 		hardness: 1
 	},
 	{
@@ -85,6 +88,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 70,
 		spacingRadius: 65,
 		collectible: true,
+		points: 10,
 		hardness: 2
 	},
 	{
@@ -96,6 +100,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 135,
 		spacingRadius: 125,
 		collectible: true,
+		points: 20,
 		hardness: 2
 	},
 	{
@@ -107,6 +112,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 90,
 		spacingRadius: 55,
 		collectible: true,
+		points: 5,
 		hardness: 3
 	},
 	{
@@ -118,6 +124,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 160,
 		spacingRadius: 7,
 		collectible: true,
+		points: 10,
 		hardness: 3
 	},
 	{
@@ -129,6 +136,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 195,
 		spacingRadius: 70,
 		collectible: true,
+		points: 200,
 		hardness: 8
 	},
 
@@ -141,6 +149,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 70,
 		spacingRadius: 55,
 		collectible: true,
+		points: 10,
 		hardness: 4
 	},
 	{
@@ -152,6 +161,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 45,
 		spacingRadius: 10,
 		collectible: true,
+		points: 75,
 		hardness: 8
 	},
 	{
@@ -163,6 +173,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 200,
 		spacingRadius: 60,
 		collectible: true,
+		points: 30,
 		hardness: 6
 	},
 	{
@@ -174,6 +185,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 160,
 		spacingRadius: 70,
 		collectible: true,
+		points: 20,
 		hardness: 4
 	},
 	{
@@ -185,6 +197,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 50,
 		spacingRadius: 10,
 		collectible: true,
+		points: 7,
 		hardness: 4
 	},
 	{
@@ -196,6 +209,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 80,
 		spacingRadius: 35,
 		collectible: true,
+		points: 20,
 		hardness: 6
 	},
 
@@ -208,6 +222,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 70,
 		spacingRadius: 100,
 		collectible: true,
+		points: 2,
 		hardness: 1
 	},
 	{
@@ -219,6 +234,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 60,
 		spacingRadius: 10,	
 		collectible: true,
+		points: 225,
 		hardness: 5
 	},
 	{
@@ -230,6 +246,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 60,
 		spacingRadius: 10,	
 		collectible: true,
+		points: 275,
 		hardness: 5
 	},
 	{
@@ -241,6 +258,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 60,
 		spacingRadius: 5,	
 		collectible: true,
+		points: 325,
 		hardness: 5
 	},
 	{
@@ -252,6 +270,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 60,
 		spacingRadius: 5,	
 		collectible: true,
+		points: 450,
 		hardness: 7
 	},
 	{
@@ -263,6 +282,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 60,
 		spacingRadius: 5,	
 		collectible: true,
+		points: 450,
 		hardness: 7
 	},
 	{
