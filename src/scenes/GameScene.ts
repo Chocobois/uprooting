@@ -829,7 +829,7 @@ export class GameScene extends BaseScene {
 			this.moveSmoothCamera(-this.cameraSmoothY);
 
 			this.tree.harvestCount -= 1;
-			this.money += this.totalScore;
+			this.money += this.totalScore + (this.totalScore > this.tree.basevalue ? this.tree.basevalue : (this.tree.basevalue*this.totalScore/this.tree.basevalue));
 
 			this.particles.createGreenMagic(this.tree.x, this.tree.y - 150*this.SCALE, 3*this.SCALE, 1.0, false);
 
