@@ -225,7 +225,7 @@ export class GameScene extends BaseScene {
 			background.setY(this.SURFACE_Y - 20*this.SCALE + (background.height * bgScale) * i);
 		})
 
-		this.undergroundEdge = this.add.image(this.CX, this.cameraBounds.height, "underground_edge");
+		this.undergroundEdge = this.add.image(this.CX, this.cameraBounds.height + this.CY, "underground_edge");
 		this.undergroundEdge.setOrigin(0.5, 1.0);
 		this.undergroundEdge.setScrollFactor(1);
 		this.fitToScreen(this.undergroundEdge);
@@ -572,7 +572,7 @@ export class GameScene extends BaseScene {
 		this.nodes = [];
 
 		this.setDeepestNode(0);
-		this.undergroundEdge.y = this.cameraBounds.height;
+		this.undergroundEdge.y = this.cameraBounds.height + this.CY;
 
 		this.dragGraphics.clear();
 		this.rootsBackGraphics.clear();
