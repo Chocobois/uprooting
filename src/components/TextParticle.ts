@@ -42,7 +42,7 @@ export class TextParticle extends Phaser.GameObjects.Container {
             else {
                 if (data.wavy) {
                     const textSize = data.textObject.getTextMetrics().fontSize * 2/3;
-                    const multiplier = ONE_OVER_TWO_PI * 4;
+                    const multiplier = ONE_OVER_TWO_PI;
                     const phase = data.elapsedTime * data.speed;
 
                     data.textObject.setPosition(

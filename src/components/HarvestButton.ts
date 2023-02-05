@@ -21,9 +21,9 @@ export class HarvestButton extends Button {
 		// this.image.setScrollFactor(0);
 		// this.add(this.image);
 
-		this.text = this.scene.createText(0, 0, 60*this.scene.SCALE, "#111", "Click the tree to harvest it");
+		this.text = this.scene.createText(0, 0, 60*this.scene.SCALE, "#111", "Click the tree to harvest it ");
 		this.text.setOrigin(0.5);
-		this.text.setStroke("#FFF", 3);
+		this.text.setStroke("#fff", 30);
 		this.add(this.text);
 
 		// this.bindInteractive(this.image, true);

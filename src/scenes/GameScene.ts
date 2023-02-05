@@ -472,7 +472,7 @@ export class GameScene extends BaseScene {
 
 	textParticle(x: number, y: number, color: string, content: string, outline: boolean=true, size: number=40) {
 		const text = this.createText(x, y, size*this.SCALE, color, content);
-		if(outline) text.setStroke("rgba(0,0,0,0.5)", 4);
+		if(outline) text.setStroke("rgba(0,0,0,0.5)", 30);
 
 		// Prevent text from going too far right
 		const right = text.getRightCenter().x;
