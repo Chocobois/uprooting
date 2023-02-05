@@ -80,6 +80,7 @@ export class GameScene extends BaseScene {
 	// Debug
 	private debugText: Phaser.GameObjects.Text;
 	private cameraDragArea: Phaser.GameObjects.Rectangle;
+	private cameraSmoothY: number;
 
 	// Particles
 	public particles: Particles;
@@ -116,6 +117,8 @@ export class GameScene extends BaseScene {
 		this.cameraDragArea.setInteractive({ useHandCursor: true, draggable: true });
 		this.cameraDragArea.on('drag', this.onCameraDrag, this);
 
+		this.cameraSmoothY = 0;
+
 
 		// Background
 
@@ -134,6 +137,7 @@ export class GameScene extends BaseScene {
 		this.shop = new Shop(this, 0.2 * this.W, this.SURFACE_Y+192*this.SCALE );
 		this.shop.on("open", () => {
 			this.cameras.main.scrollY = 0;
+			this.cameraSmoothY = 0;
 
 			if (this.state == GameState.GrowingRoots) {
 				this.shop.open();
@@ -284,6 +288,9 @@ export class GameScene extends BaseScene {
 
 	update(time: number, delta: number) {
 
+		// Smooth camera movement
+		this.cameras.main.scrollY += 0.3 * (this.cameraSmoothY - this.cameras.main.scrollY);
+
 		// Update game objects
 		this.particles.update(time, delta);
 		this.textParticles.update(time, delta);
@@ -369,7 +376,7 @@ export class GameScene extends BaseScene {
 
 		const pointer = this.input.activePointer;
 		const upperArea = 0.10 * this.H; // Upper 10% of the screen
-		const lowerArea = 0.70 * this.H; // Lower 30% of the screen
+		const lowerArea = 0.50 * this.H; // Lower 30% of the screen
 		const maxScrollSpeed = 20;
 
 		const timeFactor = 1 - 1/(this.timeScrolling/1200+1);
@@ -377,13 +384,13 @@ export class GameScene extends BaseScene {
 		// If pointer at the top of the screen, move camera upwards
 		if (pointer.y < upperArea && this.validDrawing) {
 			const factor = 1 - pointer.y / upperArea;
-			this.cameras.main.scrollY -= maxScrollSpeed * factor * timeFactor * this.SCALE;
+			this.cameraSmoothY -= maxScrollSpeed * factor * timeFactor * this.SCALE;
 			this.scrolling = true;
 		}
 		// If pointer at the bottom of the screen, move camera downwards
 		else if (pointer.y > lowerArea && this.validDrawing) {
 			const factor = (pointer.y - lowerArea) / (this.H - lowerArea);
-			this.cameras.main.scrollY += maxScrollSpeed * factor * timeFactor * this.SCALE;
+			this.cameraSmoothY += maxScrollSpeed * factor * timeFactor * this.SCALE;
 			this.scrolling = true;
 		}
 		else {
@@ -691,14 +698,14 @@ export class GameScene extends BaseScene {
 	onScroll(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) {
 		if (this.state != GameState.GrowingRoots) { return; }
 
-		this.cameras.main.scrollY += deltaY * this.SCALE;
+		this.cameraSmoothY += deltaY * this.SCALE;
 	}
 
 	onCameraDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number) {
 		if (this.state != GameState.GrowingRoots) { return; }
 
 		this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom;
-		this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
+		this.cameraSmoothY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
 
 	}
 
