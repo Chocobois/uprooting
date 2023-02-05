@@ -314,8 +314,7 @@ export class GameScene extends BaseScene {
 		}
 
 		// Debug, move this to some ui thing
-		//this.debugText.setText(`State: ${this.state}\nEnergy: ${this.tree.energy}/${this.tree.maxEnergy}`);
-		this.debugText.setText(`${this.scrolling}`);
+		this.debugText.setText(`State: ${this.state}\nEnergy: ${this.tree.energy}/${this.tree.maxEnergy}`);
 
 		if (this.state == GameState.GrowingRoots) {
 			// Move camera with mouse input
