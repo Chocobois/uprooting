@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: production-files
-          path: ./dist/unpacked
+          path: ./dist
 
   deploy:
     name: Deploy
@@ -44,10 +44,21 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: production-files
-          path: ./dist/unpacked
+          path: ./built/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist/unpacked
+          publish_dir: ./built/unpacked
+
+      - name: Create release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            /home/runner/work/uprooting/uprooting/built/Chocobois-GGJ2023-release.zip
+            /home/runner/work/uprooting/uprooting/built/game-web.zip
