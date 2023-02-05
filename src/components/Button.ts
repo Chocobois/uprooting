@@ -84,6 +84,7 @@ export class Button extends Phaser.GameObjects.Container {
 	onDown(pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) {
 		this.hold = true;
 		this.blocked = false;
+		this.emit("down");
 	}
 
 	onUp(pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) {
