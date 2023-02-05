@@ -24,7 +24,7 @@ export class Node extends Button {
 		this.add(this.image);
 
 		this.bindInteractive(this.image, true);
-		const inputPadding = 10*this.scene.SCALE / this.image.scaleX;
+		const inputPadding = 30*this.scene.SCALE / this.image.scaleX;
 		this.image.input.hitArea.setTo(-inputPadding, -inputPadding, this.image.width+2*inputPadding, this.image.height+2*inputPadding);
 		// this.scene.input.enableDebug(this.image);
 	}

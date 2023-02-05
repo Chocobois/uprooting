@@ -414,7 +414,7 @@ export class GameScene extends BaseScene {
 
 		const pointer = this.input.activePointer;
 		const upperArea = 0.10 * this.H; // Upper 10% of the screen
-		const lowerArea = 0.50 * this.H; // Lower 30% of the screen
+		const lowerArea = 0.70 * this.H; // Lower 40% of the screen
 		const maxScrollSpeed = 20;
 
 		const timeFactor = 1 - 1/(this.timeScrolling/1200+1);
@@ -426,8 +426,9 @@ export class GameScene extends BaseScene {
 			this.scrolling = true;
 		}
 		// If pointer at the bottom of the screen, move camera downwards
-		else if (pointer.y > lowerArea && this.validDrawing) {
-			const factor = (pointer.y - lowerArea) / (this.H - lowerArea);
+		else if (pointer.y > lowerArea) { // this.validDrawing
+			let factor = (pointer.y - lowerArea) / (this.H - lowerArea);
+			factor = Math.pow(factor, 0.5);
 			this.moveSmoothCamera(maxScrollSpeed * factor * timeFactor * this.SCALE);
 			this.scrolling = true;
 		}
@@ -783,7 +784,7 @@ export class GameScene extends BaseScene {
 	}
 
 	get ANGLE_LIMIT() {
-		return Math.PI / 2;
+		return 0.7*Math.PI;
 	}
 
 	get PROXIMITY_LIMIT() {
