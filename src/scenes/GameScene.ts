@@ -59,6 +59,7 @@ export class GameScene extends BaseScene {
 	private deepestNodeY: number;
 
 	private dragPos: Phaser.Math.Vector2;
+	private validDrawing: boolean;
 
 	// Graphics for roots. Should be replaced as it's very inefficient.
 	private dragGraphics: Phaser.GameObjects.Graphics;
@@ -364,12 +365,12 @@ export class GameScene extends BaseScene {
 		const maxScrollSpeed = 20;
 
 		// If pointer at the top of the screen, move camera upwards
-		if (pointer.y < upperArea) {
+		if (pointer.y < upperArea && this.validDrawing) {
 			const factor = 1 - pointer.y / upperArea;
 			this.cameras.main.scrollY -= maxScrollSpeed * factor * this.SCALE;
 		}
 		// If pointer at the bottom of the screen, move camera downwards
-		if (pointer.y > lowerArea) {
+		if (pointer.y > lowerArea && this.validDrawing) {
 			const factor = (pointer.y - lowerArea) / (this.H - lowerArea);
 			this.cameras.main.scrollY += maxScrollSpeed * factor * this.SCALE;
 		}
@@ -475,7 +476,7 @@ export class GameScene extends BaseScene {
 			const line = new Phaser.Geom.Line(start.x, start.y, end.x, end.y);
 			const mineralIntersects = this.underground.getIntersectedMinerals(line);
 			const touchingObstacle = mineralIntersects.some(mineral => mineral.obstacle);
-			const nextValid = next && !touchingObstacle;
+			this.validDrawing = !!next && !touchingObstacle;
 
 			const invalidReason = nextPosResult instanceof Phaser.Math.Vector2
 				? touchingObstacle
@@ -486,7 +487,7 @@ export class GameScene extends BaseScene {
 			this.dragPos = this.dragPos.lerp(end, delta/100);
 
 			if (this.tree.energy > this.currentNode.cost) {
-				if (nextValid && canDraw) {
+				if (next && this.validDrawing && canDraw) {
 					this.addConnection(next);
 					this.dragPos = new Phaser.Math.Vector2(next.x, next.y);
 					this.handleMineralCollection(mineralIntersects);
@@ -497,7 +498,7 @@ export class GameScene extends BaseScene {
 				this.returnToSurfaceButton.show();
 			}
 
-			const limitReached = !nextValid && canDraw;
+			const limitReached = !this.validDrawing && canDraw;
 
 			if (limitReached && !this.oneTimeEvents.wrongPlacementSound) {
 				this.oneTimeEvents.wrongPlacementSound = true;
@@ -510,7 +511,7 @@ export class GameScene extends BaseScene {
 			}
 
 			this.dragGraphics.clear();
-			this.dragGraphics.lineStyle(5*this.SCALE, nextValid ? 0x00FF00 : 0xFF0000, 1.0);
+			this.dragGraphics.lineStyle(5*this.SCALE, this.validDrawing ? 0x00FF00 : 0xFF0000, 1.0);
 			this.dragGraphics.beginPath();
 			this.dragGraphics.moveTo(start.x, start.y);
 			this.dragGraphics.lineTo(this.dragPos.x, this.dragPos.y);
