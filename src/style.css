@@ -33,17 +33,16 @@ body {
   position: absolute;
   z-index: -10;
 	margin: auto;
-  font-family: "fonmaru", serif;
+  font-family: "PermanentMarker-Regular", serif;
 }
 
 /* fredoka-one-regular - latin */
 @font-face {
-  font-family: "fonmaru";
+  font-family: "PermanentMarker-Regular";
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400;
   src:
-    url("./assets/fonts/fonmaru.woff2") format("woff2"),
-    url("./assets/fonts/fonmaru.woff") format("woff");
+    url("./assets/fonts/PermanentMarker-Regular.woff2") format("woff2");
 /*    url("./assets/fonts/fredoka-one-v13-latin-regular.woff2") format("woff2"),*/
 /*    url("./assets/fonts/fredoka-one-v13-latin-regular.woff") format("woff");*/
 }

@@ -52,7 +52,7 @@ export class TextParticle extends Phaser.GameObjects.Container {
                 enable: true,
             },
         }
-        
+
         this.DEAFULT_EFFECTS_HALF = {
             fadeOut: {enable: true},
             move: { moveSpeed: this.DEFAULT_MOVE_SPEED / 2 },
