@@ -11,6 +11,7 @@ import GetShortestDistance from "phaser/src/geom/line/GetShortestDistance";
 import { MiniButton } from "../components/MiniButton";
 import { Shop, ItemType, ItemData } from "../components/Shop";
 import { TextParticle } from "../components/TextParticle";
+import { HUD } from "../components/HUD";
 
 
 enum GameState {
@@ -68,6 +69,8 @@ export class GameScene extends BaseScene {
 	// Manages item spawns underground
 	private underground: Underground;
 	private shop: Shop;
+	private hud: HUD;
+	public money: number;
 
 	// UI
 	private returnToSurfaceButton: SurfaceButton;
@@ -134,7 +137,12 @@ export class GameScene extends BaseScene {
 
 		// this.fitToScreen(this.background);
 
-		this.shop = new Shop(this, 0.2 * this.W, this.SURFACE_Y+192*this.SCALE );
+		// Money
+		this.money = 0;
+
+		this.hud = new HUD(this);
+
+		this.shop = new Shop(this, 0.2 * this.W, this.SURFACE_Y+192*this.SCALE);
 		this.shop.on("open", () => {
 			this.cameras.main.scrollY = 0;
 			this.cameraSmoothY = 0;
@@ -272,6 +280,7 @@ export class GameScene extends BaseScene {
 		this.debugText.setLineSpacing(0);
 		this.debugText.setScrollFactor(0);
 		this.debugText.setDepth(1000000);
+		this.debugText.setVisible(false);
 
 
 		// Events
@@ -300,6 +309,7 @@ export class GameScene extends BaseScene {
 		this.textParticles.update(time, delta);
 		this.underground.update(time, delta);
 		this.shop.update(time, delta);
+		this.hud.update(time, delta, this.money, this.tree.energy, this.tree.maxEnergy);
 		this.tree.update(time, delta);
 		this.nodes.forEach(node => {
 			node.update(time, delta);
@@ -673,6 +683,7 @@ export class GameScene extends BaseScene {
 	onTreeClick() {
 		if (this.state == GameState.HarvestingTree) {
 			this.tree.harvestCount -= 1;
+			this.money += this.totalScore;
 
 			this.particles.createGreenMagic(this.tree.x, this.tree.y - 150*this.SCALE, 3*this.SCALE, 1.0, false);
 
