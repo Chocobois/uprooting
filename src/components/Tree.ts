@@ -8,6 +8,7 @@ export class Tree extends Button {
 	public energy: number;
 	public maxEnergy: number;
 	public harvestCount: number;
+	public strength: number;
 
 	// Feel free to edit this ts declaration, it's supposed to be a k-v pair object
 	private oneTimeEvents: Record<string, boolean>;
@@ -20,9 +21,10 @@ export class Tree extends Button {
 
 		// Stats
 		this.level = 0;
-		this.maxEnergy = 100;
+		this.maxEnergy = 100000;
 		this.energy = this.maxEnergy;
 		this.harvestCount = 3;
+		this.strength = 1;
 
 
 		// Tree sprite

@@ -116,7 +116,7 @@ const images: Asset[] = [
 	{ key: "emerald", path: emerald },
 	{ key: "diamond", path: diamond },
 	{ key: "platinum", path: platinum },
-	{ key: "watercave1", path: watercave },
+	{ key: "watercave", path: watercave },
 	{ key: "badrock", path: badrock },
 	{ key: "gray_badrock", path: gray_badrock },
 	{ key: "ylw_badrock", path: ylw_badrock },
