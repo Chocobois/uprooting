@@ -369,7 +369,7 @@ export class GameScene extends BaseScene {
 
 				this.musicNormal.volume = 0;
 				this.musicDrawing.volume = 0;
-				this.musicShop.volume = this.musicMuted ? 0 : (this.musicVolume * 0.6);
+				this.musicShop.volume = this.musicMuted ? 0 : (this.musicVolume * 0.3);
 
 				break;
 
