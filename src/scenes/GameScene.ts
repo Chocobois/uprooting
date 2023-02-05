@@ -81,6 +81,7 @@ export class GameScene extends BaseScene {
 	private shop: Shop;
 	private hud: HUD;
 	public money: number;
+	public score: number;
 
 	// UI
 	private returnToSurfaceButton: SurfaceButton;
@@ -156,6 +157,7 @@ export class GameScene extends BaseScene {
 
 		// Money
 		this.money = 0;
+		this.score = 0;
 
 		this.hud = new HUD(this);
 
@@ -558,6 +560,7 @@ export class GameScene extends BaseScene {
 		// Add current score to growth
 		// Should be a whole sequence here instead and the shop thing, etc
 		this.tree.addMaxEnergy(this.totalScore);
+		this.score = 0;
 
 		// Destroy all nodes
 		this.currentNode = null;
@@ -597,7 +600,8 @@ export class GameScene extends BaseScene {
 			250*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
 
 			if (this.currentNode && collectible.points) {
-				this.currentNode.addScore(collectible.points);
+				this.currentNode.addScore();
+				this.score += collectible.points;
 			}
 
 			this.sound.play("r_collect");
@@ -781,6 +785,7 @@ export class GameScene extends BaseScene {
 
 		// Add growth score
 		oldNode.addScore();
+		this.score += 1;
 		this.tree.energy -= newNode.rootDepth;
 
 		this.drawRoot(newNode);
@@ -802,7 +807,12 @@ export class GameScene extends BaseScene {
 		const cameraY = this.cameras.main.scrollY - 20;
 		const bottomY = cameraY + this.H + 40;
 		if(cameraY < parentY && cameraY < currentY && bottomY > parentY && bottomY > currentY){
-			const thickness = (3 + 4 * Math.sqrt(node.score > 25 ? 25 : node.score)) * this.SCALE;
+
+			// const thickness = (3 + 4 * Math.sqrt(node.score)) * this.SCALE;
+			let minSize = 3;
+			let thickness = 30 * Math.log10(0.2 * node.score + Math.exp(1/minSize));
+			thickness *= this.SCALE;
+
 			this.rootsGraphics.lineStyle(thickness, 0x795548, 1.0);
 			this.rootsGraphics.beginPath();
 			this.rootsGraphics.moveTo(node.parent.x, node.parent.y);
@@ -915,6 +925,7 @@ export class GameScene extends BaseScene {
 	}
 
 	get totalScore() {
-		return this.nodes.length > 0 ? this.nodes[0].score : 0;
+		// return this.nodes.length > 0 ? this.nodes[0].score : 0;
+		return this.score;
 	}
 }
