@@ -421,13 +421,13 @@ export class GameScene extends BaseScene {
 				break;
 
 			case MusicState.Jingle:
-				if (this.musicNormal.isPlaying) {
-					this.musicNormal.volume -= (1 / delta) / 2;
-					if (this.musicNormal.volume <= 0) {
-						this.musicNormal.volume = 0;
-						this.musicNormal.stop();
+				[this.musicNormal, this.musicDrawing].forEach(music => {
+					music.volume -= (1 / delta) / 2;
+					if (music.volume <= 0) {
+						music.volume = 0;
+						music.stop();
 					}
-				}
+				})
 				break;
 
 			case MusicState.Nothing:
@@ -839,7 +839,7 @@ export class GameScene extends BaseScene {
 	onNodeDragStart(node: Node) {
 		this.currentNode = node;
 		this.dragPos = new Phaser.Math.Vector2(node.x, node.y);
-		this.musicState = MusicState.LayeredLoop;
+		if (this.musicState == MusicState.NormalLoop) this.musicState = MusicState.LayeredLoop;
 		this.oneTimeEvents.wrongPlacementSound = false;
 	}
 
