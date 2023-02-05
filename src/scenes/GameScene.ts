@@ -26,6 +26,7 @@ enum MusicState {
 	Nothing,
 	NormalLoop,
 	LayeredLoop,
+	Shop,
 	Jingle
 }
 
@@ -75,6 +76,7 @@ export class GameScene extends BaseScene {
 	public musicNormal: Music;
 	public musicDrawing: Music;
 	public musicJingle: Music;
+	public musicShop: Music;
 	public musicVolume: number;
 
 	// Feel free to edit this ts declaration, it's supposed to be a k-v pair object
@@ -121,10 +123,28 @@ export class GameScene extends BaseScene {
 			if (this.state == GameState.GrowingRoots) {
 				this.shop.open();
 				this.state = GameState.InsideShop;
+				this.musicState = MusicState.Shop;
+				this.musicNormal.stop();
+				this.musicDrawing.stop();
+				this.musicShop.play();
 			}
 		});
 		this.shop.on("close", () => {
 			this.state = GameState.GrowingRoots;
+			
+			this.musicShop.stop();
+			this.sound.play("m_shop", {
+				name: "shopEnding",
+				start: 3308100/48000, // 495095
+				duration: 1,
+				config: { volume: this.musicShop.volume }
+			})
+			
+			setTimeout(() => {
+				this.musicState = MusicState.NormalLoop;
+				this.musicNormal.play();
+				this.musicDrawing.play();
+			}, 1300);
 		});
 		this.shop.on("buy", (itemData: ItemData) => {
 			if (itemData.type == ItemType.TreeEnergy) {
@@ -189,6 +209,7 @@ export class GameScene extends BaseScene {
 				this.musicNormal.mute = !this.musicNormal.mute;
 				this.musicDrawing.mute = !this.musicDrawing.mute;
 				this.musicJingle.mute = !this.musicJingle.mute;
+				this.musicShop.mute = !this.musicShop.mute;
 			});
 
 		this.audioButton = new MiniButton(this, this.W - buttonSize, 1.5 * buttonSize, "audio")
@@ -210,6 +231,7 @@ export class GameScene extends BaseScene {
 		this.musicNormal = new Music(this, 'm_first', { volume: this.musicMuted ? 0 : this.musicVolume });
 		this.musicDrawing = new Music(this, 'm_first_draw', { volume: 0 });
 		this.musicJingle = new Music(this, 'm_first_end', { volume: this.musicMuted ? 0 : this.musicVolume });
+		this.musicShop = new Music(this, 'm_shop', { volume: 0 });
 
 		this.musicNormal.play();
 		this.musicDrawing.play();
@@ -257,6 +279,7 @@ export class GameScene extends BaseScene {
 			node.update(time, delta);
 		});
 		this.returnToSurfaceButton.update(time, delta);
+		this.updateMusic(time, delta);
 
 		// Debug, move this to some ui thing
 		this.debugText.setText(`State: ${this.state}\nEnergy: ${this.tree.energy}/${this.tree.maxEnergy}`);
@@ -268,23 +291,54 @@ export class GameScene extends BaseScene {
 
 			this.handleRootDrawing(delta);
 		}
+	}
 
-		// Update music based on if the player is drawing a line
 
-		const targetVolume = this.musicMuted ? 0 : (
-			(this.musicState == MusicState.LayeredLoop) ? this.musicVolume : 0.00001
-		)
+	updateMusic(time, delta /* , newState?: MusicState */ ) {
 
-		const volumeSame = Math.abs(this.musicDrawing.volume - targetVolume) <= 1e-4;
+		/* if (newState) this.musicState = newState; */
 
-		if (!volumeSame) {
-			const volumeStep = (this.musicDrawing.volume < targetVolume) ? 1 : -1;
-			this.musicDrawing.volume += (volumeStep / delta) / 5;
-		}
+		switch (this.musicState) {
+			case MusicState.NormalLoop:
+			case MusicState.LayeredLoop:
+
+				this.musicNormal.volume = this.musicMuted ? 0 : this.musicVolume;
+				this.musicShop.volume = 0;
+
+				// Update music based on if the player is drawing a line
+
+				const targetVolume = this.musicMuted ? 0 : (
+					(this.musicState == MusicState.LayeredLoop) ? this.musicVolume : 0.00001
+				)
+
+				const volumeSame = Math.abs(this.musicDrawing.volume - targetVolume) <= 1e-4;
+
+				if (!volumeSame) {
+					const volumeStep = (this.musicDrawing.volume < targetVolume) ? 1 : -1;
+					this.musicDrawing.volume += (volumeStep / delta) / 5;
+				}
+
+				else if (this.musicDrawing.volume < 0) { this.musicDrawing.volume = 0; }
+
+				// If the drawing music plays for a split second after starting the game, it's an autoplay issue	
+
+				break;
 		
-		else if (this.musicDrawing.volume < 0) this.musicDrawing.volume = 0;
+			case MusicState.Shop:
 
-		// If the drawing music plays for a split second after starting the game, it's an autoplay issue
+				this.musicNormal.volume = 0;
+				this.musicDrawing.volume = 0;
+				this.musicShop.volume = this.musicMuted ? 0 : (this.musicVolume * 0.6);
+
+				break;
+
+			case MusicState.Jingle:
+				break;
+
+			case MusicState.Nothing:
+			default:
+				break;
+		}
 	}
 
 
@@ -565,7 +619,7 @@ export class GameScene extends BaseScene {
 	onPointerUp(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]): void {
 		this.currentNode = null;
 		this.dragGraphics.clear();
-		this.musicState = MusicState.NormalLoop;
+		if (this.state != GameState.InsideShop) this.musicState = MusicState.NormalLoop;
 	}
 
 	onScroll(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) {

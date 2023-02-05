@@ -48,6 +48,7 @@ export class Shop extends Phaser.GameObjects.Container {
 	private ownerImage: Phaser.GameObjects.Image;
 	private foreground: Phaser.GameObjects.Image;
 	private exitButton: Button;
+	private buyImage: Phaser.GameObjects.Image;
 	private buyButton: Button;
 	// private selectedItemImage: Phaser.GameObjects.Image;
 	private selectedItemTitle: Phaser.GameObjects.Text;
@@ -186,16 +187,16 @@ export class Shop extends Phaser.GameObjects.Container {
 		this.buyButton = new Button(this.scene, .87*W, .85*H);
 		this.add(this.buyButton);
 
-		let buyImage = this.scene.add.image(0, 0, "shop_buy_button");
-		buyImage.setOrigin(0.5);
-		buyImage.setScale(0.17 * H / buyImage.height);
-		this.buyButton.add(buyImage);
+		this.buyImage = this.scene.add.image(0, 0, "shop_buy_button");
+		this.buyImage.setOrigin(0.5);
+		this.buyImage.setScale(0.17 * H / this.buyImage.height);
+		this.buyButton.add(this.buyImage);
 
 		let buyText = this.scene.createText(0, 0, 100*this.scene.SCALE, "#000", "Buy");
 		buyText.setOrigin(0.5);
 		this.buyButton.add(buyText);
 
-		this.buyButton.bindInteractive(buyImage);
+		this.buyButton.bindInteractive(this.buyImage);
 		this.buyButton.on("click", this.buyItem, this);
 
 
@@ -265,6 +266,7 @@ export class Shop extends Phaser.GameObjects.Container {
 
 		this.buyButton.enabled = false;
 		this.buyButton.setAlpha(0.5);
+		this.buyImage.input.cursor = "not-allowed"
 		this.ownerImage.setFrame(0);
 
 		if (itemData) {
@@ -275,6 +277,7 @@ export class Shop extends Phaser.GameObjects.Container {
 			if (itemData.price > 0) {
 				this.buyButton.enabled = true;
 				this.buyButton.setAlpha(1.0);
+				this.buyImage.input.cursor = "pointer"
 				this.ownerImage.setFrame(1);
 			}
 		}

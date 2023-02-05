@@ -15,7 +15,7 @@ interface SpriteSheet {
 interface Audio {
 	key: string;
 	path: string;
-	volume: number;
+	volume?: number;
 	rate?: number;
 }
 
@@ -126,6 +126,7 @@ const images: Asset[] = [
 import green_magic from "./images/effects/green_magic.png";
 import meme_explosion from "./images/effects/meme_explosion.png";
 import dust_explosion from "./images/effects/dustyexplosion.png";
+import blue_sparkle from "./images/effects/blue_sparkle.png";
 import item_tag from "./images/ui/item_tag.png";
 
 // NPCs
@@ -141,6 +142,8 @@ const spritesheets: SpriteSheet[] = [
 	{ key: "green_magic", path: green_magic, width: 128, height: 128 },
 	{ key: "meme_explosion", path: meme_explosion, width: 200, height: 282 },
 	{ key: "dust_explosion", path: dust_explosion, width: 128, height: 128 },
+	{ key: "blue_sparkle", path: blue_sparkle, width: 256, height: 256 },
+
 
 	// NPCs
 	{ key: "jbun", path: jbun, width: 517, height: 1016 },
@@ -165,11 +168,11 @@ import r_place from "./sounds/roots/place.mp3";
 import r_place_error from "./sounds/roots/place_error.mp3";
 
 const audios: Audio[] = [
-	{ key: "m_main_menu", path: m_main_menu, volume: 1 },
-	{ key: "m_first", path: m_first, volume: 1 },
-	{ key: "m_first_draw", path: m_first_draw, volume: 1 },
-	{ key: "m_first_end", path: m_first_end, volume: 1 },
-	{ key: "m_shop", path: m_shop, volume: 1 },
+	{ key: "m_main_menu", path: m_main_menu },
+	{ key: "m_first", path: m_first },
+	{ key: "m_first_draw", path: m_first_draw },
+	{ key: "m_first_end", path: m_first_end },
+	{ key: "m_shop", path: m_shop },
 	{ key: "r_grow", path: r_grow, volume: 0.5 },
 	{ key: "r_place", path: r_place, volume: 1 },
 	{ key: "r_place_error", path: r_place_error, volume: 0.5 },
