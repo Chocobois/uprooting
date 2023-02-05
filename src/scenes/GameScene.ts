@@ -436,11 +436,15 @@ export class GameScene extends BaseScene {
 		this.underground.destroyMinerals(collectibles);
 
 		collectibles.forEach(collectible => {
-			const text = this.createText(collectible.x, collectible.y-10, 40*this.SCALE, "Lime", `+1 ${collectible.properName}`)
-			this.textParticles.push(text, 1.5, true);
+			this.textParticle(collectible.x, collectible.y-10, "Lime", `+1 ${collectible.properName}`);
 		});
 	}
 
+	textParticle(x: number, y: number, color: string, content: string, outline: boolean=true) {
+		const text = this.createText(x, y, 40*this.SCALE, color, content);
+		if(outline) text.setStroke("rgba(0,0,0,0.5)", 4);
+		this.textParticles.push(text, 1.5, true);
+	}
 
 	/* Tree */
 
@@ -492,8 +496,7 @@ export class GameScene extends BaseScene {
 				this.oneTimeEvents.wrongPlacementSound = true;
 				this.sound.play("r_place_error", { volume: 0.25 });
 
-				const text = this.createText(pointer.x, pointer.y-10, 40*this.SCALE, "Red", invalidReason)
-				this.textParticles.push(text, 1.5, true);
+				this.textParticle(pointer.x, pointer.y-10, "OrangeRed", invalidReason);
 
 			} else if (!limitReached) {
 				this.oneTimeEvents.wrongPlacementSound = false;
@@ -580,8 +583,7 @@ export class GameScene extends BaseScene {
 
 		this.sound.play("r_place", { volume: 0.3, rate: 1 + Math.random() * 0.1 });
 
-		const text = this.createText(newNode.x+5, newNode.y-5, 40*this.SCALE, "Yellow", `-${newNode.rootDepth}`)
-		this.textParticles.push(text, 1.5, true);
+		this.textParticle(newNode.x+5, newNode.y-5, "Yellow", `-${newNode.rootDepth}`);
 
 		this.currentNode = newNode;
 
