@@ -117,7 +117,7 @@ export class GameScene extends BaseScene {
 		this.cameras.main.setBounds(0, 0, this.W, this.H);
 		this.cameraDragArea = this.add.rectangle(this.CX, this.CY, this.W, this.H, 0xFF0000, 0.0);
 		this.cameraDragArea.setScrollFactor(0);
-		this.cameraDragArea.setInteractive({ useHandCursor: true, draggable: true });
+		this.cameraDragArea.setInteractive({ cursor: "ns-resize", draggable: true });
 		this.cameraDragArea.on('drag', this.onCameraDrag, this);
 
 		this.cameraSmoothY = 0;
