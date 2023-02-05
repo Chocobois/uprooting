@@ -93,7 +93,7 @@ export class Shop extends Phaser.GameObjects.Container {
 				type: ItemType.FruitUpgrade,
 				image: ["apple", "pear", "cherry", "banana", "dragonfruit", "dragondragonfruit"],
 				title: ["Orange Essence", "Pear Essence", "Cherry Essence", "Banana Essence", "Dragonfruit Essence", "Dragondragonfruit Essence"],
-				description: ["Magically grow oranges on your tree!","Magically grow pears on your tree!","Magically grow cherries on your tree!","Magically grow bananas on your tree!","Magically grow dragonfruit on your tree! Dragonfruit doesn't even grow on trees!", "Magically grow oranges on your tree!"],
+				description: ["Magically grow oranges on your tree!","Magically grow pears on your tree!","Magically grow cherries on your tree!","Magically grow bananas on your tree!","Magically grow dragonfruit on your tree! Dragonfruit doesn't even grow on trees!", "Dragondragonfruit! There's a strange cube inside of it."],
 				price: [500, 750, 1250, 2500, 5000, 12500],
 				iteration:1,
 				maxIteration: 6,
