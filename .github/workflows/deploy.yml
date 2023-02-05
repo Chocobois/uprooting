@@ -72,4 +72,4 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-            *.zip
+            dist/Chocobois-GGJ2023-release.zip
