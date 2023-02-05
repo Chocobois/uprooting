@@ -5,6 +5,7 @@
     "strict": true,
     "useDefineForClassFields": true,
     "strictPropertyInitialization": false,
+    "forceConsistentCasingInFileNames": true,
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
