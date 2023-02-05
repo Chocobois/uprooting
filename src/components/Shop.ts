@@ -104,7 +104,7 @@ export class Shop extends Phaser.GameObjects.Container {
 				image: ["bones", "ylw_badrock", "badrock", "ruby", "gray_badrock","ancient_diamond","demon_rock","curse_rock"],
 				title: ["Hard Roots","Iron Roots","Titanium Roots","Gluttonous Roots","Adamantite Roots","Prosperous Roots","Dauntless Roots","Roots of the Developer"],
 				description: ["Gain the ability to break through bones!","Break through rocks!","Break through hard rocks!","Break through and harvest gems!","Break through bedrock!","Break and harvest ancient diamonds! Superb!","Break through hot rocks!","Venture into the unknown..."],
-				price: [200,400,800,3200,6400,12800,25600,128000],
+				price: [400,800,1600,6400,12800,32000,128000,512000],
 				iteration:1,
 				maxIteration:8,
 				value: [1,1,1,1,1,1,1,1],
@@ -335,7 +335,7 @@ export class Shop extends Phaser.GameObjects.Container {
 				this.scene.sound.play("s_nofunds");
 				this.selectedItemTitle.setText("Shop owner");
 				this.selectedItemDescription.setText(
-					`You can't afford that!\nThe ${this.selectedItem.title[this.selectedItem.iteration-1].toLocaleLowerCase()}\nis ${this.selectedItem.price} gold.`
+					`You can't afford that!\nThe ${this.selectedItem.title[this.selectedItem.iteration-1].toLocaleLowerCase()}\nis ${this.selectedItem.price[this.selectedItem.iteration-1]} gold.`
 				);
 				this.selectedItem = null;
 				this.buyButton.enabled = false;
