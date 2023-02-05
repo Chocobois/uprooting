@@ -5,6 +5,7 @@ import { MineralType, MineralRange } from "./Underground";
 export class Mineral extends Button {
 	private image: Phaser.GameObjects.Image;
 	private size: number;
+	public properName: String;
 	public spacingRadius: number; // Personal space
 	public collisionRadius: number; // Personal space
 	public collectible: boolean;
@@ -12,6 +13,7 @@ export class Mineral extends Button {
 
 	constructor(scene: BaseScene, params: MineralRange, x: number, y: number) {
 		super(scene, x, y);
+		this.properName = params.properName;
 		this.spacingRadius = params.spacingRadius;
 		this.collisionRadius = params.collisionRadius;
 		this.collectible = params.collectible;

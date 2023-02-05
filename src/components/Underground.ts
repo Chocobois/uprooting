@@ -25,7 +25,8 @@ export enum MineralType {
 }
 
 export interface MineralRange {
-	type: MineralType, // Which item to spawn
+	type: MineralType; // Which item to spawn
+	properName: String; // Name for the item
 	centerDepth: number; // Y-coord where spawns are at max
 	centerRadius: number; // Y-distance from center. Odds reduces the further away from center they are.
 	odds: number; // Chance of attempted spawning
@@ -38,6 +39,7 @@ export interface MineralRange {
 const MINERALS: MineralRange[] = [
 	{
 		type: MineralType.Applecore,
+		properName: "Apple Core",
 		centerDepth: 2000,
 		centerRadius: 3000,
 		odds: 0.04,
@@ -48,6 +50,7 @@ const MINERALS: MineralRange[] = [
 	},
 	{
 		type: MineralType.Bones,
+		properName: "Bones",
 		centerDepth: 5000,
 		centerRadius: 4000,
 		odds: 0.02,
@@ -58,6 +61,7 @@ const MINERALS: MineralRange[] = [
 	},
 	{
 		type: MineralType.Ruby,
+		properName: "Ruby",
 		centerDepth: 8000,
 		centerRadius: 4000,
 		odds: 0.06,

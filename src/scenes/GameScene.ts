@@ -4,6 +4,7 @@ import { Particles } from "./../components/Particles";
 import { Node } from "./../components/Node";
 import { Tree } from "./../components/Tree";
 import { Underground } from "./../components/Underground";
+import { Mineral } from "./../components/Mineral";
 import { SurfaceButton } from "./../components/SurfaceButton";
 import { HarvestButton } from "./../components/HarvestButton";
 import GetShortestDistance from "phaser/src/geom/line/GetShortestDistance";
@@ -28,6 +29,16 @@ enum MusicState {
 	LayeredLoop,
 	Shop,
 	Jingle
+}
+
+enum InvalidNodeReason {
+	None = "None",
+	ProgrammerGoofed = "Programmer Goofed",
+	AboveSurface = "Root cannot be above the surface",
+	TooDeep = "Root is too deep",
+	TurnTooHarsh = "Root turns too harshly",
+	SelfIntersecting = "Root self intersects",
+	ObstacleInTheWay = "Root is obstructed"
 }
 
 const MUSIC_VOLUME = 0.4;
@@ -420,6 +431,16 @@ export class GameScene extends BaseScene {
 		this.updateScore();
 	}
 
+	handleMineralCollection(minerals: Mineral[]) {
+		const collectibles = minerals.filter(mineral => mineral.collectible);
+		this.underground.destroyMinerals(collectibles);
+
+		collectibles.forEach(collectible => {
+			const text = this.createText(collectible.x, collectible.y-10, 40*this.SCALE, "Lime", `+1 ${collectible.properName}`)
+			this.textParticles.push(text, 1.5, true);
+		});
+	}
+
 
 	/* Tree */
 
@@ -429,7 +450,8 @@ export class GameScene extends BaseScene {
 
 		if (this.currentNode && this.input.activePointer.isDown) {
 			const start = new Phaser.Math.Vector2(this.currentNode.x, this.currentNode.y);
-			const next = this.nextNodePos(pointer);
+			const nextPosResult = this.nextNodePos(pointer);
+			const next = nextPosResult instanceof Phaser.Math.Vector2 ? nextPosResult : null;
 
 			// Distance must be DRAG_LIMIT
 			const distance = Phaser.Math.Distance.BetweenPoints(this.currentNode, pointer);
@@ -444,15 +466,19 @@ export class GameScene extends BaseScene {
 			const touchingObstacle = mineralIntersects.some(mineral => mineral.obstacle);
 			const nextValid = next && !touchingObstacle;
 
+			const invalidReason = nextPosResult instanceof Phaser.Math.Vector2
+				? touchingObstacle
+					? InvalidNodeReason.ObstacleInTheWay
+					: InvalidNodeReason.None
+				: nextPosResult;
+
 			this.dragPos = this.dragPos.lerp(end, delta/100);
 
 			if (this.tree.energy > this.currentNode.cost) {
 				if (nextValid && canDraw) {
 					this.addConnection(next);
 					this.dragPos = new Phaser.Math.Vector2(next.x, next.y);
-
-					// Remove collectible minerals
-					this.underground.destroyMinerals(mineralIntersects.filter(mineral => mineral.collectible));
+					this.handleMineralCollection(mineralIntersects);
 				}
 			}
 			else if (!this.oneTimeEvents.outOfEnergy) {
@@ -465,6 +491,10 @@ export class GameScene extends BaseScene {
 			if (limitReached && !this.oneTimeEvents.wrongPlacementSound) {
 				this.oneTimeEvents.wrongPlacementSound = true;
 				this.sound.play("r_place_error", { volume: 0.25 });
+
+				const text = this.createText(pointer.x, pointer.y-10, 40*this.SCALE, "Red", invalidReason)
+				this.textParticles.push(text, 1.5, true);
+
 			} else if (!limitReached) {
 				this.oneTimeEvents.wrongPlacementSound = false;
 			}
@@ -481,11 +511,11 @@ export class GameScene extends BaseScene {
 
 	// Returns the position of next node to be created given the pointer's position
 	// If one can't be created, null is returned
-	nextNodePos(pointer: Phaser.Math.Vector2): Phaser.Math.Vector2 | null {
-		if (!this.currentNode) return null;
+	nextNodePos(pointer: Phaser.Math.Vector2): Phaser.Math.Vector2 | InvalidNodeReason {
+		if (!this.currentNode) return InvalidNodeReason.ProgrammerGoofed;
 
 		// Can't be above ground very far
-		if (pointer.y < this.SURFACE_Y) return null;
+		if (pointer.y < this.SURFACE_Y) return InvalidNodeReason.AboveSurface;
 
 		const start = new Phaser.Math.Vector2(this.currentNode.x, this.currentNode.y);
 		const vector = new Phaser.Math.Vector2(pointer);
@@ -499,7 +529,7 @@ export class GameScene extends BaseScene {
 
 			const cos = prev.dot(vector) / (prev.length() * vector.length());
 
-			if (cos < Math.cos(this.ANGLE_LIMIT)) return null;
+			if (cos < Math.cos(this.ANGLE_LIMIT)) return InvalidNodeReason.TurnTooHarsh;
 		}
 
 		const end = start.clone().add(vector);
@@ -518,7 +548,7 @@ export class GameScene extends BaseScene {
 			return intersects;
 		});
 
-		if (anyEncroachingNodes) return null;
+		if (anyEncroachingNodes) return InvalidNodeReason.SelfIntersecting;
 
 		return end;
 	}
