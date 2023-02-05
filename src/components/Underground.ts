@@ -29,7 +29,8 @@ interface MineralRange {
 	centerDepth: number; // Y-coord where spawns are at max
 	centerRadius: number; // Y-distance from center. Odds reduces the further away from center they are.
 	odds: number; // Chance of attempted spawning
-	minRadius: number; // Minimum radius between two items
+	collisionRadius: number; // Radius for collision
+	spacingRadius: number; // Personal space radius needed to stay away from other items
 }
 
 const MINERALS: MineralRange[] = [
@@ -38,21 +39,24 @@ const MINERALS: MineralRange[] = [
 		centerDepth: 2000,
 		centerRadius: 3000,
 		odds: 0.04,
-		minRadius: 400,
+		collisionRadius: 30,
+		spacingRadius: 200,
 	},
 	{
 		type: MineralType.Bones,
 		centerDepth: 5000,
 		centerRadius: 4000,
-		odds: 0.06,
-		minRadius: 400,
+		odds: 0.02,
+		collisionRadius: 30,
+		spacingRadius: 100,
 	},
 	{
 		type: MineralType.Ruby,
 		centerDepth: 8000,
 		centerRadius: 4000,
-		odds: 0.02,
-		minRadius: 200,
+		odds: 0.06,
+		collisionRadius: 30,
+		spacingRadius: 250,	
 	},
 ];
 
@@ -133,25 +137,26 @@ export class Underground extends Phaser.GameObjects.Container {
 					mineralRange.type,
 					this.left + (this.right - this.left) * Math.random(),
 					this.currentY,
-					mineralRange.minRadius * this.scene.SCALE
+					mineralRange.spacingRadius * this.scene.SCALE,
+					mineralRange.collisionRadius,
 				);
 			}
 		});
 
 	}
 
-	addMineral(type: MineralType, x: number, y: number, minRadius: number=0) {
-		if (this.hasFreeSpace(x, y, minRadius)) {
-			let mineral = new Mineral(this.scene, x, y, type);
+	addMineral(type: MineralType, x: number, y: number, spacingRadius: number, collisionRadius: number) {
+		if (this.hasFreeSpace(x, y, spacingRadius)) {
+			let mineral = new Mineral(this.scene, x, y, type, spacingRadius, collisionRadius);
 
 			this.add(mineral);
 			this.items.push(mineral);
 		}
 	}
 
-	hasFreeSpace(x: number, y: number, radius: number) {
+	hasFreeSpace(x: number, y: number, myRadius: number) {
 		for (let item of this.items) {
-			if (Phaser.Math.Distance.Between(x, y, item.x, item.y) < radius) {
+			if (Phaser.Math.Distance.Between(x, y, item.x, item.y) < myRadius + item.spacingRadius) {
 				return false;
 			}
 		}

@@ -5,9 +5,13 @@ import { MineralType } from "./Underground";
 export class Mineral extends Button {
 	private image: Phaser.GameObjects.Image;
 	private size: number;
+	public spacingRadius: number; // Personal space
+	public collisionRadius: number; // Personal space
 
-	constructor(scene: BaseScene, x: number, y: number, type: MineralType) {
+	constructor(scene: BaseScene, x: number, y: number, type: MineralType, spacingRadius: number, collisionRadius: number) {
 		super(scene, x, y);
+		this.spacingRadius = spacingRadius;
+		this.collisionRadius = collisionRadius;
 
 		this.size = Phaser.Math.RND.between(60, 120) * this.scene.SCALE;
 		// console.log(size);
