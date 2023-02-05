@@ -54,6 +54,10 @@ import emerald from "./images/items/emerald.png";
 import diamond from "./images/items/diamond.png";
 import platinum from "./images/items/platinum.png";
 import badrock from "./images/items/hasty_rock.png";
+import gray_badrock from "./images/items/grey_hasty_rock.png";
+import ylw_badrock from "./images/items/ylw_hasty_rock.png";
+import demon_rock from "./images/items/demon_rock.png";
+import curse_rock from "./images/items/curse_rock.png";
 import watercave from "./images/items/watercave.png";
 import coin from "./images/items/coin.png";
 import energy from "./images/items/energy.png";
@@ -112,6 +116,10 @@ const images: Asset[] = [
 	{ key: "platinum", path: platinum },
 	{ key: "watercave1", path: watercave },
 	{ key: "badrock", path: badrock },
+	{ key: "gray_badrock", path: gray_badrock },
+	{ key: "ylw_badrock", path: ylw_badrock },
+	{ key: "demon_rock", path: demon_rock },
+	{ key: "curse_rock", path: curse_rock },
 	{ key: "coin", path: coin },
 	{ key: "energy", path: energy },
 

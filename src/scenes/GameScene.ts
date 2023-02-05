@@ -10,7 +10,7 @@ import { HarvestButton } from "./../components/HarvestButton";
 import GetShortestDistance from "phaser/src/geom/line/GetShortestDistance";
 import { MiniButton } from "../components/MiniButton";
 import { Shop, ItemType, ItemData } from "../components/Shop";
-import { TextParticle } from "../components/TextParticle";
+import { TextParticle, TextParticleEffects } from "../components/TextParticle";
 import { HUD } from "../components/HUD";
 
 
@@ -124,7 +124,7 @@ export class GameScene extends BaseScene {
 
 		this.cameraDragArea = this.add.rectangle(this.CX, this.CY, this.W, this.H, 0xFF0000, 0.0);
 		this.cameraDragArea.setScrollFactor(0);
-		this.cameraDragArea.setInteractive({ useHandCursor: true, draggable: true });
+		this.cameraDragArea.setInteractive({ cursor: "ns-resize", draggable: true });
 		this.cameraDragArea.on('drag', this.onCameraDrag, this);
 
 		this.setCameraBounds(0, 0, this.W, this.H);
@@ -377,7 +377,7 @@ export class GameScene extends BaseScene {
 
 				this.musicNormal.volume = 0;
 				this.musicDrawing.volume = 0;
-				this.musicShop.volume = this.musicMuted ? 0 : (this.musicVolume * 0.6);
+				this.musicShop.volume = this.musicMuted ? 0 : (this.musicVolume * 0.3);
 
 				break;
 
@@ -501,11 +501,14 @@ export class GameScene extends BaseScene {
 		this.underground.destroyMinerals(collectibles);
 
 		collectibles.forEach(collectible => {
-			this.textParticle(collectible.x, collectible.y-10, "Lime", `+1 ${collectible.properName}`, true, 60);
+			this.textParticle(collectible.x, collectible.y-10, "Lime", `+1 ${collectible.properName}`, true,
+			250*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
 		});
 	}
 
-	textParticle(x: number, y: number, color: string, content: string, outline: boolean=true, size: number=40) {
+	textParticle(x: number, y: number, color: string, content: string, outline: boolean=true, size: number=40,
+		duration: number=1.5, effects: TextParticleEffects={ wave: {enable: true}, fadeOut: {enable: true} }) {
+
 		const text = this.createText(x, y, size*this.SCALE, color, content);
 		if(outline) text.setStroke("rgba(0,0,0,0.5)", 30);
 
@@ -514,7 +517,7 @@ export class GameScene extends BaseScene {
 		const diff = this.W - right - 20;
 		if(diff < 0) text.setX(text.x+diff);
 
-		this.textParticles.push(text, 1.5, true);
+		this.textParticles.push(text, duration, effects);
 	}
 
 	/* Tree */
@@ -570,7 +573,8 @@ export class GameScene extends BaseScene {
 				this.oneTimeEvents.wrongPlacementSound = true;
 				this.sound.play("r_place_error", { volume: 0.25 });
 
-				this.textParticle(pointer.x, pointer.y-10, "OrangeRed", invalidReason);
+				this.textParticle(pointer.x, pointer.y-10, "OrangeRed", invalidReason,
+					undefined, 200 * this.SCALE, 3, this.textParticles.DEAFULT_EFFECTS_HALF);
 
 			} else if (!limitReached) {
 				this.oneTimeEvents.wrongPlacementSound = false;
@@ -668,7 +672,7 @@ export class GameScene extends BaseScene {
 
 		this.sound.play("r_place", { volume: 0.3, rate: 1 + Math.random() * 0.1 });
 
-		this.textParticle(newNode.x+5, newNode.y-5, "Yellow", `-${newNode.rootDepth}`);
+		this.textParticle(newNode.x+5, newNode.y-5, "Yellow", `-${newNode.rootDepth}`, undefined, 150 * this.SCALE);
 
 		this.currentNode = newNode;
 
