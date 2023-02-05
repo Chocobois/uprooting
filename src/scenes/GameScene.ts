@@ -3,7 +3,7 @@ import { Music } from "./../components/Music";
 import { Particles } from "./../components/Particles";
 import { Node } from "./../components/Node";
 import { Tree } from "./../components/Tree";
-import { Underground } from "./../components/Underground";
+import { Underground, MineralType } from "./../components/Underground";
 import { Mineral } from "./../components/Mineral";
 import { SurfaceButton } from "./../components/SurfaceButton";
 import { HarvestButton } from "./../components/HarvestButton";
@@ -558,11 +558,24 @@ export class GameScene extends BaseScene {
 		this.underground.destroyMinerals(collectibles);
 
 		collectibles.forEach(collectible => {
-			this.textParticle(collectible.x, collectible.y-10, "Lime", `+1 ${collectible.properName}`, true,
+			let color = "Lime";
+			if (collectible.type == MineralType.applecore) {
+				color = "Red";
+			}
+
+			this.textParticle(collectible.x, collectible.y-10, color, `+1 ${collectible.properName}`, true,
 			250*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
 
 			if (this.currentNode && collectible.points) {
 				this.currentNode.addScore(collectible.points);
+			}
+
+			// Create sparkle effect
+			if (collectible.type == MineralType.applecore) {
+				this.particles.createBlueSparkle(collectible.x, collectible.y, 3*this.SCALE, 1.0, false);
+			}
+			else {
+				this.particles.createDustExplosion(collectible.x, collectible.y, 3*this.SCALE, 1.0, false);
 			}
 		});
 	}
