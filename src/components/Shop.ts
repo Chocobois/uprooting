@@ -15,25 +15,34 @@ export enum ItemType {
 export interface ItemData {
 	type: ItemType,
 	image: string;
-	title: string;
-	description: string;
-	price: number;
+	title: string[];
+	description: string[];
+	iteration: number;
+	maxIteration: number;
+	price: number[];
+	value: number[];
 }
 
 const SOLD_OUT_ITEM: ItemData = {
 	type: ItemType.SoldOut,
 	image: "shop_sold_out",
-	title: "Out of stock",
-	description: "I give up. That's it.",
-	price: 0,
+	title: ["Out of stock"],
+	description: ["I give up. That's it."],
+	iteration:1,
+	maxIteration: 1,
+	value: [9999],
+	price: [0],
 };
 
 const OWNER: ItemData = {
 	type: ItemType.ShopOwner,
 	image: "shop_sold_out",
-	title: "Shop owner",
-	description: "H-hey, I'm not for sale!",
-	price: 0,
+	title: ["Shop owner"],
+	description: ["H-hey, I'm not for sale!"],
+	iteration:1,
+	maxIteration: 1,
+	value: [9999],
+	price: [0],
 };
 
 
@@ -73,23 +82,32 @@ export class Shop extends Phaser.GameObjects.Container {
 			{
 				type: ItemType.TreeEnergy,
 				image: "sapling",
-				title: "Root Upgrade",
-				description: "Increase your root energy",
-				price: 10,
+				title: ["Magic Storage","Magic Font","Magical Spring"],
+				description: ["Increase your root energy","Increase your root energy","Increase your root energy"],
+				price: [10,5000,10000],
+				iteration: 1,
+				maxIteration: 3,
+				value: [100,1000,10000],
 			},
 			{
 				type: ItemType.FruitUpgrade,
 				image: "apple",
-				title: "Fruit Upgrade",
-				description: "Upgrade your fruit or something, i dunno",
-				price: 50,
+				title: ["Fruit Upgrade"],
+				description: ["Upgrade your fruit or something, i dunno"],
+				price: [50],
+				iteration:1,
+				maxIteration: 1,
+				value: [100],
 			},
 			{
 				type: ItemType.RockBreak,
 				image: "bones",
-				title: "Rock Breaker",
-				description: "Gain the ability to break through rocks!",
-				price: 200,
+				title: ["Hard Roots","Iron Roots","Titanium Roots","Gluttonous Roots","Adamantite Roots","Prosperous Roots","Dauntless Roots","Roots of the Developer"],
+				description: ["Gain the ability to break through bones!","Break through rocks!","Break through hard rocks!","Break through and harvest gems!","Break through bedrock!","Break and harvest ancient diamonds! Superb!","Break through hot rocks!","Venture into the unknown..."],
+				price: [200,400,800,3200,6400,12800,25600,128000],
+				iteration:1,
+				maxIteration:8,
+				value: [1,1,1,1,1,1,1,1],
 			},
 			SOLD_OUT_ITEM,
 			SOLD_OUT_ITEM,
@@ -279,11 +297,11 @@ export class Shop extends Phaser.GameObjects.Container {
 
 		if (itemData) {
 			// this.selectedItemImage.setTexture("apple");
-			this.selectedItemTitle.setText(itemData.title);
-			this.selectedItemDescription.setText(itemData.description);
+			this.selectedItemTitle.setText(itemData.title[itemData.iteration-1]);
+			this.selectedItemDescription.setText(itemData.description[itemData.iteration-1]);
 			
-			if (itemData.price > 0) {
-				this.selectedItemDescription.setText(`${itemData.description}\nOnly ${itemData.price} gold!`);
+			if (itemData.price[itemData.iteration-1] > 0) {
+				this.selectedItemDescription.setText(`${itemData.description[itemData.iteration-1]}\nOnly ${itemData.price[itemData.iteration-1]} gold!`);
 				this.buyButton.enabled = true;
 				this.buyButton.setAlpha(1.0);
 				this.buyImage.input.cursor = "pointer"
@@ -307,14 +325,14 @@ export class Shop extends Phaser.GameObjects.Container {
 
 		if (this.selectedItem) {
 			const scene = this.scene as GameScene;
-			if( scene.money >= this.selectedItem.price ) {
-				scene.money -= this.selectedItem.price
+			if( scene.money >= this.selectedItem.price[this.selectedItem.iteration-1] ) {
+				scene.money -= this.selectedItem.price[this.selectedItem.iteration-1]
 				this.emit("buy", this.selectedItem);
 				this.upgradeShopItem(this.selectedItem);
 			} else {
 				this.selectedItemTitle.setText("Shop owner");
 				this.selectedItemDescription.setText(
-					`You can't afford that!\nThe ${this.selectedItem.title.toLocaleLowerCase()}\nis ${this.selectedItem.price} gold.`
+					`You can't afford that!\nThe ${this.selectedItem.title[this.selectedItem.iteration-1].toLocaleLowerCase()}\nis ${this.selectedItem.price} gold.`
 				);
 				this.selectedItem = null;
 				this.buyButton.enabled = false;
@@ -327,14 +345,14 @@ export class Shop extends Phaser.GameObjects.Container {
 		const index = this.itemsForSale.indexOf(itemData);
 
 		if (itemData.type == ItemType.TreeEnergy) {
-			itemData.price = Math.round(itemData.price * 1.5);
+			itemData.price[itemData.iteration-1] = Math.round(itemData.price[itemData.iteration-1] * 1.5);
 		}
 		if (itemData.type == ItemType.FruitUpgrade) {
-			itemData.price = Math.round(itemData.price * 2.0);
+			itemData.price[itemData.iteration-1] = Math.round(itemData.price[itemData.iteration-1] * 2.0);
 			itemData.image = "applecore";
 			// Go through a list...
 		}
-		if (itemData.type == ItemType.RockBreak) {
+		if (itemData.iteration > itemData.maxIteration) {
 			this.itemsForSale[index] = SOLD_OUT_ITEM;
 		}
 

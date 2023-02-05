@@ -62,7 +62,7 @@ export class ShopItem extends Button {
 
 	getPrice(): number {
 		if (this.itemData) {
-			return this.itemData.price;
+			return this.itemData.price[this.itemData.iteration-1];
 		}
 		return 0;
 	}
