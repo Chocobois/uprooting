@@ -199,6 +199,9 @@ export class GameScene extends BaseScene {
 			} else if (itemData.type == ItemType.RockBreak)
 			{
 				this.tree.strength += itemData.value[itemData.iteration-1];
+			} else if (itemData.type == ItemType.FruitUpgrade)
+			{
+				this.tree.basevalue = itemData.value[itemData.iteration-1];
 			}
 			// Add more shop item mechanics...
 			// Or break up into more emits
@@ -583,11 +586,14 @@ export class GameScene extends BaseScene {
 
 		collectibles.forEach(collectible => {
 			let color = "Lime";
-			if (collectible.type == MineralType.applecore) {
+			if (collectible.points > 200) {
 				color = "Red";
+			} else if (collectible.points > 1000)
+			{
+				color = "Blue"
 			}
 
-			this.textParticle(collectible.x, collectible.y-10, color, `+1 ${collectible.properName}`, true,
+			this.textParticle(collectible.x, collectible.y-10, color, `${collectible.properName} +${collectible.points}!`, true,
 			250*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
 
 			if (this.currentNode && collectible.points) {
@@ -598,10 +604,19 @@ export class GameScene extends BaseScene {
 
 			// Create sparkle effect
 			if (collectible.type == MineralType.applecore) {
-				this.particles.createBlueSparkle(collectible.x, collectible.y, 3*this.SCALE, 1.0, false);
+				this.particles.createGreenMagic(collectible.x, collectible.y, (collectible.collisionRadius/35)*3.5*this.SCALE, 1.0, false);
 			}
-			else {
-				this.particles.createDustExplosion(collectible.x, collectible.y, 3*this.SCALE, 1.0, false);
+			else if (collectible.type == MineralType.emerald || collectible.type == MineralType.ruby || collectible.type == MineralType.diamond || collectible.type == MineralType.ancient_diamond)
+			{
+				this.particles.createBlueSparkle(collectible.x, collectible.y, (collectible.collisionRadius/50)*4*this.SCALE, 1.0, false);	
+			}
+			else if (collectible.type == MineralType.demon_rock || collectible.type == MineralType.curse_rock)
+			{
+				this.particles.createExplosion(collectible.x, collectible.y, (collectible.collisionRadius/50)*4*this.SCALE, 1.0, false);	
+			}
+			else
+			{
+				this.particles.createDustExplosion(collectible.x, collectible.y, (collectible.collisionRadius/50)*4*this.SCALE, 1.0, false);
 			}
 		});
 	}
@@ -787,7 +802,7 @@ export class GameScene extends BaseScene {
 		const cameraY = this.cameras.main.scrollY - 20;
 		const bottomY = cameraY + this.H + 40;
 		if(cameraY < parentY && cameraY < currentY && bottomY > parentY && bottomY > currentY){
-			const thickness = (3 + 4 * Math.sqrt(node.score)) * this.SCALE;
+			const thickness = (3 + 4 * Math.sqrt(node.score > 25 ? 25 : node.score)) * this.SCALE;
 			this.rootsGraphics.lineStyle(thickness, 0x795548, 1.0);
 			this.rootsGraphics.beginPath();
 			this.rootsGraphics.moveTo(node.parent.x, node.parent.y);
@@ -821,7 +836,7 @@ export class GameScene extends BaseScene {
 			this.moveSmoothCamera(-this.cameraSmoothY);
 
 			this.tree.harvestCount -= 1;
-			this.money += this.totalScore;
+			this.money += this.totalScore + (this.totalScore > this.tree.basevalue ? this.tree.basevalue : (this.tree.basevalue*this.totalScore/this.tree.basevalue));
 
 			this.particles.createGreenMagic(this.tree.x, this.tree.y - 150*this.SCALE, 3*this.SCALE, 1.0, false);
 
