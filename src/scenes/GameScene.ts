@@ -360,7 +360,7 @@ export class GameScene extends BaseScene {
 		this.textParticles.update(time, delta);
 		this.underground.update(time, delta);
 		this.shop.update(time, delta);
-		this.hud.update(time, delta, this.money, this.tree.energy, this.tree.maxEnergy);
+		this.hud.update(time, delta, this.money, this.tree.energy, this.tree.maxEnergy, this.totalScore);
 		this.tree.update(time, delta);
 		this.nodes.forEach(node => {
 			node.update(time, delta);
@@ -836,7 +836,7 @@ export class GameScene extends BaseScene {
 			this.moveSmoothCamera(-this.cameraSmoothY);
 
 			this.tree.harvestCount -= 1;
-			this.money += this.totalScore + (this.totalScore > this.tree.basevalue ? this.tree.basevalue : (this.tree.basevalue*this.totalScore/this.tree.basevalue));
+			this.money += this.totalScore + ((this.totalScore > this.tree.basevalue) ? this.tree.basevalue : (this.tree.basevalue*this.totalScore/this.tree.basevalue));
 
 			this.particles.createGreenMagic(this.tree.x, this.tree.y - 150*this.SCALE, 3*this.SCALE, 1.0, false);
 

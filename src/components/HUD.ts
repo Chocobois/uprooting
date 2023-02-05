@@ -22,6 +22,7 @@ export class HUD extends Phaser.GameObjects.Container {
 	private moneyBack: RoundRectangle;
 	private moneyIcon: Phaser.GameObjects.Image;
 	private moneyText: Phaser.GameObjects.Text;
+	private scoreText: Phaser.GameObjects.Text;
 
 	private energyBorder: RoundRectangle;
 	private energyBack: RoundRectangle;
@@ -69,6 +70,9 @@ export class HUD extends Phaser.GameObjects.Container {
 		this.moneyText.setOrigin(0.0, 0.57);
 		this.add(this.moneyText);
 
+		this.scoreText = this.scene.createText(ml+0.6*iconSize, y, textSize, "#000", "1,134");
+		this.scoreText.setOrigin(0.0, 3.50);
+		this.add(this.scoreText);
 
 		const ew = 0.2 * this.scene.W;
 		// const ex = mx + mw/2 + ew/2 + 5*pad;
@@ -97,10 +101,11 @@ export class HUD extends Phaser.GameObjects.Container {
 
 	}
 
-	update(time: number, delta: number, money: number, energy: number, maxEnergy: number) {
+	update(time: number, delta: number, money: number, energy: number, maxEnergy: number, score: number = 0) {
 
 		this.moneyText.setText(`${money}`);
 		this.energyText.setText(`${energy}/${maxEnergy}`);
+//		this.scoreText.setText(`${score}`);
 
 		const factor = energy / maxEnergy;
 		this.energyMeter.setWidth(factor * this.energyBack.width);

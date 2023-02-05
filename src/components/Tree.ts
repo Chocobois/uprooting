@@ -60,7 +60,7 @@ export class Tree extends Button {
 	}
 
 	setTreeScore(score: number) {
-		const treeSize = this.scene.H * (.1 + (score > 500 ? (5 + 0.0001*score) : (.01 * score)));
+		const treeSize = this.scene.H * (.1 + ((score > 500) ? (5 + 0.0001*score) : (.01 * score)));
 
 		this.treeSprite.setScale(treeSize / this.treeSprite.width);
 		const inputPadding = 40 * this.scene.SCALE / this.treeSprite.scaleX;
@@ -69,11 +69,19 @@ export class Tree extends Button {
 		if (score > 80) {
 			this.level += 1;
 			this.treeSprite.setTexture("tree");
+// \hacky way to fix tree inflation error
+			this.treeSprite.setScale(treeSize / this.treeSprite.width);
+			this.treeSprite.input.hitArea.setTo(-inputPadding, -inputPadding, this.treeSprite.width+2*inputPadding, this.treeSprite.height+2*inputPadding);
+// *\hack
 			this.emit("levelUp", this.level);
 		}
 		else if (score > 20 && score <= 80) {
 			this.level += 1;
+// \hacky way to fix tree inflation error
 			this.treeSprite.setTexture("tree_little");
+			this.treeSprite.setScale(treeSize / this.treeSprite.width);
+// *\hack
+			this.treeSprite.input.hitArea.setTo(-inputPadding, -inputPadding, this.treeSprite.width+2*inputPadding, this.treeSprite.height+2*inputPadding);
 			this.emit("levelUp", this.level);
 
 		}
