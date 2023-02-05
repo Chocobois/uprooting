@@ -155,7 +155,7 @@ export class GameScene extends BaseScene {
 		// this.fitToScreen(this.background);
 
 		// Money
-		this.money = 0;
+		this.money = 99990;
 
 		this.hud = new HUD(this);
 
@@ -594,10 +594,19 @@ export class GameScene extends BaseScene {
 
 			// Create sparkle effect
 			if (collectible.type == MineralType.applecore) {
-				this.particles.createBlueSparkle(collectible.x, collectible.y, 3*this.SCALE, 1.0, false);
+				this.particles.createGreenMagic(collectible.x, collectible.y, (collectible.collisionRadius/35)*6*this.SCALE, 1.0, false);
 			}
-			else {
-				this.particles.createDustExplosion(collectible.x, collectible.y, 3*this.SCALE, 1.0, false);
+			else if (collectible.type == MineralType.emerald || collectible.type == MineralType.ruby || collectible.type == MineralType.diamond || collectible.type == MineralType.ancient_diamond)
+			{
+				this.particles.createBlueSparkle(collectible.x, collectible.y, (collectible.collisionRadius/50)*4*this.SCALE, 1.0, false);	
+			}
+			else if (collectible.type == MineralType.demon_rock || collectible.type == MineralType.curse_rock)
+			{
+				this.particles.createExplosion(collectible.x, collectible.y, (collectible.collisionRadius/50)*4*this.SCALE, 1.0, false);	
+			}
+			else
+			{
+				this.particles.createDustExplosion(collectible.x, collectible.y, (collectible.collisionRadius/50)*4*this.SCALE, 1.0, false);
 			}
 		});
 	}
