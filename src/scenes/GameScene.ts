@@ -29,7 +29,7 @@ enum MusicState {
 	Jingle
 }
 
-const MUSIC_VOLUME = 0.4;
+const MUSIC_VOLUME = 0.4*0;
 
 export class GameScene extends BaseScene {
 	// Gameplay state, see enum above
@@ -116,7 +116,7 @@ export class GameScene extends BaseScene {
 
 		this.underground = new Underground(this, this.SURFACE_Y, this.BEDROCK_Y);
 
-		this.shop = new Shop(this, 0.2 * this.W, this.SURFACE_Y+192*this.SCALE );
+		this.shop = new Shop(this, 0.2 * this.W, this.SURFACE_Y+48);
 		this.shop.on("open", () => {
 			this.cameras.main.scrollY = 0;
 
@@ -141,6 +141,10 @@ export class GameScene extends BaseScene {
 		this.background = this.add.image(this.CX, this.SURFACE_Y - 20*this.SCALE, "underground");
 		this.background.setOrigin(0.5, 0);
 		this.background.setScale(2 * this.W / this.background.width);
+
+
+		this.underground = new Underground(this, this.SURFACE_Y, this.BEDROCK_Y);
+
 
 		// Tree
 
@@ -359,6 +363,7 @@ export class GameScene extends BaseScene {
 		// Restart tree
 		this.addNode(this.CX, this.SURFACE_Y + 10, true);
 		this.tree.reset();
+		this.underground.reset();
 		this.updateScore();
 	}
 

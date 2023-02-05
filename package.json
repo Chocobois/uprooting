@@ -19,6 +19,7 @@
     "vite-plugin-zip-pack": "^1.0.5"
   },
   "dependencies": {
-    "phaser": "^3.55.2"
+    "phaser": "^3.55.2",
+    "phaser3-rex-plugins": "^1.1.80"
   }
 }
