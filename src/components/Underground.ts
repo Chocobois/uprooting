@@ -123,8 +123,8 @@ export class Underground extends Phaser.GameObjects.Container {
 
 	attemptSpawningItem() {
 		MINERALS.forEach(mineralRange => {
-			let centerDepth = this.top + mineralRange.centerDepth;
-			let spawnHeight = mineralRange.centerRadius;
+			let centerDepth = this.top + mineralRange.centerDepth * this.scene.SCALE;
+			let spawnHeight = mineralRange.centerRadius * this.scene.SCALE;
 			// Funny triangle formula. Peak 1 at center. 0 at edges. Negative outside.
 			let odds = mineralRange.odds * Math.pow((spawnHeight - Math.abs(this.currentY - centerDepth)) / spawnHeight, 1.5);
 
