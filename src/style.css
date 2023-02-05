@@ -34,6 +34,8 @@ body {
   z-index: -10;
 	margin: auto;
   font-family: "PermanentMarker-Regular", serif;
+  font-size: 3rem;
+  white-space: nowrap;
 }
 
 /* fredoka-one-regular - latin */
