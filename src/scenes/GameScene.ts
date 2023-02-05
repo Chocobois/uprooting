@@ -32,14 +32,14 @@ enum MusicState {
 }
 
 enum InvalidNodeReason {
-	None = "None",
-	ProgrammerGoofed = "Programmer Goofed",
-	AboveSurface = "Root cannot be above the surface",
-	TooDeep = "Root is too deep",
-	TurnTooHarsh = "Root turns too harshly",
-	SelfIntersecting = "Root self intersects",
-	TooClose = "Root are too close together",
-	ObstacleInTheWay = "Root is obstructed"
+	None = "you shouldn't be seeing this text, but if you are, uhhh... congratulations?",
+	ProgrammerGoofed = "golen or hex made an oopsie",
+	AboveSurface = "Wrong way!",
+	TooDeep = "Root is too deep!",
+	TurnTooHarsh = "Root turns too harshly!",
+	SelfIntersecting = "Root self intersects!",
+	TooClose = "Roots are too close together!",
+	ObstacleInTheWay = "Root is obstructed!"
 }
 
 const MUSIC_VOLUME = 0.4;
