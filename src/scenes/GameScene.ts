@@ -436,12 +436,12 @@ export class GameScene extends BaseScene {
 		this.underground.destroyMinerals(collectibles);
 
 		collectibles.forEach(collectible => {
-			this.textParticle(collectible.x, collectible.y-10, "Lime", `+1 ${collectible.properName}`);
+			this.textParticle(collectible.x, collectible.y-10, "Lime", `+1 ${collectible.properName}`, true, 60);
 		});
 	}
 
-	textParticle(x: number, y: number, color: string, content: string, outline: boolean=true) {
-		const text = this.createText(x, y, 40*this.SCALE, color, content);
+	textParticle(x: number, y: number, color: string, content: string, outline: boolean=true, size: number=40) {
+		const text = this.createText(x, y, size*this.SCALE, color, content);
 		if(outline) text.setStroke("rgba(0,0,0,0.5)", 4);
 		this.textParticles.push(text, 1.5, true);
 	}
