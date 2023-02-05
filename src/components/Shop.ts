@@ -274,8 +274,9 @@ export class Shop extends Phaser.GameObjects.Container {
 			// this.selectedItemImage.setTexture("apple");
 			this.selectedItemTitle.setText(itemData.title);
 			this.selectedItemDescription.setText(itemData.description);
-
+			
 			if (itemData.price > 0) {
+				this.selectedItemDescription.setText(`${itemData.description}\nOnly ${itemData.price} gold!`);
 				this.buyButton.enabled = true;
 				this.buyButton.setAlpha(1.0);
 				this.buyImage.input.cursor = "pointer"
@@ -306,7 +307,7 @@ export class Shop extends Phaser.GameObjects.Container {
 			} else {
 				this.selectedItemTitle.setText("Shop owner");
 				this.selectedItemDescription.setText(
-					`You can't afford that!\nThe ${this.selectedItem.title.toLocaleLowerCase()}\nis${this.selectedItem.price} gold.`
+					`You can't afford that!\nThe ${this.selectedItem.title.toLocaleLowerCase()}\nis ${this.selectedItem.price} gold.`
 				);
 				this.selectedItem = null;
 				this.buyButton.enabled = false;
