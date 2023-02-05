@@ -6,6 +6,8 @@ enum ParticleType {
 	GreenMagic = "green_magic",
 	Shell = "shell", // Doesn't exist
 	Sweat = "sweat", // Doesn't exist
+	BlueSparkle = "blue_sparkle",
+	DustExplosion = "dust_explosion",
 }
 
 class Particle extends Phaser.GameObjects.Sprite {
@@ -108,6 +110,26 @@ class Particle extends Phaser.GameObjects.Sprite {
 
 	greenMagic(x: number, y: number, scale: number, duration: number, flip: boolean) {
 		this.init(x, y, ParticleType.GreenMagic);
+
+		this.setScale((flip ? 1 : -1) * scale, scale);
+		this.setFrame(0);
+		this.setOrigin(0.5);
+
+		this.lifeTime = duration * (0.8 + 0.2*Math.random());
+	}
+
+	blueSparkle(x: number, y: number, scale: number, duration: number, flip: boolean) {
+		this.init(x, y, ParticleType.BlueSparkle);
+
+		this.setScale((flip ? 1 : -1) * scale, scale);
+		this.setFrame(0);
+		this.setOrigin(0.5);
+
+		this.lifeTime = duration * (0.8 + 0.2*Math.random());
+	}
+
+	dustExplosion(x: number, y: number, scale: number, duration: number, flip: boolean) {
+		this.init(x, y, ParticleType.DustExplosion);
 
 		this.setScale((flip ? 1 : -1) * scale, scale);
 		this.setFrame(0);
@@ -249,9 +271,24 @@ export class Particles extends Phaser.GameObjects.Container {
 		});
 	}
 
+	// 15 frames, 128x128
 	createGreenMagic(x: number, y: number, scale: number, duration: number, flip: boolean) {
 		this.getFreeParticles(1).forEach((particle) => {
 			particle.greenMagic(x, y, scale, duration, flip);
+		});
+	}
+
+	// 15 frames, 256x256
+	createBlueSparkle(x: number, y: number, scale: number, duration: number, flip: boolean) {
+		this.getFreeParticles(1).forEach((particle) => {
+			particle.blueSparkle(x, y, scale, duration, flip);
+		});
+	}
+
+	// 15 frames, 128x128
+	createDustExplosion(x: number, y: number, scale: number, duration: number, flip: boolean) {
+		this.getFreeParticles(1).forEach((particle) => {
+			particle.dustExplosion(x, y, scale, duration, flip);
 		});
 	}
 }

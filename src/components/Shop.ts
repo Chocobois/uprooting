@@ -177,7 +177,7 @@ export class Shop extends Phaser.GameObjects.Container {
 		this.add(this.selectedItemTitle);
 
 		this.selectedItemDescription = this.scene.createText(sx, sy, 50*this.scene.SCALE, "#000", "Culpa ut quis ullamco nisi aliqua id est occaecat proident aliqua in.");
-		this.selectedItemDescription.setWordWrapWidth(.35*W);
+		this.selectedItemDescription.setWordWrapWidth(3.5*W);
 		this.selectedItemDescription.setLineSpacing(0);
 		this.selectedItemDescription.setOrigin(0, -0.05);
 		this.add(this.selectedItemDescription);

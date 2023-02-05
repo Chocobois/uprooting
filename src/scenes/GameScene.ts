@@ -32,14 +32,14 @@ enum MusicState {
 }
 
 enum InvalidNodeReason {
-	None = "you shouldn't be seeing this text, but if you are, uhhh... congratulations?",
 	ProgrammerGoofed = "golen or hex made an oopsie",
 	AboveSurface = "Wrong way!",
 	TooDeep = "Root is too deep!",
 	TurnTooHarsh = "Root turns too harshly!",
 	SelfIntersecting = "Root self intersects!",
 	TooClose = "Roots are too close together!",
-	ObstacleInTheWay = "Root is obstructed!"
+	ObstacleInTheWay = "Root is obstructed!",
+	Unaffordable = "Not enough energy!"
 }
 
 const MUSIC_VOLUME = 0.4;
@@ -74,10 +74,13 @@ export class GameScene extends BaseScene {
 	private harvestButton: HarvestButton;
 	private musicButton: MiniButton;
 	private audioButton: MiniButton;
+	private timeScrolling: number;
+	private scrolling: boolean;
 
 	// Debug
 	private debugText: Phaser.GameObjects.Text;
 	private cameraDragArea: Phaser.GameObjects.Rectangle;
+	private cameraSmoothY: number;
 
 	// Particles
 	public particles: Particles;
@@ -100,7 +103,7 @@ export class GameScene extends BaseScene {
 	}
 
 	create(): void {
-		this.cameras.main.setBackgroundColor(0x4FC3F7);
+		this.cameras.main.setBackgroundColor(0);
 		this.fade(false, 200, 0x000000);
 
 		this.state = GameState.GrowingRoots;
@@ -113,6 +116,8 @@ export class GameScene extends BaseScene {
 		this.cameraDragArea.setScrollFactor(0);
 		this.cameraDragArea.setInteractive({ useHandCursor: true, draggable: true });
 		this.cameraDragArea.on('drag', this.onCameraDrag, this);
+
+		this.cameraSmoothY = 0;
 
 
 		// Background
@@ -132,6 +137,7 @@ export class GameScene extends BaseScene {
 		this.shop = new Shop(this, 0.2 * this.W, this.SURFACE_Y+192*this.SCALE );
 		this.shop.on("open", () => {
 			this.cameras.main.scrollY = 0;
+			this.cameraSmoothY = 0;
 
 			if (this.state == GameState.GrowingRoots) {
 				this.shop.open();
@@ -282,6 +288,11 @@ export class GameScene extends BaseScene {
 
 	update(time: number, delta: number) {
 
+		// Smooth camera movement
+		if (this.state == GameState.GrowingRoots) {
+			this.cameras.main.scrollY += 0.3 * (this.cameraSmoothY - this.cameras.main.scrollY);
+		}
+
 		// Update game objects
 		this.particles.update(time, delta);
 		this.textParticles.update(time, delta);
@@ -293,6 +304,12 @@ export class GameScene extends BaseScene {
 		});
 		this.returnToSurfaceButton.update(time, delta);
 		this.updateMusic(time, delta);
+
+		if(this.scrolling) {
+			this.timeScrolling += delta;
+		} else {
+			this.timeScrolling = 0;
+		}
 
 		// Debug, move this to some ui thing
 		this.debugText.setText(`State: ${this.state}\nEnergy: ${this.tree.energy}/${this.tree.maxEnergy}`);
@@ -361,18 +378,25 @@ export class GameScene extends BaseScene {
 
 		const pointer = this.input.activePointer;
 		const upperArea = 0.10 * this.H; // Upper 10% of the screen
-		const lowerArea = this.H - 0.30 * this.H; // Lower 30% of the screen
-		const maxScrollSpeed = 5;
+		const lowerArea = 0.50 * this.H; // Lower 30% of the screen
+		const maxScrollSpeed = 20;
+
+		const timeFactor = 1 - 1/(this.timeScrolling/1200+1);
 
 		// If pointer at the top of the screen, move camera upwards
 		if (pointer.y < upperArea && this.validDrawing) {
 			const factor = 1 - pointer.y / upperArea;
-			this.cameras.main.scrollY -= maxScrollSpeed * factor * this.SCALE;
+			this.cameraSmoothY -= maxScrollSpeed * factor * timeFactor * this.SCALE;
+			this.scrolling = true;
 		}
 		// If pointer at the bottom of the screen, move camera downwards
-		if (pointer.y > lowerArea && this.validDrawing) {
+		else if (pointer.y > lowerArea && this.validDrawing) {
 			const factor = (pointer.y - lowerArea) / (this.H - lowerArea);
-			this.cameras.main.scrollY += maxScrollSpeed * factor * this.SCALE;
+			this.cameraSmoothY += maxScrollSpeed * factor * timeFactor * this.SCALE;
+			this.scrolling = true;
+		}
+		else {
+			this.scrolling = false;
 		}
 	}
 
@@ -385,6 +409,7 @@ export class GameScene extends BaseScene {
 	returnToSurface() {
 		this.state = GameState.ReturningToSurfaceCutscene;
 		this.returnToSurfaceButton.hide();
+		this.cameraSmoothY = 0;
 
 		// Smooth camera transition
 		this.tweens.addCounter({
@@ -409,6 +434,8 @@ export class GameScene extends BaseScene {
 	onHarvestComplete() {
 		this.state = GameState.GrowingRoots;
 		this.oneTimeEvents.outOfEnergy = false;
+		this.oneTimeEvents.growthStage1Sound = false;
+		this.oneTimeEvents.growthStage2Sound = false;
 
 		// Add current score to growth
 		// Should be a whole sequence here instead and the shop thing, etc
@@ -476,12 +503,15 @@ export class GameScene extends BaseScene {
 			const line = new Phaser.Geom.Line(start.x, start.y, end.x, end.y);
 			const mineralIntersects = this.underground.getIntersectedMinerals(line);
 			const touchingObstacle = mineralIntersects.some(mineral => mineral.obstacle);
-			this.validDrawing = !!next && !touchingObstacle;
+			const canAfford = this.tree.energy > this.currentNode.cost;
+			this.validDrawing = !!next && !touchingObstacle && canAfford;
 
 			const invalidReason = nextPosResult instanceof Phaser.Math.Vector2
 				? touchingObstacle
 					? InvalidNodeReason.ObstacleInTheWay
-					: InvalidNodeReason.None
+					: canAfford
+						? InvalidNodeReason.ProgrammerGoofed // shouldn't get here
+						: InvalidNodeReason.Unaffordable
 				: nextPosResult;
 
 			this.dragPos = this.dragPos.lerp(end, delta/100);
@@ -560,10 +590,10 @@ export class GameScene extends BaseScene {
 
 		// Check proximity
 		const tooClose = this.nodes.some(node => {
-			if (!node.parent || node == this.currentNode || node.parent == this.currentNode) return false;
+			if (!node.parent) return false;
 
 			const otherLine = new Phaser.Geom.Line(node.parent.x, node.parent.y, node.x, node.y);
-			const distances = otherLine.getPoints(4).map(point => new Phaser.Math.Vector2(point.x, point.y).distance(end));
+			const distances = otherLine.getPoints(0, 0.25).map(point => new Phaser.Math.Vector2(point.x, point.y).distance(end));
 
 			const dist = distances.reduce((a,c) => Math.min(a,c), Infinity);
 
@@ -676,14 +706,14 @@ export class GameScene extends BaseScene {
 	onScroll(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) {
 		if (this.state != GameState.GrowingRoots) { return; }
 
-		this.cameras.main.scrollY += deltaY * this.SCALE;
+		this.cameraSmoothY += deltaY * this.SCALE;
 	}
 
 	onCameraDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number) {
 		if (this.state != GameState.GrowingRoots) { return; }
 
 		this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom;
-		this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
+		this.cameraSmoothY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
 
 	}
 
