@@ -100,7 +100,7 @@ export class GameScene extends BaseScene {
 	}
 
 	create(): void {
-		this.cameras.main.setBackgroundColor(0x4FC3F7);
+		this.cameras.main.setBackgroundColor(0);
 		this.fade(false, 200, 0x000000);
 
 		this.state = GameState.GrowingRoots;

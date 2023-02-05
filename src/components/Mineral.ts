@@ -19,7 +19,7 @@ export class Mineral extends Button {
 		this.collectible = params.collectible;
 		this.obstacle = params.obstacle;
 
-		this.size = params.collisionRadius * this.scene.SCALE * 8;
+		this.size = params.collisionRadius*2;
 		// console.log(size);
 		// this.size = size;
 

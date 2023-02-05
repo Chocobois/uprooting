@@ -42,8 +42,19 @@ const MINERALS: MineralRange[] = [
 		properName: "Apple Core",
 		centerDepth: 2000,
 		centerRadius: 3000,
+		odds: 0.01,
+		collisionRadius: 250,
+		spacingRadius: 300,
+		collectible: false,
+		obstacle: true
+	},
+	{
+		type: MineralType.Applecore,
+		properName: "Apple Core",
+		centerDepth: 2000,
+		centerRadius: 3000,
 		odds: 0.04,
-		collisionRadius: 15,
+		collisionRadius: 70,
 		spacingRadius: 200,
 		collectible: true,
 		obstacle: false
@@ -54,7 +65,7 @@ const MINERALS: MineralRange[] = [
 		centerDepth: 5000,
 		centerRadius: 4000,
 		odds: 0.02,
-		collisionRadius: 20,
+		collisionRadius: 70,
 		spacingRadius: 100,
 		collectible: false,
 		obstacle: true
@@ -65,7 +76,7 @@ const MINERALS: MineralRange[] = [
 		centerDepth: 8000,
 		centerRadius: 4000,
 		odds: 0.06,
-		collisionRadius: 20,
+		collisionRadius: 60,
 		spacingRadius: 250,	
 		collectible: true,
 		obstacle: false
@@ -112,6 +123,14 @@ export class Underground extends Phaser.GameObjects.Container {
 
 		this.currentY = this.top;
 		this.deltaY = 1 * this.scene.SCALE;
+
+
+		MINERALS.forEach(mineralRange => {
+			mineralRange.centerDepth *= this.scene.SCALE;
+			mineralRange.centerRadius *= this.scene.SCALE;
+			mineralRange.collisionRadius *= this.scene.SCALE;
+			mineralRange.spacingRadius *= this.scene.SCALE;
+		});
 	}
 
 	update(time: number, delta: number, ) {
@@ -139,8 +158,8 @@ export class Underground extends Phaser.GameObjects.Container {
 
 	attemptSpawningItem() {
 		MINERALS.forEach(mineralRange => {
-			let centerDepth = this.top + mineralRange.centerDepth * this.scene.SCALE;
-			let spawnHeight = mineralRange.centerRadius * this.scene.SCALE;
+			let centerDepth = this.top + mineralRange.centerDepth;
+			let spawnHeight = mineralRange.centerRadius;
 			// Funny triangle formula. Peak 1 at center. 0 at edges. Negative outside.
 			let odds = mineralRange.odds * Math.pow((spawnHeight - Math.abs(this.currentY - centerDepth)) / spawnHeight, 1.5);
 
