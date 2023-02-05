@@ -21,7 +21,7 @@ export class Tree extends Button {
 
 		// Stats
 		this.level = 0;
-		this.maxEnergy = 1000000;
+		this.maxEnergy = 100;
 		this.energy = this.maxEnergy;
 		this.harvestCount = 3;
 		this.strength = 3;

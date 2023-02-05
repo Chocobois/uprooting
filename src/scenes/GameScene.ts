@@ -535,6 +535,10 @@ export class GameScene extends BaseScene {
 		collectibles.forEach(collectible => {
 			this.textParticle(collectible.x, collectible.y-10, "Lime", `+1 ${collectible.properName}`, true,
 			250*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
+
+			if (collectible.points) {
+				this.currentNode.addScore(collectible.points);
+			}
 		});
 	}
 

@@ -39,6 +39,7 @@ export interface MineralRange {
 	collectible: boolean; // Is this collectible by dragging a branch on it?
 	hardness: number; // How cool your tree needs to be to break this? Blocks growth if > tree strength.
 	noRotation?: boolean;
+	points?: number;
 }
 
 const MINERALS: MineralRange[] = [
