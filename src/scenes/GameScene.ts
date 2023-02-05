@@ -305,6 +305,7 @@ export class GameScene extends BaseScene {
 			growthStage2Sound: false,
 			wrongPlacementSound: false,
 			outOfEnergy: false,
+			spawnShop: false,
 		}
 
 
@@ -488,6 +489,11 @@ export class GameScene extends BaseScene {
 		this.oneTimeEvents.outOfEnergy = false;
 		this.oneTimeEvents.growthStage1Sound = false;
 		this.oneTimeEvents.growthStage2Sound = false;
+
+		if (!this.oneTimeEvents.spawnShop) {
+			this.oneTimeEvents.spawnShop = true;
+			this.shop.activateOverworldShop();
+		}
 
 		// Add current score to growth
 		// Should be a whole sequence here instead and the shop thing, etc
@@ -726,7 +732,9 @@ export class GameScene extends BaseScene {
 	}
 
 	onTreeClick() {
-		if (this.state == GameState.HarvestingTree) {
+		if (this.state == GameState.GrowingRoots || this.state == GameState.HarvestingTree) {
+			this.moveSmoothCamera(-this.cameraSmoothY);
+
 			this.tree.harvestCount -= 1;
 			this.money += this.totalScore;
 
