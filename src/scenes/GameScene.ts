@@ -59,6 +59,7 @@ export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
 	private overworld: Phaser.GameObjects.Image;
 	private overworldBush: Phaser.GameObjects.Image;
+	private undergroundEdge: Phaser.GameObjects.Image;
 
 	// Tree
 	private tree: Tree;
@@ -195,9 +196,15 @@ export class GameScene extends BaseScene {
 		this.background.setOrigin(0.5, 0);
 		this.background.setScale(2 * this.W / this.background.width);
 
+		this.undergroundEdge = this.add.image(this.CX, this.cameraBounds.height, "underground_edge");
+		this.undergroundEdge.setOrigin(0.5, 1.0);
+		this.undergroundEdge.setScrollFactor(1);
+		this.fitToScreen(this.undergroundEdge);
+
 
 		// The underground mineral spawner
 		this.underground = new Underground(this, this.SURFACE_Y, this.BEDROCK_Y);
+		this.undergroundEdge.setDepth(this.underground.depth + 1)
 
 
 		// Tree
@@ -438,6 +445,14 @@ export class GameScene extends BaseScene {
 		if (y == 0) { this.deepestNodeY = 0; }
 		this.deepestNodeY = Math.max(y, this.deepestNodeY);
 		this.setCameraBounds(0, 0, this.W, this.deepestNodeY + 0.6 * this.H);
+		// this.undergroundEdge.setY(this.cameraBounds.height);
+		this.tweens.addCounter({
+			from: this.undergroundEdge.y,
+			to: Math.max(this.cameraBounds.height, 1.5*this.H),
+			duration: 500,
+			ease: "Quad",
+			onUpdate: (tween) => this.undergroundEdge.setY(tween.getValue())
+		});
 		// this.setCameraBounds(0, 0, this.W, 100000);
 		// this.cameras.main.setBounds(-0.5*this.W, -this.H, 2*this.W, 1000000);
 	}
