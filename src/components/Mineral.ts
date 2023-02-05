@@ -10,6 +10,7 @@ export class Mineral extends Button {
 	public collisionRadius: number; // Personal space
 	public collectible: boolean;
 	public obstacle: boolean;
+	public hardness: number;
 
 	constructor(scene: BaseScene, params: MineralRange, x: number, y: number) {
 		super(scene, x, y);
@@ -17,7 +18,8 @@ export class Mineral extends Button {
 		this.spacingRadius = params.spacingRadius;
 		this.collisionRadius = params.collisionRadius;
 		this.collectible = params.collectible;
-		this.obstacle = params.obstacle;
+		this.obstacle = false;
+		this.hardness = params.hardness
 
 		this.size = params.collisionRadius*2;
 		// console.log(size);

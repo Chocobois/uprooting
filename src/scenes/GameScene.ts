@@ -557,7 +557,7 @@ export class GameScene extends BaseScene {
 			// Check minerals
 			const line = new Phaser.Geom.Line(start.x, start.y, end.x, end.y);
 			const mineralIntersects = this.underground.getIntersectedMinerals(line);
-			const touchingObstacle = mineralIntersects.some(mineral => mineral.obstacle);
+			const touchingObstacle = mineralIntersects.some((mineral => mineral.hardness > this.tree.strength));
 			const canAfford = this.tree.energy > this.currentNode.cost;
 			this.validDrawing = !!next && !touchingObstacle && canAfford;
 
