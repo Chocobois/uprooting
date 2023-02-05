@@ -57,7 +57,7 @@ export class BaseScene extends Phaser.Scene {
 			fontFamily: "VCR_OSD_MONO",
 			fontSize: Math.max(size*10, 1) + "px",
 			color: color,
-			fontStyle: "800"
+			fontStyle: "bold"
 		}).setLineSpacing(0.4*size).setPadding(2).setScale(0.1);
 	}
 
