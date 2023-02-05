@@ -74,6 +74,8 @@ export class GameScene extends BaseScene {
 	private harvestButton: HarvestButton;
 	private musicButton: MiniButton;
 	private audioButton: MiniButton;
+	private timeScrolling: number;
+	private scrolling: boolean;
 
 	// Debug
 	private debugText: Phaser.GameObjects.Text;
@@ -294,6 +296,12 @@ export class GameScene extends BaseScene {
 		this.returnToSurfaceButton.update(time, delta);
 		this.updateMusic(time, delta);
 
+		if(this.scrolling) {
+			this.timeScrolling += delta;
+		} else {
+			this.timeScrolling = 0;
+		}
+
 		// Debug, move this to some ui thing
 		this.debugText.setText(`State: ${this.state}\nEnergy: ${this.tree.energy}/${this.tree.maxEnergy}`);
 
@@ -361,18 +369,25 @@ export class GameScene extends BaseScene {
 
 		const pointer = this.input.activePointer;
 		const upperArea = 0.10 * this.H; // Upper 10% of the screen
-		const lowerArea = this.H - 0.30 * this.H; // Lower 30% of the screen
-		const maxScrollSpeed = 5;
+		const lowerArea = 0.70 * this.H; // Lower 30% of the screen
+		const maxScrollSpeed = 20;
+
+		const timeFactor = 1 - 1/(this.timeScrolling/1200+1);
 
 		// If pointer at the top of the screen, move camera upwards
 		if (pointer.y < upperArea && this.validDrawing) {
 			const factor = 1 - pointer.y / upperArea;
-			this.cameras.main.scrollY -= maxScrollSpeed * factor * this.SCALE;
+			this.cameras.main.scrollY -= maxScrollSpeed * factor * timeFactor * this.SCALE;
+			this.scrolling = true;
 		}
 		// If pointer at the bottom of the screen, move camera downwards
-		if (pointer.y > lowerArea && this.validDrawing) {
+		else if (pointer.y > lowerArea && this.validDrawing) {
 			const factor = (pointer.y - lowerArea) / (this.H - lowerArea);
-			this.cameras.main.scrollY += maxScrollSpeed * factor * this.SCALE;
+			this.cameras.main.scrollY += maxScrollSpeed * factor * timeFactor * this.SCALE;
+			this.scrolling = true;
+		}
+		else {
+			this.scrolling = false;
 		}
 	}
 
