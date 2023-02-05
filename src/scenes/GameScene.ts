@@ -164,6 +164,7 @@ export class GameScene extends BaseScene {
 				this.musicState = MusicState.Shop;
 				this.musicNormal.stop();
 				this.musicDrawing.stop();
+				this.musicJingle.stop();
 				this.musicShop.play();
 			}
 		});
@@ -508,6 +509,19 @@ export class GameScene extends BaseScene {
 		if (!this.oneTimeEvents.spawnShop) {
 			this.oneTimeEvents.spawnShop = true;
 			this.shop.activateOverworldShop();
+			this.musicState = MusicState.Jingle;
+			this.musicNormal.stop();
+			this.musicDrawing.stop();
+			this.musicJingle.play();
+			setTimeout(() => {
+				this.musicNormal = new Music(this, 'm_first', { volume: this.musicMuted ? 0 : this.musicVolume });
+				this.musicDrawing = new Music(this, 'm_first_draw', { volume: 0 });
+				if (this.musicState == MusicState.Jingle) {
+					this.musicState = MusicState.NormalLoop;
+					this.musicNormal.play();
+					this.musicDrawing.play();
+				}
+			}, this.musicJingle.duration * 1000);
 		}
 
 		// Add current score to growth
