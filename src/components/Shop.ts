@@ -184,7 +184,7 @@ export class Shop extends Phaser.GameObjects.Container {
 
 
 		// Buy button
-		this.buyButton = new Button(this.scene, .87*W, .85*H);
+		this.buyButton = new Button(this.scene, .89*W, .81*H);
 		this.add(this.buyButton);
 
 		this.buyImage = this.scene.add.image(0, 0, "shop_buy_button");

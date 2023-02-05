@@ -43,6 +43,13 @@ enum InvalidNodeReason {
 	Unaffordable = "Not enough energy!"
 }
 
+interface CameraBounds {
+	left: number;
+	top: number;
+	width: number;
+	height: number;
+}
+
 const MUSIC_VOLUME = 0.4;
 
 export class GameScene extends BaseScene {
@@ -84,6 +91,7 @@ export class GameScene extends BaseScene {
 	private debugText: Phaser.GameObjects.Text;
 	private cameraDragArea: Phaser.GameObjects.Rectangle;
 	private cameraSmoothY: number;
+	private cameraBounds: CameraBounds;
 
 	// Particles
 	public particles: Particles;
@@ -114,12 +122,12 @@ export class GameScene extends BaseScene {
 
 		// Camera management
 
-		this.cameras.main.setBounds(0, 0, this.W, this.H);
 		this.cameraDragArea = this.add.rectangle(this.CX, this.CY, this.W, this.H, 0xFF0000, 0.0);
 		this.cameraDragArea.setScrollFactor(0);
 		this.cameraDragArea.setInteractive({ useHandCursor: true, draggable: true });
 		this.cameraDragArea.on('drag', this.onCameraDrag, this);
 
+		this.setCameraBounds(0, 0, this.W, this.H);
 		this.cameraSmoothY = 0;
 
 
@@ -328,7 +336,7 @@ export class GameScene extends BaseScene {
 
 		if (this.state == GameState.GrowingRoots) {
 			// Move camera with mouse input
-			this.moveCamera();
+			this.handleCameraMovement();
 
 			this.handleRootDrawing(delta);
 		}
@@ -383,7 +391,17 @@ export class GameScene extends BaseScene {
 	}
 
 
-	moveCamera() {
+	setCameraBounds(left: number, top: number, width: number, height: number) {
+		this.cameraBounds = {
+			left: left,
+			top: top,
+			width: width,
+			height: height,
+		};
+		this.cameras.main.setBounds(left, top, width, height);
+	}
+
+	handleCameraMovement() {
 		// Only allow touch camera movement during node drawing
 		if (!this.currentNode) { return; }
 
@@ -397,13 +415,13 @@ export class GameScene extends BaseScene {
 		// If pointer at the top of the screen, move camera upwards
 		if (pointer.y < upperArea && this.validDrawing) {
 			const factor = 1 - pointer.y / upperArea;
-			this.cameraSmoothY -= maxScrollSpeed * factor * timeFactor * this.SCALE;
+			this.moveSmoothCamera(- maxScrollSpeed * factor * timeFactor * this.SCALE);
 			this.scrolling = true;
 		}
 		// If pointer at the bottom of the screen, move camera downwards
 		else if (pointer.y > lowerArea && this.validDrawing) {
 			const factor = (pointer.y - lowerArea) / (this.H - lowerArea);
-			this.cameraSmoothY += maxScrollSpeed * factor * timeFactor * this.SCALE;
+			this.moveSmoothCamera(maxScrollSpeed * factor * timeFactor * this.SCALE);
 			this.scrolling = true;
 		}
 		else {
@@ -411,10 +429,17 @@ export class GameScene extends BaseScene {
 		}
 	}
 
+	moveSmoothCamera(dy: number) {
+		this.cameraSmoothY += dy;
+		this.cameraSmoothY = Phaser.Math.Clamp(this.cameraSmoothY, this.cameraBounds.top, this.cameraBounds.top + this.cameraBounds.height - this.H);
+	}
+
 	setDeepestNode(y: number) {
 		if (y == 0) { this.deepestNodeY = 0; }
 		this.deepestNodeY = Math.max(y, this.deepestNodeY);
-		this.cameras.main.setBounds(0, 0, this.W, this.deepestNodeY + 0.6 * this.H);
+		this.setCameraBounds(0, 0, this.W, this.deepestNodeY + 0.6 * this.H);
+		// this.setCameraBounds(0, 0, this.W, 100000);
+		// this.cameras.main.setBounds(-0.5*this.W, -this.H, 2*this.W, 1000000);
 	}
 
 	returnToSurface() {
@@ -718,14 +743,14 @@ export class GameScene extends BaseScene {
 	onScroll(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) {
 		if (this.state != GameState.GrowingRoots) { return; }
 
-		this.cameraSmoothY += deltaY * this.SCALE;
+		this.moveSmoothCamera(deltaY * this.SCALE);
 	}
 
 	onCameraDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number) {
 		if (this.state != GameState.GrowingRoots) { return; }
 
 		this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom;
-		this.cameraSmoothY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
+		this.moveSmoothCamera(-(pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom);
 
 	}
 
