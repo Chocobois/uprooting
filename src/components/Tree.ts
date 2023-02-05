@@ -67,7 +67,7 @@ export class Tree extends Button {
 			this.treeSprite.setTexture("tree");
 			this.emit("levelUp", this.level);
 		}
-		else if (score > 20) {
+		else if (score > 20 && score <= 80) {
 			this.level += 1;
 			this.treeSprite.setTexture("tree_little");
 			this.emit("levelUp", this.level);
