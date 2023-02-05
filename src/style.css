@@ -33,17 +33,18 @@ body {
   position: absolute;
   z-index: -10;
 	margin: auto;
-  font-family: "fonmaru", serif;
+  font-family: "VCR_OSD_MONO", serif;
 }
 
 /* fredoka-one-regular - latin */
 @font-face {
-  font-family: "fonmaru";
+  font-family: "VCR_OSD_MONO";
   font-style: normal;
   font-weight: 500;
   src:
-    url("./assets/fonts/fonmaru.woff2") format("woff2"),
-    url("./assets/fonts/fonmaru.woff") format("woff");
+    url(./assets/fonts/VCR_OSD_MONO.woff2) format("woff2");
+    /* url("./assets/fonts/fonmaru.woff2") format("woff2"),
+    url("./assets/fonts/fonmaru.woff") format("woff"); */
 /*    url("./assets/fonts/fredoka-one-v13-latin-regular.woff2") format("woff2"),*/
 /*    url("./assets/fonts/fredoka-one-v13-latin-regular.woff") format("woff");*/
 }
