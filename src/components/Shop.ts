@@ -139,9 +139,11 @@ export class Shop extends Phaser.GameObjects.Container {
 		this.ownerButton.add(this.ownerImage);
 
 		this.ownerButton.bindInteractive(this.ownerImage);
+		this.ownerButton.on("down", () => {});
 		this.ownerButton.on("click", () => {
 			this.selectItem(OWNER);
 			this.ownerImage.setFrame(2);
+			this.scene.sound.play("s_squish2");
 		});
 
 
