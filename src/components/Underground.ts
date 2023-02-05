@@ -38,9 +38,22 @@ export interface MineralRange {
 	spacingRadius: number; // Personal space radius needed to stay away from other items
 	collectible: boolean; // Is this collectible by dragging a branch on it?
 	obstacle: boolean; // Does it block growth?
+	hardness: number; // How cool your tree needs to be to break this
 }
 
 const MINERALS: MineralRange[] = [
+	{
+		type: MineralType.curse_rock,
+		properName: "Wilson",
+		centerDepth: 20000,
+		centerRadius: 1500,
+		odds: 0.15,
+		collisionRadius: 300,
+		spacingRadius: 165,
+		collectible: false,
+		obstacle: true,
+		hardness: 9
+	},
 	{
 		type: MineralType.applecore,
 		properName: "Apple Core",
@@ -49,8 +62,9 @@ const MINERALS: MineralRange[] = [
 		odds: 0.01,
 		collisionRadius: 120,
 		spacingRadius: 300,
-		collectible: true,
-		obstacle: true
+		collectible: false,
+		obstacle: true,
+		hardness: 1
 	},
 	{
 		type: MineralType.applecore,
@@ -61,30 +75,70 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 70,
 		spacingRadius: 100,
 		collectible: true,
-		obstacle: false
+		obstacle: false,
+		hardness: 1
+	},
+	{
+		type: MineralType.bones,
+		properName: "Bones",
+		centerDepth: 5000,
+		centerRadius: 7500,
+		odds: 0.065,
+		collisionRadius: 70,
+		spacingRadius: 65,
+		collectible: false,
+		obstacle: true,
+		hardness: 2
+	},
+	{
+		type: MineralType.bones,
+		properName: "Bones",
+		centerDepth: 9500,
+		centerRadius: 7500,
+		odds: 0.065,
+		collisionRadius: 135,
+		spacingRadius: 125,
+		collectible: false,
+		obstacle: true,
+		hardness: 2
 	},
 	{
 		type: MineralType.ylw_badrock,
 		properName: "Rock",
 		centerDepth: 3500,
 		centerRadius: 3500,
-		odds: 0.06,
+		odds: 0.075,
 		collisionRadius: 90,
-		spacingRadius: 100,
+		spacingRadius: 55,
 		collectible: false,
-		obstacle: true
+		obstacle: true,
+		hardness: 3
 	},
 	{
 		type: MineralType.ylw_badrock,
 		properName: "Rock Rock",
 		centerDepth: 4500,
 		centerRadius: 3500,
-		odds: 0.04,
+		odds: 0.06,
 		collisionRadius: 160,
-		spacingRadius: 180,
+		spacingRadius: 7,
 		collectible: false,
-		obstacle: true
+		obstacle: true,
+		hardness: 3
 	},
+	{
+		type: MineralType.demon_rock,
+		properName: "Redstone",
+		centerDepth: 18000,
+		centerRadius: 2400,
+		odds: 0.1,
+		collisionRadius: 195,
+		spacingRadius: 70,
+		collectible: false,
+		obstacle: true,
+		hardness: 8
+	},
+
 	{
 		type: MineralType.badrock,
 		properName: "Hard Rock",
@@ -92,20 +146,46 @@ const MINERALS: MineralRange[] = [
 		centerRadius: 4500,
 		odds: 0.065,
 		collisionRadius: 70,
-		spacingRadius: 100,
+		spacingRadius: 55,
 		collectible: false,
-		obstacle: true
+		obstacle: true,
+		hardness: 4
+	},
+	{
+		type: MineralType.demon_rock,
+		properName: "Redstone Dust",
+		centerDepth: 19000,
+		centerRadius: 1600,
+		odds: 0.05,
+		collisionRadius: 45,
+		spacingRadius: 10,
+		collectible: false,
+		obstacle: true,
+		hardness: 8
+	},
+	{
+		type: MineralType.gray_badrock,
+		properName: "Killer Killer Rock",
+		centerDepth: 17500,
+		centerRadius: 3500,
+		odds: 0.125,
+		collisionRadius: 200,
+		spacingRadius: 60,
+		collectible: false,
+		obstacle: true,
+		hardness: 6
 	},
 	{
 		type: MineralType.badrock,
 		properName: "Hard Rock Rock",
 		centerDepth: 10000,
-		centerRadius: 6000,
+		centerRadius: 5000,
 		odds: 0.065,
 		collisionRadius: 160,
-		spacingRadius: 100,
+		spacingRadius: 70,
 		collectible: false,
-		obstacle: true
+		obstacle: true,
+		hardness: 4
 	},
 	{
 		type: MineralType.badrock,
@@ -116,63 +196,22 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 50,
 		spacingRadius: 10,
 		collectible: false,
-		obstacle: true
+		obstacle: true,
+		hardness: 4
 	},
 	{
 		type: MineralType.gray_badrock,
 		properName: "Killer Rock",
-		centerDepth: 17500,
+		centerDepth: 15500,
 		centerRadius: 4500,
-		odds: 0.95,
+		odds: 0.055,
 		collisionRadius: 80,
-		spacingRadius: 65,
+		spacingRadius: 35,
 		collectible: false,
-		obstacle: true
+		obstacle: true,
+		hardness: 6
 	},
-	{
-		type: MineralType.gray_badrock,
-		properName: "Killer Killer Rock",
-		centerDepth: 18000,
-		centerRadius: 2000,
-		odds: 0.075,
-		collisionRadius: 200,
-		spacingRadius: 165,
-		collectible: false,
-		obstacle: true
-	},
-	{
-		type: MineralType.demon_rock,
-		properName: "Redstone",
-		centerDepth: 19000,
-		centerRadius: 1800,
-		odds: 0.085,
-		collisionRadius: 255,
-		spacingRadius: 150,
-		collectible: false,
-		obstacle: true
-	},
-	{
-		type: MineralType.demon_rock,
-		properName: "Redstone Dust",
-		centerDepth: 19000,
-		centerRadius: 1600,
-		odds: 0.025,
-		collisionRadius: 45,
-		spacingRadius: 10,
-		collectible: false,
-		obstacle: true
-	},
-	{
-		type: MineralType.curse_rock,
-		properName: "Wilson",
-		centerDepth: 20000,
-		centerRadius: 1500,
-		odds: 0.065,
-		collisionRadius: 300,
-		spacingRadius: 275,
-		collectible: false,
-		obstacle: true
-	},
+
 	{
 		type: MineralType.applecore,
 		properName: "Apple Core",
@@ -182,40 +221,68 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 70,
 		spacingRadius: 100,
 		collectible: true,
-		obstacle: false
+		obstacle: false,
+		hardness: 1
 	},
 	{
-		type: MineralType.bones,
-		properName: "Bones",
-		centerDepth: 5000,
-		centerRadius: 7500,
-		odds: 0.075,
-		collisionRadius: 70,
-		spacingRadius: 100,
-		collectible: false,
-		obstacle: true
-	},
-	{
-		type: MineralType.bones,
-		properName: "Bones",
-		centerDepth: 9500,
-		centerRadius: 7500,
-		odds: 0.075,
-		collisionRadius: 135,
-		spacingRadius: 140,
-		collectible: false,
-		obstacle: true
+		type: MineralType.emerald,
+		properName: "Emerald",
+		centerDepth: 8000,
+		centerRadius: 3000,
+		odds: 0.025,
+		collisionRadius: 60,
+		spacingRadius: 10,	
+		collectible: true,
+		obstacle: true,
+		hardness: 5
 	},
 	{
 		type: MineralType.ruby,
 		properName: "Ruby",
-		centerDepth: 8000,
-		centerRadius: 4000,
+		centerDepth: 13000,
+		centerRadius: 3000,
+		odds: 0.025,
+		collisionRadius: 60,
+		spacingRadius: 10,	
+		collectible: true,
+		obstacle: true,
+		hardness: 5
+	},
+	{
+		type: MineralType.diamond,
+		properName: "Diamond",
+		centerDepth: 16500,
+		centerRadius: 3000,
+		odds: 0.025,
+		collisionRadius: 60,
+		spacingRadius: 5,	
+		collectible: true,
+		obstacle: true,
+		hardness: 5
+	},
+	{
+		type: MineralType.platinum,
+		properName: "Platinum",
+		centerDepth: 16500,
+		centerRadius: 3000,
 		odds: 0.06,
 		collisionRadius: 60,
-		spacingRadius: 250,	
+		spacingRadius: 5,	
 		collectible: true,
-		obstacle: false
+		obstacle: true,
+		hardness: 7
+	},
+	{
+		type: MineralType.platinum,
+		properName: "Platinum",
+		centerDepth: 19000,
+		centerRadius: 3000,
+		odds: 0.1,
+		collisionRadius: 60,
+		spacingRadius: 5,	
+		collectible: true,
+		obstacle: true,
+		hardness: 7
 	},
 	{
 		type: MineralType.watercave,
@@ -224,9 +291,10 @@ const MINERALS: MineralRange[] = [
 		centerRadius: 1200,
 		odds: 0.015,
 		collisionRadius: 255,
-		spacingRadius: 100,	
+		spacingRadius: 300,	
 		collectible: false,
-		obstacle: true
+		obstacle: true,
+		hardness: 999
 	},
 	{
 		type: MineralType.watercave,
@@ -235,9 +303,10 @@ const MINERALS: MineralRange[] = [
 		centerRadius: 1800,
 		odds: 0.012,
 		collisionRadius: 375,
-		spacingRadius: 165,	
+		spacingRadius: 300,	
 		collectible: false,
-		obstacle: true
+		obstacle: true,
+		hardness: 999
 	},
 	{
 		type: MineralType.watercave,
@@ -246,9 +315,10 @@ const MINERALS: MineralRange[] = [
 		centerRadius: 2200,
 		odds: 0.015,
 		collisionRadius: 565,
-		spacingRadius: 275,	
+		spacingRadius: 300,	
 		collectible: false,
-		obstacle: true
+		obstacle: true,
+		hardness: 999
 	},
 ];
 
