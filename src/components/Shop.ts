@@ -14,7 +14,7 @@ export enum ItemType {
 
 export interface ItemData {
 	type: ItemType,
-	image: string;
+	image: string[];
 	title: string[];
 	description: string[];
 	iteration: number;
@@ -25,7 +25,7 @@ export interface ItemData {
 
 const SOLD_OUT_ITEM: ItemData = {
 	type: ItemType.SoldOut,
-	image: "shop_sold_out",
+	image: ["shop_sold_out"],
 	title: ["Out of stock"],
 	description: ["I give up. That's it."],
 	iteration:1,
@@ -36,7 +36,7 @@ const SOLD_OUT_ITEM: ItemData = {
 
 const OWNER: ItemData = {
 	type: ItemType.ShopOwner,
-	image: "shop_sold_out",
+	image: ["shop_sold_out"],
 	title: ["Shop owner"],
 	description: ["H-hey, I'm not for sale!"],
 	iteration:1,
@@ -81,17 +81,17 @@ export class Shop extends Phaser.GameObjects.Container {
 		this.itemsForSale = [
 			{
 				type: ItemType.TreeEnergy,
-				image: "sapling",
-				title: ["Magic Storage","Magic Font","Magical Spring"],
-				description: ["Increase your root energy","Increase your root energy","Increase your root energy"],
-				price: [10,5000,10000],
+				image: ["sapling","sapling","sapling","sapling","sapling"],
+				title: ["Magic Storage","Magic Font","Magical Spring", "Great Heart of Magic", "Magus of the Developer"],
+				description: ["Increase your root energy a little.","Increase your root energy significantly.","Increase your root energy by a huge amount.","Increase your root energy massively.","An inconceivable amount of root energy!"],
+				price: [10,5000,10000,20000,50000],
 				iteration: 1,
-				maxIteration: 3,
-				value: [100,1000,10000],
+				maxIteration: 5,
+				value: [100,1000,10000,40000,256000],
 			},
 			{
 				type: ItemType.FruitUpgrade,
-				image: "apple",
+				image: ["apple"],
 				title: ["Fruit Upgrade"],
 				description: ["Upgrade your fruit or something, i dunno"],
 				price: [50],
@@ -101,7 +101,7 @@ export class Shop extends Phaser.GameObjects.Container {
 			},
 			{
 				type: ItemType.RockBreak,
-				image: "bones",
+				image: ["bones", "ylw_badrock", "badrock", "ruby", "gray_badrock","ancient_diamond","demon_rock","curse_rock"],
 				title: ["Hard Roots","Iron Roots","Titanium Roots","Gluttonous Roots","Adamantite Roots","Prosperous Roots","Dauntless Roots","Roots of the Developer"],
 				description: ["Gain the ability to break through bones!","Break through rocks!","Break through hard rocks!","Break through and harvest gems!","Break through bedrock!","Break and harvest ancient diamonds! Superb!","Break through hot rocks!","Venture into the unknown..."],
 				price: [200,400,800,3200,6400,12800,25600,128000],
@@ -349,13 +349,12 @@ export class Shop extends Phaser.GameObjects.Container {
 		}
 		if (itemData.type == ItemType.FruitUpgrade) {
 			itemData.price[itemData.iteration-1] = Math.round(itemData.price[itemData.iteration-1] * 2.0);
-			itemData.image = "applecore";
 			// Go through a list...
 		}
+		itemData.iteration++;
 		if (itemData.iteration > itemData.maxIteration) {
 			this.itemsForSale[index] = SOLD_OUT_ITEM;
 		}
-
 		this.selectItem(null, true);
 		this.updateItemsForSale();
 	}

@@ -189,11 +189,11 @@ export class GameScene extends BaseScene {
 
 			if (itemData.type == ItemType.TreeEnergy) {
 				this.tree.addMaxEnergy(itemData.value[itemData.iteration-1]);
+				this.tree.energy = this.tree.maxEnergy;
 			} else if (itemData.type == ItemType.RockBreak)
 			{
 				this.tree.strength += itemData.value[itemData.iteration-1];
 			}
-			itemData.iteration++;
 			// Add more shop item mechanics...
 			// Or break up into more emits
 		});
