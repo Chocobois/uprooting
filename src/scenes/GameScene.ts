@@ -25,11 +25,11 @@ enum GameState {
 }
 
 enum MusicState {
-	Nothing,
-	NormalLoop,
-	LayeredLoop,
-	Shop,
-	Jingle
+	Nothing = "Initial",
+	NormalLoop = "Overground",
+	LayeredLoop = "Drawing roots",
+	Shop = "Shop",
+	Jingle = "Jingle",
 }
 
 enum InvalidNodeReason {
@@ -109,11 +109,17 @@ export class GameScene extends BaseScene {
 	public musicShop: Music;
 	public musicVolume: number;
 
+	public titleMusic: Music;
+
 	// Feel free to edit this ts declaration, it's supposed to be a k-v pair object
 	private oneTimeEvents: Record<string, boolean>;
 
 	constructor() {
 		super({ key: "GameScene" });
+	}
+
+	init(previousMusic): void {
+		this.titleMusic = previousMusic;
 	}
 
 	create(): void {
@@ -292,6 +298,15 @@ export class GameScene extends BaseScene {
 		this.musicDrawing.play();
 		this.musicState = MusicState.NormalLoop;
 
+		if ("titleMusic" in this.scene.settings.data) {
+			// @ts-ignore-start
+			const titleMusic: Music = this.scene.settings.data.titleMusic;
+			this.musicNormal.setSeek(titleMusic.currentTime);
+			this.musicDrawing.setSeek(titleMusic.currentTime);
+			titleMusic.stop();
+			// @ts-ignore-end
+		}
+
 
 		// Input
 
@@ -401,6 +416,13 @@ export class GameScene extends BaseScene {
 				break;
 
 			case MusicState.Jingle:
+				if (this.musicNormal.isPlaying) {
+					this.musicNormal.volume -= (1 / delta) / 2;
+					if (this.musicNormal.volume <= 0) {
+						this.musicNormal.volume = 0;
+						this.musicNormal.stop();
+					}
+				}
 				break;
 
 			case MusicState.Nothing:
@@ -505,8 +527,8 @@ export class GameScene extends BaseScene {
 			this.oneTimeEvents.spawnShop = true;
 			this.shop.activateOverworldShop();
 			this.musicState = MusicState.Jingle;
-			this.musicNormal.stop();
-			this.musicDrawing.stop();
+			// this.musicNormal.stop();
+			// this.musicDrawing.stop();
 			this.musicJingle.play();
 			setTimeout(() => {
 				this.musicNormal = new Music(this, 'm_first', { volume: this.musicMuted ? 0 : this.musicVolume });
@@ -796,7 +818,7 @@ export class GameScene extends BaseScene {
 	onPointerUp(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]): void {
 		this.currentNode = null;
 		this.dragGraphics.clear();
-		if (this.state != GameState.InsideShop) this.musicState = MusicState.NormalLoop;
+		if (this.musicState == MusicState.LayeredLoop) this.musicState = MusicState.NormalLoop;
 	}
 
 	onScroll(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) {
