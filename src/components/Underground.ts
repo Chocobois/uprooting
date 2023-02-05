@@ -38,6 +38,7 @@ export interface MineralRange {
 	spacingRadius: number; // Personal space radius needed to stay away from other items
 	collectible: boolean; // Is this collectible by dragging a branch on it?
 	hardness: number; // How cool your tree needs to be to break this? Blocks growth if > tree strength.
+	noRotation?: boolean;
 }
 
 const MINERALS: MineralRange[] = [
@@ -270,9 +271,10 @@ const MINERALS: MineralRange[] = [
 		centerRadius: 1200,
 		odds: 0.015,
 		collisionRadius: 255,
-		spacingRadius: 300,	
+		spacingRadius: 5,	
 		collectible: false,
-		hardness: 999
+		hardness: 999,
+		noRotation: true,
 	},
 	{
 		type: MineralType.watercave,
@@ -281,9 +283,10 @@ const MINERALS: MineralRange[] = [
 		centerRadius: 1800,
 		odds: 0.012,
 		collisionRadius: 375,
-		spacingRadius: 300,	
+		spacingRadius: 5,	
 		collectible: false,
-		hardness: 999
+		hardness: 999,
+		noRotation: true,
 	},
 	{
 		type: MineralType.watercave,
@@ -292,9 +295,10 @@ const MINERALS: MineralRange[] = [
 		centerRadius: 2200,
 		odds: 0.015,
 		collisionRadius: 565,
-		spacingRadius: 300,	
+		spacingRadius: 5,	
 		collectible: false,
-		hardness: 999
+		hardness: 999,
+		noRotation: true,
 	},
 ];
 

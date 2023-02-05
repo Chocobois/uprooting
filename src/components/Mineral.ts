@@ -29,9 +29,12 @@ export class Mineral extends Button {
 		// const key = Phaser.Math.RND.pick(["circle"]);
 		this.image = this.scene.add.image(0, 0, params.type);
 		this.image.setScale(this.size / this.image.width);
-		this.image.setAngle(Phaser.Math.RND.between(0, 360));
 		this.add(this.image);
 		// this.scene.input.enableDebug(this.image);
+
+		if (!params.noRotation) {
+			this.image.setAngle(Phaser.Math.RND.between(0, 360));
+		}
 
 		// this.bindInteractive(this.image, true);
 		// const inputPadding = 40 / this.image.scaleX;

@@ -56,9 +56,11 @@ export class GameScene extends BaseScene {
 	// Gameplay state, see enum above
 	private state: GameState;
 
-	private background: Phaser.GameObjects.Image;
 	private overworld: Phaser.GameObjects.Image;
 	private overworldBush: Phaser.GameObjects.Image;
+
+	public backgrounds: Phaser.GameObjects.Image[];
+	// private background: Phaser.GameObjects.Image;
 	private undergroundEdge: Phaser.GameObjects.Image;
 
 	// Tree
@@ -192,9 +194,17 @@ export class GameScene extends BaseScene {
 
 
 		// Underground
-		this.background = this.add.image(this.CX, this.SURFACE_Y - 20*this.SCALE, "underground");
-		this.background.setOrigin(0.5, 0);
-		this.background.setScale(2 * this.W / this.background.width);
+		this.backgrounds = [
+			this.add.image(this.CX, this.CY, "underground"),
+			this.add.image(this.CX, this.CY, "underground_2"),
+			this.add.image(this.CX, this.CY, "underground_3"),
+			this.add.image(this.CX, this.CY, "underground_4"),
+		]; this.backgrounds.forEach((background, i) => {
+			const bgScale = 2 * this.W / background.width;
+			background.setOrigin(0.5, 0);
+			background.setScale(bgScale);
+			background.setY(this.SURFACE_Y - 20*this.SCALE + (background.height * bgScale) * i);
+		})
 
 		this.undergroundEdge = this.add.image(this.CX, this.cameraBounds.height, "underground_edge");
 		this.undergroundEdge.setOrigin(0.5, 1.0);
@@ -739,7 +749,7 @@ export class GameScene extends BaseScene {
 	}
 
 	onTreeClick() {
-		if (this.state == GameState.GrowingRoots || this.state == GameState.HarvestingTree) {
+		if (this.state == GameState.HarvestingTree || (this.state == GameState.GrowingRoots && this.totalScore > 10)) {
 			this.moveSmoothCamera(-this.cameraSmoothY);
 
 			this.tree.harvestCount -= 1;
