@@ -32,14 +32,14 @@ enum MusicState {
 }
 
 enum InvalidNodeReason {
-	None = "you shouldn't be seeing this text, but if you are, uhhh... congratulations?",
 	ProgrammerGoofed = "golen or hex made an oopsie",
 	AboveSurface = "Wrong way!",
 	TooDeep = "Root is too deep!",
 	TurnTooHarsh = "Root turns too harshly!",
 	SelfIntersecting = "Root self intersects!",
 	TooClose = "Roots are too close together!",
-	ObstacleInTheWay = "Root is obstructed!"
+	ObstacleInTheWay = "Root is obstructed!",
+	Unaffordable = "Not enough energy!"
 }
 
 const MUSIC_VOLUME = 0.4;
@@ -491,12 +491,15 @@ export class GameScene extends BaseScene {
 			const line = new Phaser.Geom.Line(start.x, start.y, end.x, end.y);
 			const mineralIntersects = this.underground.getIntersectedMinerals(line);
 			const touchingObstacle = mineralIntersects.some(mineral => mineral.obstacle);
-			this.validDrawing = !!next && !touchingObstacle;
+			const canAfford = this.tree.energy > this.currentNode.cost;
+			this.validDrawing = !!next && !touchingObstacle && canAfford;
 
 			const invalidReason = nextPosResult instanceof Phaser.Math.Vector2
 				? touchingObstacle
 					? InvalidNodeReason.ObstacleInTheWay
-					: InvalidNodeReason.None
+					: canAfford
+						? InvalidNodeReason.ProgrammerGoofed // shouldn't get here
+						: InvalidNodeReason.Unaffordable
 				: nextPosResult;
 
 			this.dragPos = this.dragPos.lerp(end, delta/100);
