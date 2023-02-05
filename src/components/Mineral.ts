@@ -21,7 +21,7 @@ export class Mineral extends Button {
 		this.collectible = params.collectible;
 		this.obstacle = false;
 		this.hardness = params.hardness
-		this.points = params.points || 0;
+		this.points = params.points || Math.round(params.centerDepth/100);
 
 		this.size = params.collisionRadius*2;
 		// console.log(size);
