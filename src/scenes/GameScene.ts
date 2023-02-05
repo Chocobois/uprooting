@@ -29,7 +29,7 @@ enum MusicState {
 	Jingle
 }
 
-const MUSIC_VOLUME = 0.4*0;
+const MUSIC_VOLUME = 0.4;
 
 export class GameScene extends BaseScene {
 	// Gameplay state, see enum above
