@@ -38,6 +38,7 @@ enum InvalidNodeReason {
 	TooDeep = "Root is too deep",
 	TurnTooHarsh = "Root turns too harshly",
 	SelfIntersecting = "Root self intersects",
+	TooClose = "Root are too close together",
 	ObstacleInTheWay = "Root is obstructed"
 }
 
@@ -543,21 +544,32 @@ export class GameScene extends BaseScene {
 
 		const end = start.clone().add(vector);
 
-		// Check intersections and proximity (latter is not implemented yet)
+		// Check intersections
 		const line = new Phaser.Geom.Line(start.x, start.y, end.x, end.y);
 
-		const anyEncroachingNodes = this.nodes.some(node => {
+		const intersecting = this.nodes.some(node => {
 			if (!node.parent || node == this.currentNode || node.parent == this.currentNode) return false;
 
 			const otherLine = new Phaser.Geom.Line(node.parent.x, node.parent.y, node.x, node.y);
 
-			const intersects = Phaser.Geom.Intersects.LineToLine(line, otherLine);
-			//const tooClose = GetShortestDistance(otherLine, end) <= PROXIMITY_LIMIT;
-
-			return intersects;
+			return Phaser.Geom.Intersects.LineToLine(line, otherLine);
 		});
 
-		if (anyEncroachingNodes) return InvalidNodeReason.SelfIntersecting;
+		if (intersecting) return InvalidNodeReason.SelfIntersecting;
+
+		// Check proximity
+		const tooClose = this.nodes.some(node => {
+			if (!node.parent || node == this.currentNode || node.parent == this.currentNode) return false;
+
+			const otherLine = new Phaser.Geom.Line(node.parent.x, node.parent.y, node.x, node.y);
+			const distances = otherLine.getPoints(4).map(point => new Phaser.Math.Vector2(point.x, point.y).distance(end));
+
+			const dist = distances.reduce((a,c) => Math.min(a,c), Infinity);
+
+			return dist <= this.PROXIMITY_LIMIT;
+		});
+
+		if (tooClose) return InvalidNodeReason.TooClose;
 
 		return end;
 	}
@@ -688,7 +700,7 @@ export class GameScene extends BaseScene {
 	}
 
 	get PROXIMITY_LIMIT() {
-		return this.DRAG_LIMIT / 5;
+		return this.DRAG_LIMIT/4;
 	}
 
 
