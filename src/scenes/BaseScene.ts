@@ -72,7 +72,7 @@ export class BaseScene extends Phaser.Scene {
 
 
 	get SCALE(): number {
-		return 1;
+		return this.H / 1080;
 	}
 
 	// Returns width of screen
