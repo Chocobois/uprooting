@@ -183,6 +183,18 @@ class Particle extends Phaser.GameObjects.Sprite {
 			this.setFrame(frame);
 		}
 
+		if (this.myType == ParticleType.BlueSparkle) {
+			let frame = Math.floor(15 * (this.life / this.lifeTime));
+			// let frame = Math.floor(15 * Math.pow(this.life / this.lifeTime, 0.65));
+			this.setFrame(frame);
+		}
+
+		if (this.myType == ParticleType.DustExplosion) {
+			let frame = Math.floor(15 * (this.life / this.lifeTime));
+			// let frame = Math.floor(15 * Math.pow(this.life / this.lifeTime, 0.65));
+			this.setFrame(frame);
+		}
+
 
 		this.vel.x += this.acc.x * delta;
 		this.vel.y += this.acc.y * delta;
