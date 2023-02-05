@@ -193,6 +193,10 @@ import r_grow from "./sounds/roots/grow.mp3";
 import r_place from "./sounds/roots/place.mp3";
 import r_place_error from "./sounds/roots/place_error.mp3";
 
+// Shop related
+import s_squish1 from "./sounds/shop/squish1.mp3";
+import s_squish2 from "./sounds/shop/squish2.mp3";
+
 const audios: Audio[] = [
 	{ key: "m_main_menu", path: m_main_menu },
 	{ key: "m_first", path: m_first },
@@ -202,6 +206,8 @@ const audios: Audio[] = [
 	{ key: "r_grow", path: r_grow, volume: 0.5 },
 	{ key: "r_place", path: r_place, volume: 1 },
 	{ key: "r_place_error", path: r_place_error, volume: 0.5 },
+	{ key: "s_squish1", path: s_squish1, volume: 1 },
+	{ key: "s_squish2", path: s_squish2, volume: 1 },
 ];
 
 
