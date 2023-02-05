@@ -4,24 +4,24 @@ import Perlin from 'phaser3-rex-plugins/plugins/perlin.js';
 
 
 export enum MineralType {
-	Apple = "apple",
-	Applecore = "applecore",
-	Banana = "banana",
-	Bone = "bone",
-	Bones = "bones",
-	Cherry = "cherry",
-	Diamond = "diamond",
-	Dragondragonfruit = "dragondragonfruit",
-	Dragonfruit = "dragonfruit",
-	Emerald = "emerald",
-	Hasty_rock = "hasty_rock",
-	Orange = "orange",
-	Pear = "pear",
-	Platinum = "platinum",
-	Ruby = "ruby",
-	Sapphire = "sapphire",
-	Stone = "stone",
-	Watercave = "watercave",
+	apple = "apple",
+	applecore = "applecore",
+	banana = "banana",
+	bone = "bone",
+	bones = "bones",
+	cherry = "cherry",
+	diamond = "diamond",
+	dragondragonfruit = "dragondragonfruit",
+	dragonfruit = "dragonfruit",
+	emerald = "emerald",
+	badrock = "badrock",
+	orange = "orange",
+	pear = "pear",
+	platinum = "platinum",
+	ruby = "ruby",
+	sapphire = "sapphire",
+	stone = "stone",
+	watercave = "watercave",
 }
 
 export interface MineralRange {
@@ -38,7 +38,7 @@ export interface MineralRange {
 
 const MINERALS: MineralRange[] = [
 	{
-		type: MineralType.Applecore,
+		type: MineralType.applecore,
 		properName: "Apple Core",
 		centerDepth: 2000,
 		centerRadius: 3000,
@@ -49,18 +49,18 @@ const MINERALS: MineralRange[] = [
 		obstacle: true
 	},
 	{
-		type: MineralType.Applecore,
+		type: MineralType.applecore,
 		properName: "Apple Core",
 		centerDepth: 2000,
 		centerRadius: 3000,
 		odds: 0.04,
 		collisionRadius: 70,
-		spacingRadius: 200,
+		spacingRadius: 100,
 		collectible: true,
 		obstacle: false
 	},
 	{
-		type: MineralType.Bones,
+		type: MineralType.bones,
 		properName: "Bones",
 		centerDepth: 5000,
 		centerRadius: 4000,
@@ -71,7 +71,7 @@ const MINERALS: MineralRange[] = [
 		obstacle: true
 	},
 	{
-		type: MineralType.Ruby,
+		type: MineralType.ruby,
 		properName: "Ruby",
 		centerDepth: 8000,
 		centerRadius: 4000,
