@@ -53,7 +53,7 @@ import ruby from "./images/items/ruby.png";
 import sapphire from "./images/items/sapphire.png";
 import emerald from "./images/items/emerald.png";
 import diamond from "./images/items/diamond.png";
-import platinum from "./images/items/platinum.png";
+import ancient_diamond from "./images/items/platinum.png";
 import badrock from "./images/items/hasty_rock.png";
 import gray_badrock from "./images/items/grey_hasty_rock.png";
 import ylw_badrock from "./images/items/ylw_hasty_rock.png";
@@ -115,7 +115,7 @@ const images: Asset[] = [
 	{ key: "sapphire", path: sapphire },
 	{ key: "emerald", path: emerald },
 	{ key: "diamond", path: diamond },
-	{ key: "platinum", path: platinum },
+	{ key: "ancient_diamond", path: ancient_diamond },
 	{ key: "watercave", path: watercave },
 	{ key: "badrock", path: badrock },
 	{ key: "gray_badrock", path: gray_badrock },

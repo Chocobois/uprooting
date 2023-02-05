@@ -21,7 +21,7 @@ export enum MineralType {
 	curse_rock="curse_rock",
 	orange = "orange",
 	pear = "pear",
-	platinum = "platinum",
+	ancient_diamond = "ancient_diamond",
 	ruby = "ruby",
 	sapphire = "sapphire",
 	stone = "stone",
@@ -116,7 +116,7 @@ const MINERALS: MineralRange[] = [
 	},
 	{
 		type: MineralType.ylw_badrock,
-		properName: "Rock Rock",
+		properName: "Large Rock",
 		centerDepth: 4500,
 		centerRadius: 3500,
 		odds: 0.06,
@@ -250,7 +250,7 @@ const MINERALS: MineralRange[] = [
 	},
 	{
 		type: MineralType.diamond,
-		properName: "Diamond",
+		properName: "Raw Diamond",
 		centerDepth: 16500,
 		centerRadius: 3000,
 		odds: 0.025,
@@ -261,8 +261,8 @@ const MINERALS: MineralRange[] = [
 		hardness: 5
 	},
 	{
-		type: MineralType.platinum,
-		properName: "Platinum",
+		type: MineralType.ancient_diamond,
+		properName: "Ancient Diamond",
 		centerDepth: 16500,
 		centerRadius: 3000,
 		odds: 0.06,
@@ -273,8 +273,8 @@ const MINERALS: MineralRange[] = [
 		hardness: 7
 	},
 	{
-		type: MineralType.platinum,
-		properName: "Platinum",
+		type: MineralType.ancient_diamond,
+		properName: "Ancient Diamond",
 		centerDepth: 19000,
 		centerRadius: 3000,
 		odds: 0.1,
