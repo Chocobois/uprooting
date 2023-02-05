@@ -225,7 +225,7 @@ export class GameScene extends BaseScene {
 			background.setY(this.SURFACE_Y - 20*this.SCALE + (background.height * bgScale) * i);
 		})
 
-		this.undergroundEdge = this.add.image(this.CX, this.cameraBounds.height + this.CY, "underground_edge");
+		this.undergroundEdge = this.add.image(this.CX, 1.5*this.H, "underground_edge");
 		this.undergroundEdge.setOrigin(0.5, 1.0);
 		this.undergroundEdge.setScrollFactor(1);
 		this.fitToScreen(this.undergroundEdge);
@@ -504,8 +504,8 @@ export class GameScene extends BaseScene {
 		// this.setCameraBounds(0, 0, this.W, 100000);
 		// this.cameras.main.setBounds(-0.5*this.W, -this.H, 2*this.W, 1000000);
 
-		if (this.totalScore > 5 && this.cameraSmoothY > this.H) {
-			this.returnToSurfaceButton.show();
+		if (this.score > 0) {
+			this.returnToSurfaceButton.show(false);
 		}
 	}
 
@@ -572,7 +572,7 @@ export class GameScene extends BaseScene {
 		this.nodes = [];
 
 		this.setDeepestNode(0);
-		this.undergroundEdge.y = this.cameraBounds.height + this.CY;
+		this.undergroundEdge.y = this.cameraBounds.height + 1.5 * this.H;
 
 		this.dragGraphics.clear();
 		this.rootsBackGraphics.clear();
@@ -612,19 +612,19 @@ export class GameScene extends BaseScene {
 
 			// Create sparkle effect
 			if (collectible.type == MineralType.applecore) {
-				this.particles.createGreenMagic(collectible.x, collectible.y, (collectible.collisionRadius/35)*3.5*this.SCALE, 1.0, false);
+				this.particles.createGreenMagic(collectible.x, collectible.y, (collectible.collisionRadius/35)*0.9, 1.0, false);
 			}
 			else if (collectible.type == MineralType.emerald || collectible.type == MineralType.ruby || collectible.type == MineralType.diamond || collectible.type == MineralType.ancient_diamond)
 			{
-				this.particles.createBlueSparkle(collectible.x, collectible.y, (collectible.collisionRadius/50)*4*this.SCALE, 1.0, false);	
+				this.particles.createBlueSparkle(collectible.x, collectible.y, (collectible.collisionRadius/50), 1.0, false);	
 			}
 			else if (collectible.type == MineralType.demon_rock || collectible.type == MineralType.curse_rock)
 			{
-				this.particles.createExplosion(collectible.x, collectible.y, (collectible.collisionRadius/50)*4*this.SCALE, 1.0, false);	
+				this.particles.createExplosion(collectible.x, collectible.y, (collectible.collisionRadius/50), 1.0, false);	
 			}
 			else
 			{
-				this.particles.createDustExplosion(collectible.x, collectible.y, (collectible.collisionRadius/50)*4*this.SCALE, 1.0, false);
+				this.particles.createDustExplosion(collectible.x, collectible.y, (collectible.collisionRadius/50), 1.0, false);
 			}
 		});
 	}
@@ -687,7 +687,7 @@ export class GameScene extends BaseScene {
 			}
 			else if (!this.oneTimeEvents.outOfEnergy) {
 				this.oneTimeEvents.outOfEnergy = true;
-				this.returnToSurfaceButton.show();
+				this.returnToSurfaceButton.show(true);
 			}
 
 			const limitReached = !this.validDrawing && canDraw;
@@ -834,9 +834,9 @@ export class GameScene extends BaseScene {
 		// Culling check
 		const parentY = node.parent.y;
 		const currentY = node.y;
-		const cameraY = this.cameras.main.scrollY - 20;
-		const bottomY = cameraY + this.H + 40;
-		if (cameraY < parentY && cameraY < currentY && bottomY > parentY && bottomY > currentY) {
+		const topY    = this.cameras.main.scrollY - 0.2 * this.H;
+		const bottomY = this.cameras.main.scrollY + 1.2 * this.H;
+		if (topY < parentY && topY < currentY && bottomY > parentY && bottomY > currentY) {
 
 			// https://www.desmos.com/calculator/s0kxcaovyr
 			let minSize = 3;

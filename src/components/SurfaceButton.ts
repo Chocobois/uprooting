@@ -6,6 +6,8 @@ export class SurfaceButton extends Button {
 	private text: Phaser.GameObjects.Text;
 
 	private size: number;
+	private revealed: boolean;
+	private alphaGoal: number;
 
 	constructor(scene: BaseScene, x: number, y: number) {
 		super(scene, x, y);
@@ -14,6 +16,8 @@ export class SurfaceButton extends Button {
 		this.setScrollFactor(0);
 
 		this.size = 0.4 * this.scene.W;
+		this.revealed = false;
+		this.alphaGoal = 0;
 
 		this.image = this.scene.add.image(0, 0, "surface_button");
 		this.image.setScale(this.size / this.image.width);
@@ -33,16 +37,34 @@ export class SurfaceButton extends Button {
 	}
 
 	update(time: number, delta: number) {
-		this.setScale(1.0 - 0.1 * this.holdSmooth);
-		this.setAlpha((this.scene.cameras.main.scrollY - 1*this.scene.H) / this.scene.H*4);
+		// Forcefully show button
+		if (this.revealed && this.scene.cameras.main.scrollY > 0.5*this.scene.H) {
+			this.alphaGoal = 1;
+		}
+		// Only show if below a certain height
+		else if (this.visible && this.scene.cameras.main.scrollY > 1.0*this.scene.H) {
+			this.alphaGoal = 1;
+		}
+		// Hide button
+		else {
+			this.alphaGoal = 0;
+		}
+
+		this.setScale(1.0 - 0.1 * this.holdSmooth - 0.2 * (1-this.alpha));
+		this.alpha += 0.2 * (this.alphaGoal - this.alpha); // Smooth transition
 	}
 
 
-	show() {
+	show(revealEntirely: boolean) {
 		this.setVisible(true);
+
+		if (revealEntirely) {
+			this.revealed = true;
+		}
 	}
 
 	hide() {
 		this.setVisible(false);
+		this.revealed = false;
 	}
 }
