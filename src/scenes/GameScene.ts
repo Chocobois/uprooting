@@ -573,17 +573,22 @@ export class GameScene extends BaseScene {
 
 		if (intersecting) return InvalidNodeReason.SelfIntersecting;
 
+		var min = Infinity;
+
 		// Check proximity
 		const tooClose = this.nodes.some(node => {
-			if (!node.parent || node == this.currentNode || node.parent == this.currentNode) return false;
+			if (!node.parent) return false;
 
 			const otherLine = new Phaser.Geom.Line(node.parent.x, node.parent.y, node.x, node.y);
-			const distances = otherLine.getPoints(4).map(point => new Phaser.Math.Vector2(point.x, point.y).distance(end));
+			const distances = otherLine.getPoints(0, 0.25).map(point => new Phaser.Math.Vector2(point.x, point.y).distance(end));
 
 			const dist = distances.reduce((a,c) => Math.min(a,c), Infinity);
+			min = Math.min(min, dist);
 
 			return dist <= this.PROXIMITY_LIMIT;
 		});
+
+		this.debugText.setText(`${min}`)
 
 		if (tooClose) return InvalidNodeReason.TooClose;
 
