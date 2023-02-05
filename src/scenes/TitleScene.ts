@@ -77,7 +77,7 @@ export class TitleScene extends BaseScene {
 		this.foreground.y += 4*250*this.SCALE;
 
 
-		this.title = this.createText(0.25*this.W, 0.7*this.H, 150*this.SCALE, "#000", "Root...?");
+		this.title = this.createText(0.25*this.W, 0.7*this.H, 160*this.SCALE, "#000", "Rerooted");
 		this.title.setOrigin(0.5);
 		this.title.setStroke("#FFF", 40*8*this.SCALE);
 		this.title.setPadding(2*40*8*this.SCALE);
