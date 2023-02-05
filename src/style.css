@@ -38,6 +38,10 @@ body {
   white-space: nowrap;
 }
 
+body:has(canvas) .fontPreloader {
+  visibility: hidden;
+}
+
 /* fredoka-one-regular - latin */
 @font-face {
   font-family: "PermanentMarker-Regular";
