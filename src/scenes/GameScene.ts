@@ -289,7 +289,9 @@ export class GameScene extends BaseScene {
 	update(time: number, delta: number) {
 
 		// Smooth camera movement
-		this.cameras.main.scrollY += 0.3 * (this.cameraSmoothY - this.cameras.main.scrollY);
+		if (this.state == GameState.GrowingRoots) {
+			this.cameras.main.scrollY += 0.3 * (this.cameraSmoothY - this.cameras.main.scrollY);
+		}
 
 		// Update game objects
 		this.particles.update(time, delta);
@@ -407,6 +409,7 @@ export class GameScene extends BaseScene {
 	returnToSurface() {
 		this.state = GameState.ReturningToSurfaceCutscene;
 		this.returnToSurfaceButton.hide();
+		this.cameraSmoothY = 0;
 
 		// Smooth camera transition
 		this.tweens.addCounter({
@@ -431,6 +434,8 @@ export class GameScene extends BaseScene {
 	onHarvestComplete() {
 		this.state = GameState.GrowingRoots;
 		this.oneTimeEvents.outOfEnergy = false;
+		this.oneTimeEvents.growthStage1Sound = false;
+		this.oneTimeEvents.growthStage2Sound = false;
 
 		// Add current score to growth
 		// Should be a whole sequence here instead and the shop thing, etc
