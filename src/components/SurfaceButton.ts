@@ -52,6 +52,7 @@ export class SurfaceButton extends Button {
 
 		this.setScale(1.0 - 0.1 * this.holdSmooth - 0.2 * (1-this.alpha));
 		this.alpha += 0.2 * (this.alphaGoal - this.alpha); // Smooth transition
+		this.image.input.enabled = (this.alphaGoal > 0);
 	}
 
 
