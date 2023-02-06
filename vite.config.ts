@@ -28,7 +28,8 @@ export default defineConfig({
   build: {
     outDir: '../dist/unpacked',
     chunkSizeWarningLimit: 4096,
-    assetsInlineLimit: 0
+    assetsInlineLimit: 0,
+    target: 'esnext'
   },
   server: {
     host: '127.0.0.1'

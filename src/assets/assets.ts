@@ -235,7 +235,7 @@ const audios: Audio[] = [
 	{ key: "s_nofunds", path: s_nofunds, volume: 0.4 },
 ];
 
-const face = new FontFace('Game Font', `url(.${GameFont})`, {style: 'normal', weight: '400'});
+const face = new FontFace('Game Font', `url(${GameFont})`, {style: 'normal', weight: '400'});
 await face.load();
 document.fonts.add(face);
 
