@@ -29,5 +29,8 @@ export default defineConfig({
     outDir: '../dist/unpacked',
     chunkSizeWarningLimit: 4096,
     assetsInlineLimit: 0
+  },
+  server: {
+    host: '127.0.0.1'
   }
 });
