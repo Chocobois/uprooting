@@ -1,5 +1,4 @@
 import { GameScene } from './../scenes/GameScene';
-import { BaseScene } from "../scenes/BaseScene";
 import { Button } from "./Button";
 import { ShopItem } from "./ShopItem";
 
@@ -47,7 +46,7 @@ const OWNER: ItemData = {
 
 
 export class Shop extends Phaser.GameObjects.Container {
-	public scene: BaseScene;
+	public scene: GameScene;
 
 	// Overworld
 	private overworldShop: Button;
@@ -71,7 +70,7 @@ export class Shop extends Phaser.GameObjects.Container {
 	private itemsForSale: ItemData[];
 
 
-	constructor(scene: BaseScene, x: number, y: number) {
+	constructor(scene: GameScene, x: number, y: number) {
 		super(scene);
 		this.scene = scene;
 		this.scene.add.existing(this);
@@ -92,7 +91,7 @@ export class Shop extends Phaser.GameObjects.Container {
 			{
 				type: ItemType.FruitUpgrade,
 				image: ["apple", "pear", "cherry", "banana", "dragonfruit", "dragondragonfruit"],
-				title: ["Orange Essence", "Pear Essence", "Cherry Essence", "Banana Essence", "Dragonfruit Essence", "Dragondragonfruit Essence"],
+				title: ["Apple Essence", "Pear Essence", "Cherry Essence", "Banana Essence", "Dragonfruit Essence", "Dragondragonfruit Essence"],
 				description: ["Magically grow oranges on your tree!","Magically grow pears on your tree!","Magically grow cherries on your tree!","Magically grow bananas on your tree!","Magically grow dragonfruit on your tree! Dragonfruit doesn't even grow on trees!", "Dragondragonfruit! There's a strange cube inside of it."],
 				price: [500, 750, 1250, 2500, 5000, 12500],
 				iteration:1,
@@ -297,16 +296,27 @@ export class Shop extends Phaser.GameObjects.Container {
 		this.ownerImage.setFrame(0);
 
 		if (itemData) {
-			// this.selectedItemImage.setTexture("apple");
-			this.selectedItemTitle.setText(itemData.title[itemData.iteration-1]);
-			this.selectedItemDescription.setText(itemData.description[itemData.iteration-1]);
-			
-			if (itemData.price[itemData.iteration-1] > 0) {
-				this.selectedItemDescription.setText(`${itemData.description[itemData.iteration-1]}\nOnly ${itemData.price[itemData.iteration-1]} gold!`);
-				this.buyButton.enabled = true;
-				this.buyButton.setAlpha(1.0);
-				this.buyImage.input.cursor = "pointer"
-				this.ownerImage.setFrame(1);
+			const cost = itemData.price[itemData.iteration-1];
+
+			if (this.scene.money >= cost) {
+				// this.selectedItemImage.setTexture("apple");
+				this.selectedItemTitle.setText(itemData.title[itemData.iteration-1]);
+				this.selectedItemDescription.setText(itemData.description[itemData.iteration-1]);
+				
+				if (cost > 0) {
+					this.selectedItemDescription.setText(`${itemData.description[itemData.iteration-1]}\nOnly ${cost} gold!`);
+					this.buyButton.enabled = true;
+					this.buyButton.setAlpha(1.0);
+					this.buyImage.input.cursor = "pointer"
+					this.ownerImage.setFrame(1);
+				}
+			}
+			else {
+				this.selectedItemTitle.setText("Shop owner");
+				this.selectedItemDescription.setText(
+					`You can't afford that!\nThe ${itemData.title[itemData.iteration-1].toLocaleLowerCase()}\nis ${cost} gold.`
+				);
+				// this.scene.sound.play("s_nofunds");
 			}
 		}
 		else {
@@ -325,21 +335,13 @@ export class Shop extends Phaser.GameObjects.Container {
 		if (!this.buyButton.enabled) { return; }
 
 		if (this.selectedItem) {
-			const scene = this.scene as GameScene;
-			if( scene.money >= this.selectedItem.price[this.selectedItem.iteration-1] ) {
-				scene.money -= this.selectedItem.price[this.selectedItem.iteration-1]
+			const cost = this.selectedItem.price[this.selectedItem.iteration-1];
+
+			if (this.scene.money >= cost) {
+				this.scene.money -= cost;
 				this.scene.sound.play("s_buy");
 				this.emit("buy", this.selectedItem);
 				this.upgradeShopItem(this.selectedItem);
-			} else {
-				this.scene.sound.play("s_nofunds");
-				this.selectedItemTitle.setText("Shop owner");
-				this.selectedItemDescription.setText(
-					`You can't afford that!\nThe ${this.selectedItem.title[this.selectedItem.iteration-1].toLocaleLowerCase()}\nis ${this.selectedItem.price[this.selectedItem.iteration-1]} gold.`
-				);
-				this.selectedItem = null;
-				this.buyButton.enabled = false;
-				this.buyButton.setAlpha(0.5);
 			}
 		}
 	}
