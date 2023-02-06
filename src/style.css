@@ -33,23 +33,11 @@ body {
   position: absolute;
   z-index: -10;
 	margin: auto;
-  font-family: "PermanentMarker-Regular", serif;
-  font-size: 3rem;
+  font-family: Sans-Serif;
+  font-size: 2.5rem;
   white-space: nowrap;
 }
 
 body:has(canvas) .fontPreloader {
   visibility: hidden;
-}
-
-/* fredoka-one-regular - latin */
-@font-face {
-  font-family: "PermanentMarker-Regular";
-  font-style: normal;
-  font-weight: 400;
-  src:
-    url("./assets/fonts/DynaPuff-Medium.ttf") format("truetype");
-/*     url("./assets/fonts/PermanentMarker-Regular.woff2") format("woff2"); */
-/*    url("./assets/fonts/fredoka-one-v13-latin-regular.woff2") format("woff2"),*/
-/*    url("./assets/fonts/fredoka-one-v13-latin-regular.woff") format("woff");*/
 }
