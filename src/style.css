@@ -48,7 +48,8 @@ body:has(canvas) .fontPreloader {
   font-style: normal;
   font-weight: 400;
   src:
-    url("./assets/fonts/PermanentMarker-Regular.woff2") format("woff2");
+    url("./assets/fonts/DynaPuff-Medium.ttf") format("truetype");
+/*     url("./assets/fonts/PermanentMarker-Regular.woff2") format("woff2"); */
 /*    url("./assets/fonts/fredoka-one-v13-latin-regular.woff2") format("woff2"),*/
 /*    url("./assets/fonts/fredoka-one-v13-latin-regular.woff") format("woff");*/
 }
