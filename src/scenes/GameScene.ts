@@ -158,7 +158,7 @@ export class GameScene extends BaseScene {
 		// this.fitToScreen(this.background);
 
 		// Money
-		this.money = 10000;
+		this.money = 0;
 		this.score = 0;
 
 		this.hud = new HUD(this);
