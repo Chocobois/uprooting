@@ -12,6 +12,7 @@ export enum ItemType {
 	SuperChain,
 	ShopOwner,
 	SoldOut,
+	NOTYPE,
 }
 
 export interface ItemData {
@@ -74,10 +75,14 @@ export class Shop extends Phaser.GameObjects.Container {
 	private selectedItem: ItemData | null;
 
 	private itemsForSale: ItemData[];
+
+	//dumping ground for ItemData, just put it here if you need somewhere to store it
 	private restrictedItems: ItemData[];
 
 	//cannot add new items before this number
 	private reserveNumber: number;
+	//stuff to be pushed to shop queue
+	private queueMap: Map<number, number>;
 
 
 	constructor(scene: GameScene, x: number, y: number) {
@@ -85,7 +90,9 @@ export class Shop extends Phaser.GameObjects.Container {
 		this.scene = scene;
 		this.scene.add.existing(this);
 		this.setDepth(100000);
+
 		this.reserveNumber = 3;
+		this.queueMap = new Map();
 
 		this.itemsForSale = [
 			{
@@ -98,6 +105,7 @@ export class Shop extends Phaser.GameObjects.Container {
 				maxIteration: 5,
 				value: [150,500,1000,5000,10000],
 				sideEffect: [null,() => this.addItemToEmptySlot(this.restrictedItems[1]),null,null,null],
+				//fixme both this and below should use overwriteOldItem because it already handles empty check
 			},
 			{
 				type: ItemType.FruitUpgrade,
@@ -167,6 +175,39 @@ export class Shop extends Phaser.GameObjects.Container {
 				title: ["Lucky Dice"],
 				description: ["A lucky dice which randomly improves your chains. I wonder where it's from..."],
 				price: [3621],
+				iteration: 1,
+				maxIteration: 1,
+				value: [1],
+				sideEffect: [null],
+			},
+			{
+				type: ItemType.NOTYPE,
+				image: ["cherry"],
+				title: ["Cherry Bomb"],
+				description: ["Sometimes explodes to remove impassable objects. Designed it myself!"],
+				price: [420],
+				iteration: 1,
+				maxIteration: 1,
+				value: [0.025],
+				sideEffect: [null],
+			},
+			{
+				type: ItemType.SuperChain,
+				image: ["greendice"],
+				title: ["Twilight Feather"],
+				description: ["A feather that manipulates polarity. Briefly maxes all chains."],
+				price: [96420],
+				iteration: 1,
+				maxIteration: 1,
+				value: [1],
+				sideEffect: [null],
+			},
+			{
+				type: ItemType.ChainUpgrade,
+				image: ["greendice"],
+				title: ["Cat's Riddle"],
+				description: ["The -ground- is -scared- of the -tree-. Chain off your last item!"],
+				price: [13337],
 				iteration: 1,
 				maxIteration: 1,
 				value: [1],
@@ -256,11 +297,11 @@ export class Shop extends Phaser.GameObjects.Container {
 		// this.selectedItemImage.setScale(.1*H / this.selectedItemImage.height);
 		// this.add(this.selectedItemImage);
 
-		this.selectedItemTitle = this.scene.createText(sx, sy, 60*this.scene.SCALE, "#000", "Something");
+		this.selectedItemTitle = this.scene.createText(sx, sy, 45*this.scene.SCALE, "#000", "Something");
 		this.selectedItemTitle.setOrigin(0, 1.05);
 		this.add(this.selectedItemTitle);
 
-		this.selectedItemDescription = this.scene.createText(sx, sy, 50*this.scene.SCALE, "#000", "Culpa ut quis ullamco nisi aliqua id est occaecat proident aliqua in.");
+		this.selectedItemDescription = this.scene.createText(sx, sy, 37*this.scene.SCALE, "#000", "Culpa ut quis ullamco nisi aliqua id est occaecat proident aliqua in.");
 		this.selectedItemDescription.setWordWrapWidth(3.5*W);
 		this.selectedItemDescription.setLineSpacing(0);
 		this.selectedItemDescription.setOrigin(0, -0.05);
@@ -337,6 +378,14 @@ export class Shop extends Phaser.GameObjects.Container {
 
 
 	updateItemsForSale() {
+		for(let [key,value] of this.queueMap)
+		{
+			//use this to not check twice against map
+			if(this.overwriteOldItem(value))
+			{
+				this.queueMap.delete(key);
+			}
+		}
 		this.items.forEach((item, index) => {
 			if (index < this.itemsForSale.length) {
 				const itemData = this.itemsForSale[index];
@@ -346,7 +395,41 @@ export class Shop extends Phaser.GameObjects.Container {
 		});
 	}
 
-	overwriteOldItem(newItem: ItemData)
+	addToShopQUeue(index: number, value: ItemData = SOLD_OUT_ITEM): boolean
+	{
+		let myItem = value;
+		if(index < this.restrictedItems.length)
+		{
+			myItem = this.restrictedItems[index];
+		}
+		//don't push things that are already there
+		//if you want multiples just add duplicates to restrictedItems
+		if(!this.queueMap.has(index))
+		{
+			this.queueMap.set(index, myItem);
+			return true;
+		}
+		return false;
+	}
+
+	//add to shop, or to queue if full, returns false if failed
+	addNewItemByIndex(index: number): boolean
+	{
+		if(index >= this.restrictedItems.length) {
+			return false;
+		}
+		if(this.overwriteOldItem(this.restrictedItems[index])) {
+			return true;
+		} else if (this.addToShopQUeue(index)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	//next two methods take an index and overwrite identical items, return if it succeeds
+	//maybe we can use this for branching upgrade paths nya
+	overwriteOldItem(newItem: ItemData): boolean
 	{
 		for(let l = 0; l < this.itemsForSale.length; l++)
 		{
@@ -358,24 +441,24 @@ export class Shop extends Phaser.GameObjects.Container {
 				{
 					this.itemsForSale[l].iteration = iter;
 				}
-				return;
+				return true;
 			}
 		}
-		this.addItemToEmptySlot(newItem);
-		return;
+		return this.addItemToEmptySlot(newItem);;
 	}
 
-	addItemToEmptySlot(newItem: ItemData)
+	addItemToEmptySlot(newItem: ItemData): boolean
 	{
 		let index = this.reserveNumber-1
 		for(let l = this.reserveNumber-1; l < this.itemsForSale.length ; l++){
 			if(this.itemsForSale[index] == SOLD_OUT_ITEM)
 			{
 				this.itemsForSale[index] = newItem;
-				break;
+				return true;
 			}
 			index++;
 		}
+		return false;
 	}
 
 	selectItem(itemData: ItemData | null, justPurchased: boolean = false) {
