@@ -196,7 +196,8 @@ export class GameScene extends BaseScene {
 			}, 1300);
 		});
 		this.shop.on("buy", (itemData: ItemData) => {
-
+			///clear chains if you buy stuff
+			this.tree.clearActiveChains();
 			if (itemData.type == ItemType.TreeEnergy) {
 				this.tree.addMaxEnergy(itemData.value[itemData.iteration-1]);
 				this.tree.energy = this.tree.maxEnergy;
@@ -206,6 +207,11 @@ export class GameScene extends BaseScene {
 			} else if (itemData.type == ItemType.FruitUpgrade)
 			{
 				this.tree.basevalue = itemData.value[itemData.iteration-1];
+			} else if (itemData.type == ItemType.ChainUpgrade) {
+				this.tree.unlockChain(itemData.value[itemData.iteration-1]);
+			} else if (itemData.type == ItemType.TreeEfficiency)
+			{
+				this.tree.refundValue = itemData.value[itemData.iteration-1]
 			}
 			// Add more shop item mechanics...
 			// Or break up into more emits
@@ -387,14 +393,16 @@ export class GameScene extends BaseScene {
 		}
 
 		// Debug, move this to some ui thing
-		this.debugText.setText(`State: ${this.state}\nEnergy: ${this.tree.energy}/${this.tree.maxEnergy}`);
 
 		if (this.state == GameState.GrowingRoots) {
 			// Move camera with mouse input
 			this.handleCameraMovement();
 
 			this.handleRootDrawing(delta);
+			this.debugText.setText(`State: ${this.state}\nEnergy: ${this.tree.energy}/${this.tree.maxEnergy}`);
+
 		}
+
 	}
 
 
@@ -561,7 +569,7 @@ export class GameScene extends BaseScene {
 
 		// Add current score to growth
 		// Should be a whole sequence here instead and the shop thing, etc
-		this.tree.addMaxEnergy(this.totalScore);
+		//this.tree.addMaxEnergy(this.totalScore);
 		this.score = 0;
 
 		// Destroy all nodes
@@ -590,18 +598,44 @@ export class GameScene extends BaseScene {
 	handleMineralCollection(minerals: Mineral[]) {
 		const collectibles = minerals.filter(mineral => mineral.collectible);
 		this.underground.destroyMinerals(collectibles);
-
 		collectibles.forEach(collectible => {
+			this.tree.updateChainList(collectible.type, collectible.itemclass);
+			//get multiplier and advance chains
+			let scoremultiplier = 1;
+			scoremultiplier = this.tree.updateChainStatus(collectible.type, collectible.itemclass);
+			let tPoints = Math.round(collectible.points*scoremultiplier);
 			let color = "Lime";
-			if (collectible.points > 200) {
-				color = "Red";
-			} else if (collectible.points > 1000)
-			{
-				color = "Blue"
+			let pColor = "Lime"
+			let tScale=200;
+			let pScale=150;
+			if (tPoints > 1000) {
+				color = "fuchsia"
+				tScale = 275
+			} else if (tPoints > 500) {
+				color = "aqua"
+				tScale = 250
+			} else if (tPoints > 250) {
+				color = "yellow";
+				tScale = 225
 			}
 
-			this.textParticle(collectible.x, collectible.y-10, color, `${collectible.properName} +${collectible.points}!`, true,
-			250*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
+			if (scoremultiplier > 20) {
+				pColor = "fuchsia"
+				pScale = 225
+			} else if (scoremultiplier > 10) {
+				pColor = "aqua"
+				pScale = 200
+			} else if (scoremultiplier > 5) {
+				pColor = "yellow";
+				pScale = 175
+			}
+
+			this.textParticle(collectible.x, collectible.y-10, color, `${collectible.properName} +${tPoints}!`, true,
+			tScale*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
+			if(scoremultiplier > 1) {
+				this.textParticle(collectible.x, collectible.y+20, pColor, `Combo x${scoremultiplier.toFixed(2)}!!!`, true,
+				pScale*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
+			}
 
 			if (this.currentNode && collectible.points) {
 				this.currentNode.addScore();
@@ -627,6 +661,14 @@ export class GameScene extends BaseScene {
 				this.particles.createDustExplosion(collectible.x, collectible.y, (collectible.collisionRadius/50), 1.0, false);
 			}
 		});
+
+		//clean persisting chains if you collected minerals, otherwise only clear the default "any chain"
+		if(collectibles.length > 0)
+		{
+			this.tree.cleanChains();
+		} else {
+			this.tree.cleanSelectedChain(this.tree.ANY_CHAIN_ID);
+		}
 	}
 
 	textParticle(x: number, y: number, color: string, content: string, outline: boolean=true, size: number=40,
@@ -893,6 +935,7 @@ export class GameScene extends BaseScene {
 		if (this.state == GameState.HarvestingTree || (this.state == GameState.GrowingRoots && this.totalScore > 10)) {
 			this.moveSmoothCamera(-this.cameraSmoothY);
 
+			this.tree.clearActiveChains();
 			this.tree.harvestCount -= 1;
 			this.money += this.totalScore + ((this.totalScore > this.tree.basevalue) ? this.tree.basevalue : (this.tree.basevalue*this.totalScore/this.tree.basevalue));
 

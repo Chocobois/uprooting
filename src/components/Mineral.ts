@@ -1,6 +1,6 @@
 import { BaseScene } from "../scenes/BaseScene";
 import { Button } from "./Button";
-import { MineralType, MineralRange } from "./Underground";
+import { MineralType, MineralRange, ComboClass } from "./Underground";
 
 export class Mineral extends Button {
 	private image: Phaser.GameObjects.Image;
@@ -13,6 +13,7 @@ export class Mineral extends Button {
 	public obstacle: boolean;
 	public hardness: number;
 	public points: number;
+	public itemclass: ComboClass;
 
 	constructor(scene: BaseScene, params: MineralRange, x: number, y: number) {
 		super(scene, x, y);
@@ -23,6 +24,7 @@ export class Mineral extends Button {
 		this.collectible = params.collectible;
 		this.obstacle = false;
 		this.hardness = params.hardness;
+		this.itemclass = params.comboClass;
 		this.points = params.points || 1;
 		if(this.points < 1000)
 		{

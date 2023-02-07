@@ -26,14 +26,16 @@ export enum MineralType {
 	sapphire = "sapphire",
 	stone = "stone",
 	watercave = "watercave",
+	NOTYPE =  "NOTYPE",
 }
 
-enum ComboType {
+export enum ComboClass {
 	FRUIT,
 	GEM,
 	BONE,
 	ROCK,
-	CAVE
+	CAVE,
+	NONE
 }
 
 export interface MineralRange {
@@ -48,7 +50,7 @@ export interface MineralRange {
 	hardness: number; // How cool your tree needs to be to break this? Blocks growth if > tree strength.
 	noRotation?: boolean;
 	points?: number;
-	comboType: ComboType;
+	comboClass: ComboClass;
 }
 
 const MINERALS: MineralRange[] = [
@@ -63,7 +65,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 1337,
 		hardness: 9,
-		comboType: ComboType.ROCK
+		comboClass: ComboClass.ROCK
 	},
 	{
 		type: MineralType.applecore,
@@ -76,7 +78,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 2,
 		hardness: 1,
-		comboType: ComboType.FRUIT
+		comboClass: ComboClass.FRUIT
 	},
 	{
 		type: MineralType.applecore,
@@ -89,7 +91,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 4,
 		hardness: 1,
-		comboType: ComboType.FRUIT
+		comboClass: ComboClass.FRUIT
 	},
 	{
 		type: MineralType.bones,
@@ -102,7 +104,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 10,
 		hardness: 2,
-		comboType: ComboType.BONE
+		comboClass: ComboClass.BONE
 	},
 	{
 		type: MineralType.bones,
@@ -115,7 +117,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 20,
 		hardness: 2,
-		comboType: ComboType.BONE
+		comboClass: ComboClass.BONE
 	},
 	{
 		type: MineralType.ylw_badrock,
@@ -128,7 +130,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 5,
 		hardness: 3,
-		comboType: ComboType.ROCK
+		comboClass: ComboClass.ROCK
 	},
 	{
 		type: MineralType.ylw_badrock,
@@ -141,7 +143,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 10,
 		hardness: 3,
-		comboType: ComboType.ROCK
+		comboClass: ComboClass.ROCK
 	},
 	{
 		type: MineralType.demon_rock,
@@ -154,7 +156,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 200,
 		hardness: 8,
-		comboType: ComboType.ROCK
+		comboClass: ComboClass.ROCK
 	},
 
 	{
@@ -168,7 +170,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 10,
 		hardness: 4,
-		comboType: ComboType.ROCK
+		comboClass: ComboClass.ROCK
 	},
 	{
 		type: MineralType.demon_rock,
@@ -181,7 +183,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 75,
 		hardness: 8,
-		comboType: ComboType.ROCK
+		comboClass: ComboClass.ROCK
 	},
 	{
 		type: MineralType.gray_badrock,
@@ -194,7 +196,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 30,
 		hardness: 6,
-		comboType: ComboType.ROCK
+		comboClass: ComboClass.ROCK
 	},
 	{
 		type: MineralType.badrock,
@@ -207,7 +209,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 20,
 		hardness: 4,
-		comboType: ComboType.ROCK
+		comboClass: ComboClass.ROCK
 	},
 	{
 		type: MineralType.badrock,
@@ -220,7 +222,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 7,
 		hardness: 4,
-		comboType: ComboType.ROCK
+		comboClass: ComboClass.ROCK
 	},
 	{
 		type: MineralType.gray_badrock,
@@ -233,7 +235,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 20,
 		hardness: 6,
-		comboType: ComboType.ROCK
+		comboClass: ComboClass.ROCK
 	},
 
 	{
@@ -247,7 +249,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 2,
 		hardness: 1,
-		comboType: ComboType.FRUIT
+		comboClass: ComboClass.FRUIT
 	},
 	{
 		type: MineralType.emerald,
@@ -260,7 +262,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 225,
 		hardness: 5,
-		comboType: ComboType.GEM
+		comboClass: ComboClass.GEM
 	},
 	{
 		type: MineralType.ruby,
@@ -273,7 +275,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 275,
 		hardness: 5,
-		comboType: ComboType.GEM
+		comboClass: ComboClass.GEM
 	},
 	{
 		type: MineralType.diamond,
@@ -286,7 +288,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 325,
 		hardness: 5,
-		comboType: ComboType.GEM
+		comboClass: ComboClass.GEM
 	},
 	{
 		type: MineralType.ancient_diamond,
@@ -299,7 +301,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 450,
 		hardness: 7,
-		comboType: ComboType.GEM
+		comboClass: ComboClass.GEM
 	},
 	{
 		type: MineralType.ancient_diamond,
@@ -312,7 +314,7 @@ const MINERALS: MineralRange[] = [
 		collectible: true,
 		points: 450,
 		hardness: 7,
-		comboType: ComboType.GEM
+		comboClass: ComboClass.GEM
 	},
 	{
 		type: MineralType.watercave,
@@ -325,7 +327,7 @@ const MINERALS: MineralRange[] = [
 		collectible: false,
 		hardness: 1,
 		noRotation: true,
-		comboType: ComboType.CAVE
+		comboClass: ComboClass.CAVE
 	},
 	{
 		type: MineralType.watercave,
@@ -338,7 +340,7 @@ const MINERALS: MineralRange[] = [
 		collectible: false,
 		hardness: 1,
 		noRotation: true,
-		comboType: ComboType.CAVE
+		comboClass: ComboClass.CAVE
 	},
 	{
 		type: MineralType.watercave,
@@ -351,13 +353,13 @@ const MINERALS: MineralRange[] = [
 		collectible: false,
 		hardness: 1,
 		noRotation: true,
-		comboType: ComboType.CAVE
+		comboClass: ComboClass.CAVE
 	},
 ];
 
-const FRUITS = MINERALS.filter((m) => m.comboType == ComboType.FRUIT);
-const BONES = MINERALS.filter((m) => m.comboType == ComboType.BONE);
-const GEMS = MINERALS.filter((m) => m.comboType == ComboType.GEM);
+const FRUITS = MINERALS.filter((m) => m.comboClass == ComboClass.FRUIT);
+const BONES = MINERALS.filter((m) => m.comboClass == ComboClass.BONE);
+const GEMS = MINERALS.filter((m) => m.comboClass == ComboClass.GEM);
 
 export class Underground extends Phaser.GameObjects.Container {
 	public scene: BaseScene;

@@ -7,6 +7,8 @@ export enum ItemType {
 	TreeEnergy,
 	FruitUpgrade,
 	RockBreak,
+	TreeEfficiency,
+	ChainUpgrade,
 	ShopOwner,
 	SoldOut,
 }
@@ -20,6 +22,7 @@ export interface ItemData {
 	maxIteration: number;
 	price: number[];
 	value: number[];
+	sideEffect: ((() => void) | null)[];
 }
 
 const SOLD_OUT_ITEM: ItemData = {
@@ -31,6 +34,7 @@ const SOLD_OUT_ITEM: ItemData = {
 	maxIteration: 1,
 	value: [9999],
 	price: [0],
+	sideEffect: [null],
 };
 
 const OWNER: ItemData = {
@@ -42,6 +46,7 @@ const OWNER: ItemData = {
 	maxIteration: 1,
 	value: [9999],
 	price: [0],
+	sideEffect: [null],
 };
 
 
@@ -68,6 +73,10 @@ export class Shop extends Phaser.GameObjects.Container {
 	private selectedItem: ItemData | null;
 
 	private itemsForSale: ItemData[];
+	private restrictedItems: ItemData[];
+
+	//cannot add new items before this number
+	private reserveNumber: number;
 
 
 	constructor(scene: GameScene, x: number, y: number) {
@@ -75,7 +84,7 @@ export class Shop extends Phaser.GameObjects.Container {
 		this.scene = scene;
 		this.scene.add.existing(this);
 		this.setDepth(100000);
-
+		this.reserveNumber = 3;
 
 		this.itemsForSale = [
 			{
@@ -83,20 +92,23 @@ export class Shop extends Phaser.GameObjects.Container {
 				image: ["sapling","sapling","sapling","sapling","sapling"],
 				title: ["Magic Storage","Magic Font","Magical Spring", "Great Heart of Magic", "Magus of the Developer"],
 				description: ["Increase your root energy a little.","Increase your root energy significantly.","Increase your root energy by a huge amount.","Increase your root energy massively.","An inconceivable amount of root energy!"],
-				price: [10,5000,10000,20000,50000],
+				price: [150,1000,5000,50000,50000],
 				iteration: 1,
 				maxIteration: 5,
-				value: [100,1000,10000,40000,256000],
+				value: [150,500,1000,5000,256000],
+				sideEffect: [null,null,null,null,null],
 			},
 			{
 				type: ItemType.FruitUpgrade,
-				image: ["apple", "pear", "cherry", "banana", "dragonfruit", "dragondragonfruit"],
+				image: ["orange", "pear", "cherry", "banana", "dragonfruit", "dragondragonfruit"],
 				title: ["Apple Essence", "Pear Essence", "Cherry Essence", "Banana Essence", "Dragonfruit Essence", "Dragondragonfruit Essence"],
 				description: ["Magically grow oranges on your tree!","Magically grow pears on your tree!","Magically grow cherries on your tree!","Magically grow bananas on your tree!","Magically grow dragonfruit on your tree! Dragonfruit doesn't even grow on trees!", "Dragondragonfruit! There's a strange cube inside of it."],
 				price: [500, 750, 1250, 2500, 5000, 12500],
 				iteration:1,
 				maxIteration: 6,
 				value: [100, 150, 250, 500, 1000, 2500],
+				sideEffect: [() => this.addItemToEmptySlot(this.restrictedItems[0]),
+					null,null,null,null,null],
 			},
 			{
 				type: ItemType.RockBreak,
@@ -107,16 +119,40 @@ export class Shop extends Phaser.GameObjects.Container {
 				iteration:1,
 				maxIteration:8,
 				value: [1,1,1,1,1,1,1,1],
+				sideEffect: [null,null,null,null,null,null,null,null],
 			},
 			SOLD_OUT_ITEM,
 			SOLD_OUT_ITEM,
 			SOLD_OUT_ITEM
 		];
 
+		this.restrictedItems = [
+			{
+				type: ItemType.ChainUpgrade,
+				image: ["apple"],
+				title: ["Apple Devourer"],
+				description: ["Get chain bonuses from apple cores. How's them apples?"],
+				price: [500],
+				iteration: 1,
+				maxIteration: 1,
+				value: [1],
+				sideEffect: [null],
+			},
+			{
+				type: ItemType.TreeEfficiency,
+				image: ["energy2"],
+				title: ["Frugal Roots"],
+				description: ["Restore energy while growing!"],
+				price: [1500],
+				iteration: 1,
+				maxIteration: 1,
+				value: [1],
+				sideEffect: [null],
+			}
+		];
 
 		const W = this.scene.W;
 		const H = this.scene.H;
-
 
 		// Overworld
 
@@ -287,6 +323,19 @@ export class Shop extends Phaser.GameObjects.Container {
 		});
 	}
 
+	addItemToEmptySlot(newItem: ItemData)
+	{
+		let index = this.reserveNumber-1
+		for(let l = this.reserveNumber-1; l < this.itemsForSale.length ; l++){
+			if(this.itemsForSale[index] == SOLD_OUT_ITEM)
+			{
+				this.itemsForSale[index] = newItem;
+				break;
+			}
+			index++;
+		}
+	}
+
 	selectItem(itemData: ItemData | null, justPurchased: boolean = false) {
 		this.selectedItem = itemData;
 
@@ -341,7 +390,13 @@ export class Shop extends Phaser.GameObjects.Container {
 				this.scene.money -= cost;
 				this.scene.sound.play("s_buy");
 				this.emit("buy", this.selectedItem);
+				const sideEffect = this.selectedItem.sideEffect[this.selectedItem.iteration-1];
+				if(sideEffect)
+				{
+					sideEffect();
+				}
 				this.upgradeShopItem(this.selectedItem);
+
 			}
 		}
 	}
