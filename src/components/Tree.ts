@@ -99,23 +99,33 @@ export class Tree extends Button {
 				chainType: ChainType.SPECIFIC_ITEM
 			},
 			{
-				type: MineralType.diamond,
-				class: 	ComboClass.GEM,
-				multiplier: [3,10],
+				type: MineralType.bone,
+				class: 	ComboClass.BONE,
+				multiplier: [1.5,2],
 				iteration: 0,
-				chainID: 10,
+				chainID: 20,
 				hasBeenActive: false,
 				chainType: ChainType.ITEM_CLASS
 			},
 			{
 				type: MineralType.bone,
 				class: 	ComboClass.BONE,
-				multiplier: [3,10],
+				multiplier: [1.5,2.5,5],
 				iteration: 0,
 				chainID: 20,
 				hasBeenActive: false,
 				chainType: ChainType.ITEM_CLASS
 			},
+			{
+				type: MineralType.diamond,
+				class: 	ComboClass.GEM,
+				multiplier: [1.5,2.5,5],
+				iteration: 0,
+				chainID: 10,
+				hasBeenActive: false,
+				chainType: ChainType.ITEM_CLASS
+			},
+
 			{
 				type: MineralType.badrock,
 				class: 	ComboClass.ROCK,
@@ -188,7 +198,7 @@ export class Tree extends Button {
 							break;
 						}
 						case ChainType.SPECIFIC_ITEM: {
-							if(value.type = mtype) {
+							if(value.type == mtype) {
 							this.activeChains.set(key,value);
 							}
 							break;
@@ -250,8 +260,8 @@ export class Tree extends Button {
 					multiplier = this.updateMultiplier(value, multiplier);
 					this.updateChainFlags(key);
 				} else if (value.chainType == ChainType.SPECIFIC_ITEM && value.type == mtype) {
-					this.updateChainFlags(key);
 					multiplier = this.updateMultiplier(value, multiplier);
+					this.updateChainFlags(key);
 				} else if (value.chainType == ChainType.LAST_ITEM) {
 					if(value.type == mtype)
 					{

@@ -119,7 +119,7 @@ export class Shop extends Phaser.GameObjects.Container {
 				iteration:1,
 				maxIteration:8,
 				value: [1,1,1,1,1,1,1,1],
-				sideEffect: [null,null,null,null,null,null,null,null],
+				sideEffect: [() => this.overwriteOldItem(this.restrictedItems[2]),null,null,null,null,null,null,null],
 			},
 			SOLD_OUT_ITEM,
 			SOLD_OUT_ITEM,
@@ -148,7 +148,18 @@ export class Shop extends Phaser.GameObjects.Container {
 				maxIteration: 1,
 				value: [5],
 				sideEffect: [null],
-			}
+			},
+			{
+				type: ItemType.ChainUpgrade,
+				image: ["applecore","applecore","applecore","bone","bone"],
+				title: ["Apple Eater","Apple Jack", "Apple Devourer","Bone Sucker", "Bone Cruncher"],
+				description: ["Chain apple cores for a bonus. How's them apples?","Upgrade apple chains. For a great lover of apples.","For apple experts. Probably not healthy.", "Consume a chain of bones for score. Gross.", "Improved bone chaining. Minerals are good for trees."],
+				price: [200,600,800,1000,1500],
+				iteration: 4,
+				maxIteration: 5,
+				value: [0,1,2,3,4],
+				sideEffect: [null,null,null,null,null],
+			},
 		];
 
 		const W = this.scene.W;
@@ -329,11 +340,17 @@ export class Shop extends Phaser.GameObjects.Container {
 		{
 			if(newItem.type == this.itemsForSale[l].type)
 			{
+				let iter = this.itemsForSale[l].iteration;
 				this.itemsForSale[l]=newItem;
-			} else {
-				this.addItemToEmptySlot(newItem);
+				if(this.itemsForSale[l].iteration > iter)
+				{
+					this.itemsForSale[l].iteration = iter;
+				}
+				return;
 			}
 		}
+		this.addItemToEmptySlot(newItem);
+		return;
 	}
 
 	addItemToEmptySlot(newItem: ItemData)
