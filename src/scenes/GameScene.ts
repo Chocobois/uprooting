@@ -212,6 +212,9 @@ export class GameScene extends BaseScene {
 			} else if (itemData.type == ItemType.TreeEfficiency)
 			{
 				this.tree.refundValue = itemData.value[itemData.iteration-1]
+			} else if (itemData.type == ItemType.SuperChain)
+			{
+				this.tree.superChains = true;
 			}
 			// Add more shop item mechanics...
 			// Or break up into more emits
@@ -595,6 +598,24 @@ export class GameScene extends BaseScene {
 		this.updateScore();
 	}
 
+	getSuperChain(): number
+	{
+		let r = Math.random()*200;
+		if(r <= 100) {
+			return 0.01;
+		} else if (r <= 150) {
+			return 0.1;
+		} else if (r <= 176) {
+			return 1;
+		} else if (r <= 190) {
+			return 2;
+		} else if (r <= 199) {
+			return 3.5;
+		} else {
+			return 99;
+		}
+	}
+
 	handleMineralCollection(minerals: Mineral[]) {
 		const collectibles = minerals.filter(mineral => mineral.collectible);
 		this.underground.destroyMinerals(collectibles);
@@ -603,12 +624,20 @@ export class GameScene extends BaseScene {
 			//get multiplier and advance chains
 			let scoremultiplier = 1;
 			scoremultiplier = this.tree.updateChainStatus(collectible.type, collectible.itemclass);
+			if(this.tree.superChains)
+			{
+				scoremultiplier += this.getSuperChain();
+			}
 			let tPoints = Math.round(collectible.points*scoremultiplier);
 			let color = "Lime";
 			let pColor = "Lime"
 			let tScale=200;
 			let pScale=150;
-			if (tPoints > 1000) {
+			if(tPoints > 10000)
+			{
+				color = "red"
+				tScale = 450;
+			} else if (tPoints > 1000) {
 				color = "fuchsia"
 				tScale = 275
 			} else if (tPoints > 500) {
@@ -619,7 +648,10 @@ export class GameScene extends BaseScene {
 				tScale = 225
 			}
 
-			if (scoremultiplier > 20) {
+			if(scoremultiplier > 99) {
+				pColor = "red"
+				pScale = 425
+			} else if (scoremultiplier > 20) {
 				pColor = "fuchsia"
 				pScale = 225
 			} else if (scoremultiplier > 10) {
@@ -637,8 +669,8 @@ export class GameScene extends BaseScene {
 					treefund=this.tree.maxEnergy-this.tree.energy;
 					this.tree.energy=this.tree.maxEnergy;
 				}
+				this.textParticle(collectible.x-35, collectible.y+5, "Green", `+${treefund} Energy!`, undefined, (pScale-25) * this.SCALE);
 			}
-			this.textParticle(collectible.x-35, collectible.y+5, "Green", `+${treefund} Energy!`, undefined, (pScale-25) * this.SCALE);
 			this.textParticle(collectible.x, collectible.y-10, color, `${collectible.properName} +${tPoints}!`, true,
 			tScale*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
 			if(scoremultiplier > 1) {

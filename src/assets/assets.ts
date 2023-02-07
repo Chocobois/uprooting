@@ -69,6 +69,7 @@ import watercave from "./images/items/watercave.png";
 import coin from "./images/items/coin.png";
 import energy from "./images/items/energy.png";
 import energy2 from "./images/items/energy2.png";
+import greendice from "./images/items/greendice.png";
 
 // Titlescreen
 import title_foreground from "./images/titlescreen/foreground.png";
@@ -134,6 +135,7 @@ const images: Asset[] = [
 	{ key: "coin", path: coin },
 	{ key: "energy", path: energy },
 	{ key: "energy2", path: energy2 },
+	{ key: "greendice", path: greendice },
 
 	// Titlescreen
 	{ key: "title_foreground", path: title_foreground },

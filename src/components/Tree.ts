@@ -38,6 +38,7 @@ export class Tree extends Button {
 	public energyMitigation: number;
 	public ANY_CHAIN_ID = 999;
 	public defaultChain: ItemChain;
+	public superChains: boolean;
 	// Feel free to edit this ts declaration, it's supposed to be a k-v pair object
 	private oneTimeEvents: Record<string, boolean>;
 
@@ -59,6 +60,7 @@ export class Tree extends Button {
 		this.unlockedChains = new Map();
 		this.activeChains = new Map();
 		this.updateMap = new Map();
+		this.superChains = false;
 		this.defaultChain = {
 			type: MineralType.NOTYPE,
 			class: 	ComboClass.NONE,

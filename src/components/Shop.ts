@@ -9,6 +9,7 @@ export enum ItemType {
 	RockBreak,
 	TreeEfficiency,
 	ChainUpgrade,
+	SuperChain,
 	ShopOwner,
 	SoldOut,
 }
@@ -108,7 +109,7 @@ export class Shop extends Phaser.GameObjects.Container {
 				maxIteration: 6,
 				value: [100, 150, 250, 500, 1000, 2500],
 				sideEffect: [() => this.addItemToEmptySlot(this.restrictedItems[0]),
-					null,null,null,null,null],
+					null,null,null,null,() => this.addItemToEmptySlot(this.restrictedItems[3])],
 			},
 			{
 				type: ItemType.RockBreak,
@@ -159,6 +160,17 @@ export class Shop extends Phaser.GameObjects.Container {
 				maxIteration: 5,
 				value: [0,1,2,3,4],
 				sideEffect: [null,null,null,null,null],
+			},
+			{
+				type: ItemType.SuperChain,
+				image: ["greendice"],
+				title: ["Lucky Dice"],
+				description: ["A lucky dice which randomly improves your chains. I wonder where it's from..."],
+				price: [3621],
+				iteration: 1,
+				maxIteration: 1,
+				value: [1],
+				sideEffect: [null],
 			},
 		];
 
