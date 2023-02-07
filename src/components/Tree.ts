@@ -37,8 +37,22 @@ export class Tree extends Button {
 	public refundValue: number;
 	public energyMitigation: number;
 	public ANY_CHAIN_ID = 999;
+
 	public defaultChain: ItemChain;
+
+	//dice
 	public superChains: boolean;
+	//cherry bomb
+	public bruteStrength: boolean;
+	public bruteness: number;
+	public maxBruteness = 8;
+	public persistence: number;
+	public maxPersistence = 10;
+	//feather
+	public limitBreak: boolean;
+	public liminalTime: number;
+
+
 	// Feel free to edit this ts declaration, it's supposed to be a k-v pair object
 	private oneTimeEvents: Record<string, boolean>;
 
@@ -60,7 +74,15 @@ export class Tree extends Button {
 		this.unlockedChains = new Map();
 		this.activeChains = new Map();
 		this.updateMap = new Map();
+		
 		this.superChains = false;
+		this.bruteStrength = false;
+		this.bruteness = 0;
+		this.persistence = 0;
+		
+		this.limitBreak = false;
+		this.liminalTime = 0;
+		
 		this.defaultChain = {
 			type: MineralType.NOTYPE,
 			class: 	ComboClass.NONE,

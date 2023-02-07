@@ -616,6 +616,18 @@ export class GameScene extends BaseScene {
 		}
 	}
 
+	prettifyNumber(input: number): string
+	{
+		if(input < 10)
+		{
+			return input.toFixed(2);
+		} else if (input < 20) {
+			return input.toFixed(1);
+		} else {
+			return Math.round(input).toString();
+		}
+	}
+
 	handleMineralCollection(minerals: Mineral[]) {
 		const collectibles = minerals.filter(mineral => mineral.collectible);
 		this.underground.destroyMinerals(collectibles);
@@ -674,7 +686,7 @@ export class GameScene extends BaseScene {
 			this.textParticle(collectible.x, collectible.y-10, color, `${collectible.properName} +${tPoints}!`, true,
 			tScale*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
 			if(scoremultiplier > 1) {
-				this.textParticle(collectible.x, collectible.y+20, pColor, `Combo x${scoremultiplier.toFixed(2)}!!!`, true,
+				this.textParticle(collectible.x, collectible.y+20, pColor, `Combo x${this.prettifyNumber(scoremultiplier)}!!!`, true,
 				pScale*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
 			}
 
@@ -747,7 +759,16 @@ export class GameScene extends BaseScene {
 			// Check minerals
 			const line = new Phaser.Geom.Line(start.x, start.y, end.x, end.y);
 			const mineralIntersects = this.underground.getIntersectedMinerals(line);
-			const touchingObstacle = mineralIntersects.some((mineral => mineral.hardness > this.tree.strength));
+			let str = this.tree.strength;
+			if(str < this.tree.maxBruteness)
+			{
+				str+=bruteness;
+				if(str > this.tree.maxBruteness)
+				{
+					str = this.tree.maxBruteness;
+				}
+			}
+			const touchingObstacle = mineralIntersects.some((mineral => mineral.hardness > str));
 			const canAfford = this.tree.energy >= this.currentNode.cost;
 			this.validDrawing = !!next && !touchingObstacle && canAfford;
 
@@ -765,6 +786,7 @@ export class GameScene extends BaseScene {
 				if (next && this.validDrawing && canDraw) {
 					this.addConnection(next);
 					this.dragPos = new Phaser.Math.Vector2(next.x, next.y);
+					//handling cherry bomb explosions
 					this.handleMineralCollection(mineralIntersects);
 				}
 			}
