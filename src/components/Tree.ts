@@ -62,7 +62,7 @@ export class Tree extends Button {
 		this.defaultChain = {
 			type: MineralType.NOTYPE,
 			class: 	ComboClass.NONE,
-			multiplier: [1.5,2,2.5],
+			multiplier: [1.1,1.25,1.5],
 			iteration: 0,
 			chainID: this.ANY_CHAIN_ID,
 			hasBeenActive: false,
@@ -74,7 +74,7 @@ export class Tree extends Button {
 			{
 				type: MineralType.applecore,
 				class: 	ComboClass.FRUIT,
-				multiplier: [3,10],
+				multiplier: [1.5,2],
 				iteration: 0,
 				chainID: 1,
 				hasBeenActive: false,
@@ -83,9 +83,18 @@ export class Tree extends Button {
 			{
 				type: MineralType.applecore,
 				class: 	ComboClass.FRUIT,
-				multiplier: [3,10],
+				multiplier: [1.5,2.5,5],
 				iteration: 0,
-				chainID: 2,
+				chainID: 1,
+				hasBeenActive: false,
+				chainType: ChainType.SPECIFIC_ITEM
+			},
+			{
+				type: MineralType.applecore,
+				class: 	ComboClass.FRUIT,
+				multiplier: [1.5,2.5,5,10],
+				iteration: 0,
+				chainID: 1,
 				hasBeenActive: false,
 				chainType: ChainType.SPECIFIC_ITEM
 			},

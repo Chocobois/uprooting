@@ -158,7 +158,7 @@ export class GameScene extends BaseScene {
 		// this.fitToScreen(this.background);
 
 		// Money
-		this.money = 0;
+		this.money = 10000;
 		this.score = 0;
 
 		this.hud = new HUD(this);
@@ -639,7 +639,7 @@ export class GameScene extends BaseScene {
 
 			if (this.currentNode && collectible.points) {
 				this.currentNode.addScore();
-				this.score += collectible.points;
+				this.score += Math.round(collectible.points*scoremultiplier);
 			}
 
 			this.sound.play("r_collect");
@@ -833,6 +833,16 @@ export class GameScene extends BaseScene {
 		oldNode.addScore();
 		this.score += 1;
 		this.tree.energy -= oldNode.cost;
+		if(this.tree.refundValue > 0)
+		{
+			if (this.tree.maxEnergy-this.tree.energy > this.tree.refundValue) {
+			this.tree.energy += this.tree.refundValue;
+			this.textParticle(newNode.x-7.5, newNode.y-5, "Green", `+${this.tree.refundValue}`, undefined, 150 * this.SCALE);
+			} else {
+				this.tree.energy = this.tree.maxEnergy;
+				this.textParticle(newNode.x-5, newNode.y-5, "Green", `+${this.tree.maxEnergy-this.tree.energy}`, undefined, 150 * this.SCALE);
+			}
+		} 
 
 		this.nodes.forEach(node => {
 			if (node.cost > this.tree.energy) {
@@ -843,7 +853,6 @@ export class GameScene extends BaseScene {
 		this.sound.play("r_place", { volume: 0.3, rate: 1 + Math.random() * 0.1 });
 
 		this.textParticle(newNode.x+5, newNode.y-5, "Yellow", `-${oldNode.cost}`, undefined, 150 * this.SCALE);
-
 		this.currentNode = newNode;
 
 		this.updateScore();

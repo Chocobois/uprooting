@@ -92,16 +92,16 @@ export class Shop extends Phaser.GameObjects.Container {
 				image: ["sapling","sapling","sapling","sapling","sapling"],
 				title: ["Magic Storage","Magic Font","Magical Spring", "Great Heart of Magic", "Magus of the Developer"],
 				description: ["Increase your root energy a little.","Increase your root energy significantly.","Increase your root energy by a huge amount.","Increase your root energy massively.","An inconceivable amount of root energy!"],
-				price: [150,1000,5000,50000,50000],
+				price: [150,1000,5000,50000,200000],
 				iteration: 1,
 				maxIteration: 5,
-				value: [150,500,1000,5000,256000],
-				sideEffect: [null,null,null,null,null],
+				value: [150,500,1000,5000,10000,50000],
+				sideEffect: [null,() => this.addItemToEmptySlot(this.restrictedItems[1]),null,null,null],
 			},
 			{
 				type: ItemType.FruitUpgrade,
 				image: ["orange", "pear", "cherry", "banana", "dragonfruit", "dragondragonfruit"],
-				title: ["Apple Essence", "Pear Essence", "Cherry Essence", "Banana Essence", "Dragonfruit Essence", "Dragondragonfruit Essence"],
+				title: ["Orange Essence", "Pear Essence", "Cherry Essence", "Banana Essence", "Dragonfruit Essence", "Dragondragonfruit Essence"],
 				description: ["Magically grow oranges on your tree!","Magically grow pears on your tree!","Magically grow cherries on your tree!","Magically grow bananas on your tree!","Magically grow dragonfruit on your tree! Dragonfruit doesn't even grow on trees!", "Dragondragonfruit! There's a strange cube inside of it."],
 				price: [500, 750, 1250, 2500, 5000, 12500],
 				iteration:1,
@@ -129,14 +129,14 @@ export class Shop extends Phaser.GameObjects.Container {
 		this.restrictedItems = [
 			{
 				type: ItemType.ChainUpgrade,
-				image: ["apple"],
-				title: ["Apple Devourer"],
-				description: ["Get chain bonuses from apple cores. How's them apples?"],
-				price: [500],
+				image: ["applecore","applecore","applecore"],
+				title: ["Apple Eater","Apple Jack", "Apple Devourer"],
+				description: ["Chain apple cores for a bonus. How's them apples?","Upgrade apple chains. For a great lover of apples.","For apple experts. Probably not healthy."],
+				price: [150,350,750],
 				iteration: 1,
-				maxIteration: 1,
-				value: [1],
-				sideEffect: [null],
+				maxIteration: 3,
+				value: [0,1,2],
+				sideEffect: [null,null,null],
 			},
 			{
 				type: ItemType.TreeEfficiency,
@@ -146,7 +146,7 @@ export class Shop extends Phaser.GameObjects.Container {
 				price: [1500],
 				iteration: 1,
 				maxIteration: 1,
-				value: [1],
+				value: [5],
 				sideEffect: [null],
 			}
 		];
@@ -321,6 +321,19 @@ export class Shop extends Phaser.GameObjects.Container {
 				item.setItem(itemData);
 			}
 		});
+	}
+
+	overwriteOldItem(newItem: ItemData)
+	{
+		for(let l = 0; l < this.itemsForSale.length; l++)
+		{
+			if(newItem.type == this.itemsForSale[l].type)
+			{
+				this.itemsForSale[l]=newItem;
+			} else {
+				this.addItemToEmptySlot(newItem);
+			}
+		}
 	}
 
 	addItemToEmptySlot(newItem: ItemData)

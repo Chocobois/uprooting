@@ -68,6 +68,7 @@ import curse_rock from "./images/items/curse_rock.png";
 import watercave from "./images/items/watercave.png";
 import coin from "./images/items/coin.png";
 import energy from "./images/items/energy.png";
+import energy2 from "./images/items/energy2.png";
 
 // Titlescreen
 import title_foreground from "./images/titlescreen/foreground.png";
@@ -132,6 +133,7 @@ const images: Asset[] = [
 	{ key: "curse_rock", path: curse_rock },
 	{ key: "coin", path: coin },
 	{ key: "energy", path: energy },
+	{ key: "energy2", path: energy2 },
 
 	// Titlescreen
 	{ key: "title_foreground", path: title_foreground },

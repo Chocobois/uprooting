@@ -105,7 +105,7 @@ export class HUD extends Phaser.GameObjects.Container {
 
 		this.moneyText.setText(`${money}`);
 		this.energyText.setText(`${energy}/${maxEnergy}`);
-//		this.scoreText.setText(`${score}`);
+		this.scoreText.setText(`${score}`);
 
 		const factor = energy / maxEnergy;
 		this.energyMeter.setWidth(factor * this.energyBack.width);
