@@ -381,7 +381,7 @@ export class Shop extends Phaser.GameObjects.Container {
 		for(let [key,value] of this.queueMap)
 		{
 			//use this to not check twice against map
-			if(this.overwriteOldItem(value))
+			if(this.overwriteOldItem(this.restrictedItems[value]))
 			{
 				this.queueMap.delete(key);
 			}
@@ -406,7 +406,7 @@ export class Shop extends Phaser.GameObjects.Container {
 		//if you want multiples just add duplicates to restrictedItems
 		if(!this.queueMap.has(index))
 		{
-			this.queueMap.set(index, myItem);
+			this.queueMap.set(index, index);
 			return true;
 		}
 		return false;

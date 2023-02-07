@@ -762,7 +762,7 @@ export class GameScene extends BaseScene {
 			let str = this.tree.strength;
 			if(str < this.tree.maxBruteness)
 			{
-				str+=bruteness;
+				str+=this.tree.bruteness;
 				if(str > this.tree.maxBruteness)
 				{
 					str = this.tree.maxBruteness;
