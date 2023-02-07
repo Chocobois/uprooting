@@ -633,7 +633,7 @@ export class GameScene extends BaseScene {
 			let pColor = "Lime"
 			let tScale=200;
 			let pScale=150;
-			if(tPoints > 10000)
+			if(tPoints > 9000)
 			{
 				color = "red"
 				tScale = 450;
