@@ -172,6 +172,8 @@ export class GameScene extends BaseScene {
 				this.shop.open();
 				this.state = GameState.InsideShop;
 				this.musicState = MusicState.Shop;
+				this.hud.hideScore();
+				this.hud.hideEnergy();
 				this.musicNormal.stop();
 				this.musicDrawing.stop();
 				this.musicJingle.stop();
@@ -180,7 +182,8 @@ export class GameScene extends BaseScene {
 		});
 		this.shop.on("close", () => {
 			this.state = GameState.GrowingRoots;
-			
+			this.hud.unhideScore();
+			this.hud.unhideEnergy();
 			this.musicShop.stop();
 			this.sound.play("m_shop", {
 				name: "shopEnding",
@@ -215,6 +218,11 @@ export class GameScene extends BaseScene {
 			} else if (itemData.type == ItemType.SuperChain)
 			{
 				this.tree.superChains = true;
+			} else if (itemData.type == ItemType.BombUpgrade)
+			{
+				this.tree.bruteStrength = true;
+				this.tree.bruteChance = itemData.value[itemData.iteration-1];
+				this.hud.addBombHUD();
 			}
 			// Add more shop item mechanics...
 			// Or break up into more emits
@@ -381,7 +389,7 @@ export class GameScene extends BaseScene {
 		this.textParticles.update(time, delta);
 		this.underground.update(time, delta);
 		this.shop.update(time, delta);
-		this.hud.update(time, delta, this.money, this.tree.energy, this.tree.maxEnergy, this.totalScore);
+		this.hud.update(time, delta, this.money, this.tree.energy, this.tree.maxEnergy, this.totalScore, this.tree.bruteness, this.tree.persistence);
 		this.tree.update(time, delta);
 		this.nodes.forEach(node => {
 			node.update(time, delta);
@@ -631,6 +639,7 @@ export class GameScene extends BaseScene {
 	handleMineralCollection(minerals: Mineral[]) {
 		const collectibles = minerals.filter(mineral => mineral.collectible);
 		this.underground.destroyMinerals(collectibles);
+		let bcheck = false;
 		collectibles.forEach(collectible => {
 			this.tree.updateChainList(collectible.type, collectible.itemclass);
 			//get multiplier and advance chains
@@ -672,6 +681,11 @@ export class GameScene extends BaseScene {
 			} else if (scoremultiplier > 5) {
 				pColor = "yellow";
 				pScale = 175
+			}
+			//did we contact a normally indestructible object
+			if(collectible.hardness > this.tree.strength)
+			{
+				bcheck = true;
 			}
 			let treefund=Math.round(this.tree.refundValue*scoremultiplier);
 			if(this.tree.refundValue>0){
@@ -715,6 +729,15 @@ export class GameScene extends BaseScene {
 			}
 		});
 
+		//end cherry bomb status if destroyed hard stuff
+		if(bcheck && this.tree.bruteStrength)
+		{
+			if(this.tree.bruteness > 0) {
+				this.tree.bruteness = 0;
+				this.tree.persistence = 0;
+				this.particles.createExplosion(this.currentNode!.x, this.currentNode!.y, 0.5, 1.0, false);	
+			}
+		}
 		//clean persisting chains if you collected minerals, otherwise only clear the default "any chain"
 		if(collectibles.length > 0)
 		{
@@ -760,7 +783,7 @@ export class GameScene extends BaseScene {
 			const line = new Phaser.Geom.Line(start.x, start.y, end.x, end.y);
 			const mineralIntersects = this.underground.getIntersectedMinerals(line);
 			let str = this.tree.strength;
-			if(str < this.tree.maxBruteness)
+			if(this.tree.bruteStrength && str < this.tree.maxBruteness)
 			{
 				str+=this.tree.bruteness;
 				if(str > this.tree.maxBruteness)
@@ -788,6 +811,24 @@ export class GameScene extends BaseScene {
 					this.dragPos = new Phaser.Math.Vector2(next.x, next.y);
 					//handling cherry bomb explosions
 					this.handleMineralCollection(mineralIntersects);
+							// add or remove bombs
+					if(this.tree.bruteStrength && this.tree.persistence <= 0)
+					{
+						if((Math.random()*1000) > (1000-(this.tree.bruteChance*1000)))
+						{
+							if(this.tree.bruteness < this.tree.maxBruteness)
+							{
+								this.tree.bruteness++;
+								this.tree.persistence = this.tree.maxPersistence;
+							}
+						} else {
+							if(this.tree.bruteness > 0) {
+								this.tree.bruteness--;
+							}
+						}
+					} else if (this.tree.persistence > 0) {
+						this.tree.persistence--;
+					}
 				}
 			}
 			else if (!this.oneTimeEvents.outOfEnergy) {
@@ -906,10 +947,11 @@ export class GameScene extends BaseScene {
 				this.tree.energy = this.tree.maxEnergy;
 			}
 		} 
-
 		this.nodes.forEach(node => {
 			if (node.cost > this.tree.energy) {
 				node.disable();
+			} else if (node.cost <= this.tree.energy) {
+				node.enable();
 			}
 		});
 

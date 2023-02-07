@@ -10,6 +10,7 @@ export enum ItemType {
 	TreeEfficiency,
 	ChainUpgrade,
 	SuperChain,
+	BombUpgrade,
 	ShopOwner,
 	SoldOut,
 	NOTYPE,
@@ -117,7 +118,7 @@ export class Shop extends Phaser.GameObjects.Container {
 				maxIteration: 6,
 				value: [100, 150, 250, 500, 1000, 2500],
 				sideEffect: [() => this.addItemToEmptySlot(this.restrictedItems[0]),
-					null,null,null,null,() => this.addItemToEmptySlot(this.restrictedItems[3])],
+					null,() => this.addNewItemByIndex(4),null,null,() => this.addItemToEmptySlot(this.restrictedItems[3])],
 			},
 			{
 				type: ItemType.RockBreak,
@@ -181,14 +182,14 @@ export class Shop extends Phaser.GameObjects.Container {
 				sideEffect: [null],
 			},
 			{
-				type: ItemType.NOTYPE,
-				image: ["cherry"],
+				type: ItemType.BombUpgrade,
+				image: ["cherrybomb"],
 				title: ["Cherry Bomb"],
 				description: ["Sometimes explodes to remove impassable objects. Designed it myself!"],
-				price: [420],
+				price: [4200],
 				iteration: 1,
 				maxIteration: 1,
-				value: [0.025],
+				value: [0.05],
 				sideEffect: [null],
 			},
 			{
@@ -381,7 +382,7 @@ export class Shop extends Phaser.GameObjects.Container {
 		for(let [key,value] of this.queueMap)
 		{
 			//use this to not check twice against map
-			if(this.overwriteOldItem(this.restrictedItems[value]))
+			if(this.overwriteOldItem(this.restrictedItems[key]))
 			{
 				this.queueMap.delete(key);
 			}
@@ -397,6 +398,7 @@ export class Shop extends Phaser.GameObjects.Container {
 
 	addToShopQUeue(index: number, value: ItemData = SOLD_OUT_ITEM): boolean
 	{
+		//may add an option to just put in an ItemData later but dead code for now
 		let myItem = value;
 		if(index < this.restrictedItems.length)
 		{
@@ -406,7 +408,7 @@ export class Shop extends Phaser.GameObjects.Container {
 		//if you want multiples just add duplicates to restrictedItems
 		if(!this.queueMap.has(index))
 		{
-			this.queueMap.set(index, index);
+			this.queueMap.set(index,this.queueMap.size);
 			return true;
 		}
 		return false;

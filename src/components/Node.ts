@@ -71,6 +71,12 @@ export class Node extends Button {
 		this.image.setAlpha(0.2);
 	}
 
+	enable() {
+		this.image.input.enabled = true;
+		this.image.setTint(0xB99578);
+		this.image.setAlpha(1);
+	}
+
 
 	// onOut() {}
 	// onOver() {}

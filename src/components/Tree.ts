@@ -44,10 +44,11 @@ export class Tree extends Button {
 	public superChains: boolean;
 	//cherry bomb
 	public bruteStrength: boolean;
+	public bruteChance: number;
 	public bruteness: number;
 	public maxBruteness = 8;
 	public persistence: number;
-	public maxPersistence = 10;
+	public maxPersistence = 5;
 	//feather
 	public limitBreak: boolean;
 	public liminalTime: number;
@@ -78,6 +79,7 @@ export class Tree extends Button {
 		this.superChains = false;
 		this.bruteStrength = false;
 		this.bruteness = 0;
+		this.bruteChance = 0;
 		this.persistence = 0;
 		
 		this.limitBreak = false;

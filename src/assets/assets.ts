@@ -70,6 +70,8 @@ import coin from "./images/items/coin.png";
 import energy from "./images/items/energy.png";
 import energy2 from "./images/items/energy2.png";
 import greendice from "./images/items/greendice.png";
+import cherrybomb from "./images/items/cherrybomb.png";
+
 
 // Titlescreen
 import title_foreground from "./images/titlescreen/foreground.png";
@@ -136,6 +138,7 @@ const images: Asset[] = [
 	{ key: "energy", path: energy },
 	{ key: "energy2", path: energy2 },
 	{ key: "greendice", path: greendice },
+	{ key: "cherrybomb", path: cherrybomb },
 
 	// Titlescreen
 	{ key: "title_foreground", path: title_foreground },
