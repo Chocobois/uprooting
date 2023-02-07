@@ -629,7 +629,16 @@ export class GameScene extends BaseScene {
 				pColor = "yellow";
 				pScale = 175
 			}
-
+			let treefund=Math.round(this.tree.refundValue*scoremultiplier);
+			if(this.tree.refundValue>0){
+				if(this.tree.maxEnergy-this.tree.energy>treefund){
+					this.tree.energy+=treefund;
+				} else {
+					treefund=this.tree.maxEnergy-this.tree.energy;
+					this.tree.energy=this.tree.maxEnergy;
+				}
+			}
+			this.textParticle(collectible.x-35, collectible.y+5, "Green", `+${treefund} Energy!`, undefined, (pScale-25) * this.SCALE);
 			this.textParticle(collectible.x, collectible.y-10, color, `${collectible.properName} +${tPoints}!`, true,
 			tScale*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
 			if(scoremultiplier > 1) {
@@ -836,11 +845,11 @@ export class GameScene extends BaseScene {
 		if(this.tree.refundValue > 0)
 		{
 			if (this.tree.maxEnergy-this.tree.energy > this.tree.refundValue) {
-			this.tree.energy += this.tree.refundValue;
-			this.textParticle(newNode.x-7.5, newNode.y-5, "Green", `+${this.tree.refundValue}`, undefined, 150 * this.SCALE);
+				this.textParticle(newNode.x-15, newNode.y-5, "Green", `+${this.tree.refundValue}`, undefined, 150 * this.SCALE);
+				this.tree.energy += this.tree.refundValue;
 			} else {
+				this.textParticle(newNode.x-15, newNode.y-5, "Green", `+${this.tree.maxEnergy-this.tree.energy}`, undefined, 150 * this.SCALE);
 				this.tree.energy = this.tree.maxEnergy;
-				this.textParticle(newNode.x-5, newNode.y-5, "Green", `+${this.tree.maxEnergy-this.tree.energy}`, undefined, 150 * this.SCALE);
 			}
 		} 
 
