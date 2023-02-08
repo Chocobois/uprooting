@@ -92,7 +92,7 @@ export class Tree extends Button {
 		
 		this.limitBreak = false;
 		this.liminalTime = 0;
-		this.usageCOunt = 0
+		this.usageCount = 0
 		this.defaultChain = {
 			type: MineralType.NOTYPE,
 			class: 	ComboClass.NONE,
