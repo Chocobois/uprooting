@@ -167,6 +167,7 @@ import green_magic from "./images/effects/green_magic.png";
 import meme_explosion from "./images/effects/meme_explosion.png";
 import dust_explosion from "./images/effects/dustyexplosion.png";
 import blue_sparkle from "./images/effects/blue_sparkle.png";
+import bad_fire from "./images/effects/bad_fire.png";
 import item_tag from "./images/ui/item_tag.png";
 
 // NPCs
@@ -183,6 +184,7 @@ const spritesheets: SpriteSheet[] = [
 	{ key: "meme_explosion", path: meme_explosion, width: 200, height: 282 },
 	{ key: "dust_explosion", path: dust_explosion, width: 128, height: 128 },
 	{ key: "blue_sparkle", path: blue_sparkle, width: 256, height: 256 },
+	{ key: "bad_fire", path: bad_fire, width: 512, height: 512 },
 
 
 	// NPCs

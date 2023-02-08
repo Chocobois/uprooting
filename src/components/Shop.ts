@@ -13,6 +13,7 @@ export enum ItemType {
 	BombUpgrade,
 	ShopOwner,
 	SoldOut,
+	EnergyRefund,
 	NOTYPE,
 }
 
@@ -98,14 +99,14 @@ export class Shop extends Phaser.GameObjects.Container {
 		this.itemsForSale = [
 			{
 				type: ItemType.TreeEnergy,
-				image: ["sapling","sapling","sapling","sapling","sapling"],
-				title: ["Magic Storage","Magic Font","Magical Spring", "Great Heart of Magic", "Magus of the Developer"],
+				image: ["sapling","sapling","sapling","sapling","sapling","sapling"],
+				title: ["Magic Storage","Magic Font","Magical Spring", "Great Heart of Magic","Unified Magic Theory", "Magia of the Developer"],
 				description: ["Increase your root energy a little.","Increase your root energy significantly.","Increase your root energy by a huge amount.","Increase your root energy massively.","An inconceivable amount of root energy!"],
-				price: [150,1000,5000,50000,200000],
+				price: [150,1000,5000,50000,200000,1000000],
 				iteration: 1,
-				maxIteration: 5,
-				value: [150,500,1000,5000,10000],
-				sideEffect: [null,() => this.addItemToEmptySlot(this.restrictedItems[1]),null,null,null],
+				maxIteration: 6,
+				value: [150,500,1000,5000,10000,33350],
+				sideEffect: [null,null,() => this.addItemToEmptySlot(this.restrictedItems[1]),null,null],
 				//fixme both this and below should use overwriteOldItem because it already handles empty check
 			},
 			{
@@ -125,10 +126,10 @@ export class Shop extends Phaser.GameObjects.Container {
 				image: ["bones", "ylw_badrock", "badrock", "ruby", "gray_badrock","ancient_diamond","demon_rock","curse_rock"],
 				title: ["Hard Roots","Iron Roots","Titanium Roots","Gluttonous Roots","Adamantite Roots","Prosperous Roots","Dauntless Roots","Roots of the Developer"],
 				description: ["Gain the ability to break through bones!","Break through rocks!","Break through hard rocks!","Break through and harvest gems!","Break through bedrock!","Break and harvest ancient diamonds! Superb!","Break through hot rocks!","Venture into the unknown..."],
-				price: [1600,16000,25600,128000,256000,1024000,2048000,4201337],
+				price: [3200,25000,75000,250000,375000,1150000,1500000,9999999],
 				iteration:1,
 				maxIteration:8,
-				value: [1,1,1,1,1,1,1,1],
+				value: [2,3,4,5,6,7,8,9],
 				sideEffect: [() => this.overwriteOldItem(this.restrictedItems[2]),null,null,null,null,null,null,null],
 			},
 			SOLD_OUT_ITEM,
@@ -151,12 +152,12 @@ export class Shop extends Phaser.GameObjects.Container {
 			{
 				type: ItemType.TreeEfficiency,
 				image: ["energy2","energy2","energy2","energy2","energy2"],
-				title: ["Frugal Roots","Ascetic Roots","Penitent Roots","Determined Roots","Fusion-Cored Roots"],
-				description: ["Restore a tiny amount of energy while growing.","Restore a modest amount of energy while growing.","Restore a significant amount of energy while growing.","Restore a large amount of energy while growing.","Restore an incredible amount of energy while growing."],
-				price: [500, 3500, 15000, 60000, 250000],
+				title: ["Frugal Roots","Ascetic Roots","Penitent Roots","Determined Roots","True Gaia Roots"],
+				description: ["Use a little less energy to grow.","Use somewhat less energy to grow.","Use significantly less energy to grow.","Use far less energy to grow.","Grow with the utmost energy efficiency."],
+				price: [500, 3500, 12500, 50000, 250000],
 				iteration: 1,
 				maxIteration: 5,
-				value: [1, 5, 10, 25, 50],
+				value: [0.98, 0.95, 0.9, 0.85, 0.8],
 				sideEffect: [null,null,null,null,null],
 			},
 			{
@@ -213,6 +214,17 @@ export class Shop extends Phaser.GameObjects.Container {
 				maxIteration: 1,
 				value: [1],
 				sideEffect: [null],
+			},
+			{
+				type: ItemType.EnergyRefund,
+				image: ["energy2","energy2","energy2","energy2","energy2"],
+				title: ["Frugal Roots","Ascetic Roots","Penitent Roots","Determined Roots","Fusion-Cored Roots"],
+				description: ["Restore a tiny amount of energy while growing.","Restore a modest amount of energy while growing.","Restore a significant amount of energy while growing.","Restore a large amount of energy while growing.","Restore an incredible amount of energy while growing."],
+				price: [500, 3500, 12500, 50000, 250000],
+				iteration: 1,
+				maxIteration: 5,
+				value: [5, 10, 25, 50, 100],
+				sideEffect: [null,null,null,null,null],
 			},
 		];
 

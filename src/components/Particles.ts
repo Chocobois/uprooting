@@ -8,6 +8,7 @@ enum ParticleType {
 	Sweat = "sweat", // Doesn't exist
 	BlueSparkle = "blue_sparkle",
 	DustExplosion = "dust_explosion",
+	FireExplosion = "bad_fire",
 }
 
 class Particle extends Phaser.GameObjects.Sprite {
@@ -138,6 +139,16 @@ class Particle extends Phaser.GameObjects.Sprite {
 		this.lifeTime = duration * (0.8 + 0.2*Math.random());
 	}
 
+	fireExplosion(x: number, y: number, scale: number, duration: number, flip: boolean) {
+		this.init(x, y, ParticleType.FireExplosion);
+
+		this.setScale((flip ? 1 : -1) * scale, scale);
+		this.setFrame(0);
+		this.setOrigin(0.5);
+
+		this.lifeTime = duration * (0.8 + 0.2*Math.random());
+	}
+
 
 	update(time: number, delta: number) {
 		time /= 1000;
@@ -191,6 +202,12 @@ class Particle extends Phaser.GameObjects.Sprite {
 
 		if (this.myType == ParticleType.DustExplosion) {
 			let frame = Math.floor(15 * (this.life / this.lifeTime));
+			// let frame = Math.floor(15 * Math.pow(this.life / this.lifeTime, 0.65));
+			this.setFrame(frame);
+		}
+
+		if (this.myType == ParticleType.FireExplosion) {
+			let frame = Math.floor(6 * (this.life / this.lifeTime));
 			// let frame = Math.floor(15 * Math.pow(this.life / this.lifeTime, 0.65));
 			this.setFrame(frame);
 		}
@@ -301,6 +318,12 @@ export class Particles extends Phaser.GameObjects.Container {
 	createDustExplosion(x: number, y: number, scale: number, duration: number, flip: boolean) {
 		this.getFreeParticles(1).forEach((particle) => {
 			particle.dustExplosion(x, y, scale, duration, flip);
+		});
+	}
+
+	createFire(x: number, y: number, scale: number, duration: number, flip: boolean) {
+		this.getFreeParticles(1).forEach((particle) => {
+			particle.fireExplosion(x, y, scale, duration, flip);
 		});
 	}
 }

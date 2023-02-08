@@ -87,6 +87,7 @@ export class GameScene extends BaseScene {
 
 	// UI
 	private returnToSurfaceButton: SurfaceButton;
+	private limitBreakButton: MiniButton;
 	private harvestButton: HarvestButton;
 	private musicButton: MiniButton;
 	private audioButton: MiniButton;
@@ -201,29 +202,7 @@ export class GameScene extends BaseScene {
 		this.shop.on("buy", (itemData: ItemData) => {
 			///clear chains if you buy stuff
 			this.tree.clearActiveChains();
-			if (itemData.type == ItemType.TreeEnergy) {
-				this.tree.addMaxEnergy(itemData.value[itemData.iteration-1]);
-				this.tree.energy = this.tree.maxEnergy;
-			} else if (itemData.type == ItemType.RockBreak)
-			{
-				this.tree.strength += itemData.value[itemData.iteration-1];
-			} else if (itemData.type == ItemType.FruitUpgrade)
-			{
-				this.tree.basevalue = itemData.value[itemData.iteration-1];
-			} else if (itemData.type == ItemType.ChainUpgrade) {
-				this.tree.unlockChain(itemData.value[itemData.iteration-1]);
-			} else if (itemData.type == ItemType.TreeEfficiency)
-			{
-				this.tree.refundValue = itemData.value[itemData.iteration-1]
-			} else if (itemData.type == ItemType.SuperChain)
-			{
-				this.tree.superChains = true;
-			} else if (itemData.type == ItemType.BombUpgrade)
-			{
-				this.tree.bruteStrength = true;
-				this.tree.bruteChance = itemData.value[itemData.iteration-1];
-				this.hud.addBombHUD();
-			}
+			this.parseItemFunction(itemData);
 			// Add more shop item mechanics...
 			// Or break up into more emits
 		});
@@ -606,6 +585,39 @@ export class GameScene extends BaseScene {
 		this.updateScore();
 	}
 
+	parseItemFunction(itemData:ItemData)
+	{
+		switch(itemData.type){
+			case ItemType.TreeEnergy: {
+				this.tree.addMaxEnergy(itemData.value[itemData.iteration-1]);
+				this.tree.energy = this.tree.maxEnergy;
+				break;
+			} case ItemType.RockBreak : {
+				this.tree.strength = itemData.value[itemData.iteration-1];
+				break;
+			} case ItemType.FruitUpgrade: {
+				this.tree.basevalue = itemData.value[itemData.iteration-1];
+				break;
+			} case ItemType.ChainUpgrade: {
+				this.tree.unlockChain(itemData.value[itemData.iteration-1]);
+				break;
+			} case ItemType.TreeEfficiency: {
+				this.tree.energyMitigation = itemData.value[itemData.iteration-1];
+				break;
+			} case ItemType.SuperChain: {
+				this.tree.superChains = true;
+				break;
+			} case ItemType.BombUpgrade: {
+				this.tree.bruteStrength = true;
+				this.tree.bruteChance = itemData.value[itemData.iteration-1];
+				this.hud.addBombHUD();
+				break;
+			} default: {
+				break;
+			}
+		}
+	}
+
 	getSuperChain(): number
 	{
 		let r = Math.random()*200;
@@ -669,7 +681,7 @@ export class GameScene extends BaseScene {
 				tScale = 225
 			}
 
-			if(scoremultiplier > 99) {
+			if(scoremultiplier >= 99) {
 				pColor = "red"
 				pScale = 425
 			} else if (scoremultiplier > 20) {
@@ -713,6 +725,7 @@ export class GameScene extends BaseScene {
 
 			// Create sparkle effect
 			if (collectible.type == MineralType.applecore) {
+
 				this.particles.createGreenMagic(collectible.x, collectible.y, (collectible.collisionRadius/35)*0.9, 1.0, false);
 			}
 			else if (collectible.type == MineralType.emerald || collectible.type == MineralType.ruby || collectible.type == MineralType.diamond || collectible.type == MineralType.ancient_diamond)
@@ -725,8 +738,14 @@ export class GameScene extends BaseScene {
 			}
 			else
 			{
-				this.particles.createDustExplosion(collectible.x, collectible.y, (collectible.collisionRadius/50), 1.0, false);
+				this.particles.createDustExplosion(collectible.x, collectible.y, (collectible.collisionRadius/45), 1.0, false);
 			}
+
+			if(scoremultiplier >= 99)
+			{
+				this.particles.createFire(collectible.x, collectible.y-55, 0.45, 0.6, false);	
+			}
+			
 		});
 
 		//end cherry bomb status if destroyed hard stuff
@@ -936,7 +955,9 @@ export class GameScene extends BaseScene {
 		// Add growth score
 		oldNode.addScore();
 		this.score += 1;
-		this.tree.energy -= oldNode.cost;
+		this.tree.energy -= Math.round(oldNode.cost*this.tree.energyMitigation);
+		// old stuff for refreshing energy on root growth
+		/*
 		if(this.tree.refundValue > 0)
 		{
 			if (this.tree.maxEnergy-this.tree.energy > this.tree.refundValue) {
@@ -947,6 +968,7 @@ export class GameScene extends BaseScene {
 				this.tree.energy = this.tree.maxEnergy;
 			}
 		} 
+		*/
 		this.nodes.forEach(node => {
 			if (node.cost > this.tree.energy) {
 				node.disable();
