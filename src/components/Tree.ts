@@ -52,7 +52,15 @@ export class Tree extends Button {
 	//feather
 	public limitBreak: boolean;
 	public liminalTime: number;
+	public usageCount: number;
+	public maxUsage = 1;
 
+	//mandrake
+	public canZombie: boolean;
+	public isZombie: boolean;
+	public lastValue: number;
+	public lastlastValue: number;
+	public currentValue: number;
 
 	// Feel free to edit this ts declaration, it's supposed to be a k-v pair object
 	private oneTimeEvents: Record<string, boolean>;
@@ -84,7 +92,7 @@ export class Tree extends Button {
 		
 		this.limitBreak = false;
 		this.liminalTime = 0;
-		
+		this.usageCOunt = 0
 		this.defaultChain = {
 			type: MineralType.NOTYPE,
 			class: 	ComboClass.NONE,
