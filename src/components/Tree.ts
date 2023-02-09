@@ -21,9 +21,11 @@ interface ItemChain{
 }
 
 export class Tree extends Button {
-	public treeSprite: Phaser.GameObjects.Image;
+	private treeContainer: Phaser.GameObjects.Container;
+	private treeSprite: Phaser.GameObjects.Image;
+	private fruits: Phaser.GameObjects.Image[];
 
-	public level: number;
+	private _level: number;
 	public energy: number;
 	public maxEnergy: number;
 	public harvestCount: number;
@@ -62,9 +64,6 @@ export class Tree extends Button {
 	public lastlastValue: number;
 	public currentValue: number;
 
-	// Feel free to edit this ts declaration, it's supposed to be a k-v pair object
-	private oneTimeEvents: Record<string, boolean>;
-
 
 	constructor(scene: BaseScene, x: number, y: number) {
 		super(scene, x, y);
@@ -72,7 +71,7 @@ export class Tree extends Button {
 
 
 		// Stats
-		this.level = 0;
+		this._level = -1;
 		this.maxEnergy = 100;
 		this.energy = this.maxEnergy;
 		this.harvestCount = 3;
@@ -172,11 +171,25 @@ export class Tree extends Button {
 		];
 
 
+		// Tree and fruits container
+		this.treeContainer = this.scene.add.container(0, 0);
+		this.add(this.treeContainer);
+
 		// Tree sprite
 		this.treeSprite = this.scene.add.image(0, 0, "sapling");
 		this.treeSprite.setOrigin(0.5, 1.0);
-		this.treeSprite.setScale(100 / this.treeSprite.width);
-		this.add(this.treeSprite);
+		// this.treeSprite.setScale(100 / this.treeSprite.width);
+		this.treeContainer.add(this.treeSprite);
+
+		// Fruits
+		this.fruits = [];
+		for (let i = 0; i < 3; i++) {
+			let fruit = this.scene.add.image(0, 0, "apple");
+			fruit.setScale(0.3 * this.scene.SCALE / fruit.width);
+			fruit.setVisible(false);
+			this.treeContainer.add(fruit);
+			this.fruits.push(fruit);
+		}
 
 
 		// Make the tree clickable
@@ -188,6 +201,10 @@ export class Tree extends Button {
 	update(time: number, delta: number) {
 		// Click animation, no real use, maybe harvesting
 		this.setScale(1.0 - 0.1 * this.holdSmooth);
+
+		// this.updateTreeScore(30 * (0.5+0.5*Math.sin(time/500)));
+		// this.updateTreeScore(30 + (500-30) * (0.5+0.5*Math.sin(time/500)));
+		// this.updateTreeScore(500 + (1000-500) * (0.5+0.5*Math.sin(time/500)));
 	}
 
 	unlockChain(index: number)
@@ -341,24 +358,95 @@ export class Tree extends Button {
 	reset() {
 		this.level = 0;
 		this.energy = this.maxEnergy;
-		this.harvestCount = 3;
-		this.treeSprite.setTexture("sapling");
+		this.harvestCount = 0;
 	}
 
-	setTreeScore(score: number) {
-		const treeSize = this.scene.H * (.1 + ((score > 500) ? (5 + 0.0001*score) : (.01 * score)));
-		const inputPadding = 40 * this.scene.SCALE / this.treeSprite.scaleX;
-		if (score > 80) {
-			this.level += 1;
-			this.treeSprite.setTexture("tree");
+	updateTreeScore(score: number) {
+		const level1 = 30;
+		const level2 = 500;
+
+		let minSize, maxSize, interpolant;
+
+		if (score < level1) {
+			this.level = 0;
+
+			minSize = 150;
+			maxSize = 350;
+			interpolant = Math.max(score, 1) / level1;
+		}
+
+		else if (score < level2) {
+			this.level = 1;
+
+			minSize = 300;
+			maxSize = 500;
+			interpolant = (score - level1) / (level2 - level1);
+		}
+
+		else {
+			this.level = 2;
+
+			// Softcap log function
+			const height = 100 * Math.log10((score + 1) * Math.pow(10, 2));
+			this.setTreeSize(height);
+			return;
+		}
+
+		const height = minSize + (maxSize - minSize) * interpolant;
+		this.setTreeSize(height);
+	}
+
+	setTreeSize(height: number) {
+		// Rescale sprite
+		// this.treeSprite.setScale(height * this.scene.SCALE / this.treeSprite.height);
+		this.treeContainer.setScale(height);
+	}
+
+	harvest() {
+		this.harvestCount -= 1;
+
+		let fruit = this.fruits.find(fruit => fruit.visible);
+		if (fruit) {
+			fruit.setVisible(false);
+		}
+	}
+
+
+	get level() {
+		return this._level;
+	}
+
+	set level(value: number) {
+		if (this._level != value) {
+			this._level = value;
+
+			this.fruits.forEach(fruit => fruit.setVisible(false));
+
+			if (this.level <= 0) {
+				this.treeSprite.setTexture("sapling");
+				this.harvestCount = 1;
+			}
+			else if (this.level == 1) {
+				this.treeSprite.setTexture("tree_little");
+				this.fruits[0].setVisible(true).setPosition(-0.27*this.scene.SCALE, -0.68*this.scene.SCALE);
+				this.fruits[1].setVisible(true).setPosition( 0.28*this.scene.SCALE, -0.58*this.scene.SCALE);
+				this.harvestCount = 2;
+			}
+			else if (this.level >= 2) {
+				this.treeSprite.setTexture("tree");
+				this.fruits[0].setVisible(true).setPosition(-0.27*this.scene.SCALE, -0.65*this.scene.SCALE);
+				this.fruits[1].setVisible(true).setPosition( 0.00*this.scene.SCALE, -0.84*this.scene.SCALE);
+				this.fruits[2].setVisible(true).setPosition( 0.25*this.scene.SCALE, -0.60*this.scene.SCALE);
+				this.harvestCount = 3;
+			}
+
+			// Resize tree
+			this.treeSprite.setScale(this.scene.SCALE / this.treeSprite.height);
+			// Resize and expand input area
+			const inputPadding = 0.1 * this.scene.SCALE / this.treeSprite.scaleX;
+			this.treeSprite.input.hitArea.setTo(-inputPadding, -inputPadding, this.treeSprite.width+2*inputPadding, this.treeSprite.height+2*inputPadding);
+
 			this.emit("levelUp", this.level);
 		}
-		else if (score > 20 && score <= 80) {
-			this.level += 1;
-			this.treeSprite.setTexture("tree_little");
-			this.emit("levelUp", this.level);
-		}
-		this.treeSprite.setScale(treeSize / this.treeSprite.width);
-		this.treeSprite.input.hitArea.setTo(-inputPadding, -inputPadding, this.treeSprite.width+2*inputPadding, this.treeSprite.height+2*inputPadding);
 	}
 }

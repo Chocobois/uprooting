@@ -137,7 +137,7 @@ export class GameScene extends BaseScene {
 
 		this.cameraDragArea = this.add.rectangle(this.CX, this.CY, this.W, this.H, 0xFF0000, 0.0);
 		this.cameraDragArea.setScrollFactor(0);
-		this.cameraDragArea.setInteractive({ cursor: "ns-resize", draggable: true });
+		this.cameraDragArea.setInteractive({ cursor: "pointer", draggable: true });
 		this.cameraDragArea.on('drag', this.onCameraDrag, this);
 
 		this.setCameraBounds(0, 0, this.W, this.H);
@@ -340,8 +340,6 @@ export class GameScene extends BaseScene {
 		// Events
 
 		this.oneTimeEvents = {
-			growthStage1Sound: false,
-			growthStage2Sound: false,
 			wrongPlacementSound: false,
 			outOfEnergy: false,
 			spawnShop: false,
@@ -536,8 +534,6 @@ export class GameScene extends BaseScene {
 	onHarvestComplete() {
 		this.state = GameState.GrowingRoots;
 		this.oneTimeEvents.outOfEnergy = false;
-		this.oneTimeEvents.growthStage1Sound = false;
-		this.oneTimeEvents.growthStage2Sound = false;
 
 		if (!this.oneTimeEvents.spawnShop) {
 			this.oneTimeEvents.spawnShop = true;
@@ -1053,17 +1049,11 @@ export class GameScene extends BaseScene {
 
 	onTreeLevelUp(level: number) {
 		if (level == 1) {
-			if (!this.oneTimeEvents.growthStage1Sound) {
-				this.oneTimeEvents.growthStage1Sound = true;
-				this.sound.play("r_grow", { volume: 0.3, rate: 1.25 });
-			}
+			this.sound.play("r_grow", { volume: 0.3, rate: 1.25 });
 		}
 
 		if (level == 2) {
-			if (!this.oneTimeEvents.growthStage2Sound) {
-				this.oneTimeEvents.growthStage2Sound = true;
-				this.sound.play("r_grow", { volume: 0.4, rate: 1.00 });
-			}
+			this.sound.play("r_grow", { volume: 0.4, rate: 1.00 });
 		}
 	}
 
@@ -1072,7 +1062,7 @@ export class GameScene extends BaseScene {
 			this.moveSmoothCamera(-this.cameraSmoothY);
 
 			this.tree.clearActiveChains();
-			this.tree.harvestCount -= 1;
+			this.tree.harvest();
 			this.money += this.totalScore + ((this.totalScore > this.tree.basevalue) ? this.tree.basevalue : (this.tree.basevalue*this.totalScore/this.tree.basevalue));
 
 			this.particles.createGreenMagic(this.tree.x, this.tree.y - 150*this.SCALE, 3*this.SCALE, 1.0, false);
@@ -1080,7 +1070,7 @@ export class GameScene extends BaseScene {
 			if (this.tree.harvestCount <= 0) {
 				this.particles.createExplosion(this.tree.x, this.tree.y - 100*this.SCALE, 2*this.SCALE, 1.0, false);
 				this.sound.play("t_chop_plant", {rate: 1 + 0.1 * Math.random()});
-				if (this.tree.treeSprite.texture.key != "sapling") {
+				if (this.tree.level > 0) {
 					this.sound.play("t_branch_snap", {rate: 1 + 0.1 * Math.random()});
 				}
 				this.onHarvestComplete();
@@ -1092,7 +1082,7 @@ export class GameScene extends BaseScene {
 
 	updateScore() {
 		// Pass score to tree
-		this.tree.setTreeScore(this.totalScore);
+		this.tree.updateTreeScore(this.totalScore);
 	}
 
 
@@ -1144,7 +1134,7 @@ export class GameScene extends BaseScene {
 
 
 	get SURFACE_Y() {
-		return 0.8 * this.H;
+		return 0.9 * this.H;
 	}
 
 	get BEDROCK_Y() {
