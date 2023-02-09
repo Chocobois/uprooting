@@ -30,8 +30,8 @@ export class SurfaceButton extends Button {
 		this.add(this.text);
 
 		this.bindInteractive(this.image, true);
-		const inputPadding = 40 * this.scene.SCALE / this.image.scaleX;
-		this.image.input.hitArea.setTo(-inputPadding, -inputPadding, this.image.width+2*inputPadding, this.image.height+2*inputPadding);
+		// const inputPadding = 40 * this.scene.SCALE / this.image.scaleX;
+		// this.image.input.hitArea.setTo(-inputPadding, -inputPadding, this.image.width+2*inputPadding, this.image.height+2*inputPadding);
 
 		this.hide();
 	}
