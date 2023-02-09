@@ -174,7 +174,7 @@ export class GameScene extends BaseScene {
 				this.state = GameState.InsideShop;
 				this.musicState = MusicState.Shop;
 				this.hud.hideScore();
-				this.hud.hideEnergy();
+				// this.hud.hideEnergy();
 				this.musicNormal.stop();
 				this.musicDrawing.stop();
 				this.musicJingle.stop();
@@ -183,8 +183,8 @@ export class GameScene extends BaseScene {
 		});
 		this.shop.on("close", () => {
 			this.state = GameState.GrowingRoots;
-			this.hud.unhideScore();
-			this.hud.unhideEnergy();
+			this.hud.showScore();
+			// this.hud.showEnergy();
 			this.musicShop.stop();
 			this.sound.play("m_shop", {
 				name: "shopEnding",
@@ -535,22 +535,25 @@ export class GameScene extends BaseScene {
 		this.state = GameState.GrowingRoots;
 		this.oneTimeEvents.outOfEnergy = false;
 
-		if (!this.oneTimeEvents.spawnShop) {
-			this.oneTimeEvents.spawnShop = true;
-			this.shop.activateOverworldShop();
-			this.musicState = MusicState.Jingle;
-			// this.musicNormal.stop();
-			// this.musicDrawing.stop();
-			this.musicJingle.play();
-			setTimeout(() => {
-				this.musicNormal = new Music(this, 'm_first', { volume: this.musicMuted ? 0 : this.musicVolume });
-				this.musicDrawing = new Music(this, 'm_first_draw', { volume: 0 });
-				if (this.musicState == MusicState.Jingle) {
-					this.musicState = MusicState.NormalLoop;
-					this.musicNormal.play();
-					this.musicDrawing.play();
-				}
-			}, this.musicJingle.duration * 1000);
+		// Set to whatever the lowest priced item is
+		if (this.money >= 150) {
+			if (!this.oneTimeEvents.spawnShop) {
+				this.oneTimeEvents.spawnShop = true;
+				this.shop.activateOverworldShop();
+				this.musicState = MusicState.Jingle;
+				// this.musicNormal.stop();
+				// this.musicDrawing.stop();
+				this.musicJingle.play();
+				setTimeout(() => {
+					this.musicNormal = new Music(this, 'm_first', { volume: this.musicMuted ? 0 : this.musicVolume });
+					this.musicDrawing = new Music(this, 'm_first_draw', { volume: 0 });
+					if (this.musicState == MusicState.Jingle) {
+						this.musicState = MusicState.NormalLoop;
+						this.musicNormal.play();
+						this.musicDrawing.play();
+					}
+				}, this.musicJingle.duration * 1000);
+			}
 		}
 
 		// Add current score to growth
@@ -606,7 +609,7 @@ export class GameScene extends BaseScene {
 			} case ItemType.BombUpgrade: {
 				this.tree.bruteStrength = true;
 				this.tree.bruteChance = itemData.value[itemData.iteration-1];
-				this.hud.addBombHUD();
+				this.hud.showBombs();
 				break;
 			} default: {
 				break;

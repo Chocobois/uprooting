@@ -18,21 +18,26 @@ export function interpolateColor(color1: number, color2: number, value: number):
 export class HUD extends Phaser.GameObjects.Container {
 	public scene: BaseScene;
 
+	private moneyContainer: Phaser.GameObjects.Container;
 	private moneyBorder: RoundRectangle;
 	private moneyBack: RoundRectangle;
 	private moneyIcon: Phaser.GameObjects.Image;
 	private moneyText: Phaser.GameObjects.Text;
+
+	private bombContainer: Phaser.GameObjects.Container;
 	private bombIcon: Phaser.GameObjects.Image;
 	private bombBack: RoundRectangle;
 	private bombBorder: RoundRectangle;
 	private bombText: Phaser.GameObjects.Text;
 
+	private energyContainer: Phaser.GameObjects.Container;
 	private energyBorder: RoundRectangle;
 	private energyBack: RoundRectangle;
 	private energyMeter: RoundRectangle;
 	private energyIcon: Phaser.GameObjects.Image;
 	private energyText: Phaser.GameObjects.Text;
 
+	private scoreContainer: Phaser.GameObjects.Container;
 	private scoreBorder: RoundRectangle;
 	private scoreBack: RoundRectangle;
 	private scoreIcon: Phaser.GameObjects.Image;
@@ -52,37 +57,63 @@ export class HUD extends Phaser.GameObjects.Container {
 		const y = this.scene.H - 0.75 * h;
 		const rad = h / 2;
 		const iconSize = 1.4*h;
-		const textSize = 0.7*h;
+		const textSize = 0.8*h;
 
 		// Inner
 		const pad = 0.2 * h;
 		const ih = h - pad;
 		const irad = ih / 2;
 
+
+		// Money
+
 		const mw = 0.12 * this.scene.W;
 		const mx = mw/2 + 3*pad;
 		const imw = mw - pad;
 		const ml = mx - mw/2 + pad;
 
+		this.moneyContainer = this.scene.add.container();
+		this.add(this.moneyContainer);
+
 		this.moneyBorder = new RoundRectangle(this.scene, mx, y, mw, h, rad, 0xefebe9);
-		this.add(this.moneyBorder);
+		this.moneyContainer.add(this.moneyBorder);
+
 		this.moneyBack = new RoundRectangle(this.scene, mx, y, imw, ih, irad, 0xCBAE82);
-		this.add(this.moneyBack);
+		this.moneyContainer.add(this.moneyBack);
+
 		this.moneyIcon = this.scene.add.image(ml, y, "coin");
 		this.moneyIcon.setScale(iconSize / this.moneyIcon.height);
-		this.add(this.moneyIcon);
+		this.moneyContainer.add(this.moneyIcon);
+
 		this.moneyText = this.scene.createText(ml+0.6*iconSize, y, textSize, "#000", "1,234");
-		this.moneyText.setOrigin(0.0, 0.57);
-		this.add(this.moneyText);
+		this.moneyText.setOrigin(0.0, 0.5);
+		this.moneyContainer.add(this.moneyText);
 
-		//invis by default
-		this.bombBorder = new RoundRectangle(this.scene, mx, (y-26), mw, h, rad, 0x373D83);
-		this.bombBack = new RoundRectangle(this.scene, mx, (y-25.5), imw, ih, irad, 0xBB96A6);
-		this.bombIcon = this.scene.add.image(ml, (y-28.5), "cherrybomb");
+
+		// Bombs
+
+		const by = y - h - 2*pad;
+
+		this.bombContainer = this.scene.add.container();
+		this.bombContainer.setVisible(false);
+		this.add(this.bombContainer);
+
+		this.bombBorder = new RoundRectangle(this.scene, mx, by, mw, h, rad, 0x373D83);
+		this.bombContainer.add(this.bombBorder);
+
+		this.bombBack = new RoundRectangle(this.scene, mx, by, imw, ih, irad, 0xBB96A6);
+		this.bombContainer.add(this.bombBack);
+
+		this.bombIcon = this.scene.add.image(ml, by, "cherrybomb");
 		this.bombIcon.setScale(iconSize / this.bombIcon.height);
-		this.bombText = this.scene.createText(ml+0.4*iconSize, (y-25.5), (textSize), "#FFFFFF", "1,234");
-		this.bombText.setOrigin(0.0, 0.57);
+		this.bombContainer.add(this.bombIcon);
 
+		this.bombText = this.scene.createText(ml+0.6*iconSize, by, textSize, "#FFFFFF", "1,234");
+		this.bombText.setOrigin(0.0, 0.5);
+		this.bombContainer.add(this.bombText);
+
+
+		// Energy
 
 		const ew = 0.2 * this.scene.W;
 		// const ex = mx + mw/2 + ew/2 + 5*pad;
@@ -90,80 +121,56 @@ export class HUD extends Phaser.GameObjects.Container {
 		const iew = ew - pad;
 		const el = ex - ew/2 + pad;
 
-		this.scoreBorder = new RoundRectangle(this.scene, ex, (y-26), ew, h, rad, 0xCFA2E8);
-		this.add(this.scoreBorder);
-		this.scoreBack = new RoundRectangle(this.scene, ex, (y-25.5), iew, ih, irad, 0x743083);
-		this.add(this.scoreBack);
-		this.scoreIcon = this.scene.add.image(el, (y-25.5), "tree");
-		this.scoreIcon.setScale(iconSize / this.scoreIcon.height);
-		this.add(this.scoreIcon);
-		this.scoreText = this.scene.createText(ex, (y-24.5), textSize/1.2, "#FFFFFF", "Score: ");
-		this.scoreText.setOrigin(0.5, 0.57);
-		this.add(this.scoreText);
-
+		this.energyContainer = this.scene.add.container();
+		this.add(this.energyContainer);
 
 		this.energyBorder = new RoundRectangle(this.scene, ex, y, ew, h, rad, 0xefebe9);
-		this.add(this.energyBorder);
+		this.energyContainer.add(this.energyBorder);
 
 		this.energyBack = new RoundRectangle(this.scene, ex, y, iew, ih, irad, 0x666666);
-		this.add(this.energyBack);
+		this.energyContainer.add(this.energyBack);
 
 		this.energyMeter = new RoundRectangle(this.scene, ex, y, iew, ih, irad, 0xFFFFFF);
 		this.energyMeter.setOrigin(0, 0.5);
 		this.energyMeter.x = this.energyBack.x - this.energyBack.width/2;
-		this.add(this.energyMeter);
+		this.energyContainer.add(this.energyMeter);
 
 		this.energyIcon = this.scene.add.image(el, y, "energy");
 		this.energyIcon.setScale(iconSize / this.energyIcon.height);
-		this.add(this.energyIcon);
+		this.energyContainer.add(this.energyIcon);
 
 		this.energyText = this.scene.createText(ex, y, textSize, "#000", "50/100");
-		this.energyText.setOrigin(0.5, 0.57);
-		this.add(this.energyText);
+		this.energyText.setOrigin(0.5, 0.5);
+		this.energyContainer.add(this.energyText);
 
+
+		// Score
+
+		const sy = y - h - 2*pad;
+
+		this.scoreContainer = this.scene.add.container();
+		this.add(this.scoreContainer);
+
+		this.scoreBorder = new RoundRectangle(this.scene, ex, sy, ew, h, rad, 0xCFA2E8);
+		this.scoreContainer.add(this.scoreBorder);
+
+		this.scoreBack = new RoundRectangle(this.scene, ex, sy, iew, ih, irad, 0x743083);
+		this.scoreContainer.add(this.scoreBack);
+
+		this.scoreIcon = this.scene.add.image(el, sy, "tree");
+		this.scoreIcon.setScale(iconSize / this.scoreIcon.height);
+		this.scoreContainer.add(this.scoreIcon);
+
+		this.scoreText = this.scene.createText(ex, sy, textSize/1.2, "#FFFFFF", "Score: ");
+		this.scoreText.setOrigin(0.5, 0.5);
+		this.scoreContainer.add(this.scoreText);
 	}
 
-	addBombHUD()
-	{
-		this.add(this.bombBorder);
-		this.add(this.bombBack);
-		this.add(this.bombIcon);
-		this.add(this.bombText);
-	}
-
-	hideScore()
-	{
-		this.scoreBorder.setAlpha(0);
-		this.scoreBack.setAlpha(0);
-		this.scoreIcon.setAlpha(0);
-		this.scoreText.setAlpha(0);
-	}
-
-	unhideScore()
-	{
-		this.scoreBorder.setAlpha(1);
-		this.scoreBack.setAlpha(1);
-		this.scoreIcon.setAlpha(1);
-		this.scoreText.setAlpha(1);
-	}
-
-	hideEnergy()
-	{
-		this.energyBorder.setAlpha(0);
-		this.energyBack.setAlpha(0);
-		this.energyMeter.setAlpha(0);
-		this.energyIcon.setAlpha(0);
-		this.energyText.setAlpha(0);
-	}
-
-	unhideEnergy()
-	{
-		this.energyBorder.setAlpha(1);
-		this.energyBack.setAlpha(1);
-		this.energyMeter.setAlpha(1);
-		this.energyIcon.setAlpha(1);
-		this.energyText.setAlpha(1);
-	}
+	showBombs() { this.bombContainer.setVisible(true); }
+	hideScore() { this.scoreContainer.setVisible(false); }
+	showScore() { this.scoreContainer.setVisible(true); }
+	hideEnergy() { this.energyContainer.setVisible(false); }
+	showEnergy() { this.energyContainer.setVisible(true); }
 
 
 	update(time: number, delta: number, money: number, energy: number, maxEnergy: number, score: number = 0, bombs: number=0, persistence: number=0) {
@@ -171,7 +178,7 @@ export class HUD extends Phaser.GameObjects.Container {
 		this.moneyText.setText(`${money}`);
 		this.energyText.setText(`${energy}/${maxEnergy}`);
 		this.scoreText.setText(`+ ${score}`);
-		this.bombText.setText(` x${bombs}`)
+		this.bombText.setText(`x${bombs}`)
 
 		let bmc = 0x373D83;
 		if (persistence > 0)
