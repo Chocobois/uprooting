@@ -310,14 +310,14 @@ export class Shop extends Phaser.GameObjects.Container {
 		// this.selectedItemImage.setScale(.1*H / this.selectedItemImage.height);
 		// this.add(this.selectedItemImage);
 
-		this.selectedItemTitle = this.scene.createText(sx, sy, 45*this.scene.SCALE, "#000", "Something");
-		this.selectedItemTitle.setOrigin(0, 1.05);
+		this.selectedItemTitle = this.scene.createText(sx, sy, 62*this.scene.SCALE, "#000", "Something");
+		this.selectedItemTitle.setOrigin(0, 1.08);
 		this.add(this.selectedItemTitle);
 
-		this.selectedItemDescription = this.scene.createText(sx, sy, 37*this.scene.SCALE, "#000", "Culpa ut quis ullamco nisi aliqua id est occaecat proident aliqua in.");
-		this.selectedItemDescription.setWordWrapWidth(3.5*W);
+		this.selectedItemDescription = this.scene.createText(sx, sy, 52*this.scene.SCALE, "#000", "Culpa ut quis ullamco nisi aliqua id est occaecat proident aliqua in.");
+		this.selectedItemDescription.setWordWrapWidth(3.6*W);
 		this.selectedItemDescription.setLineSpacing(0);
-		this.selectedItemDescription.setOrigin(0, -0.05);
+		this.selectedItemDescription.setOrigin(0, -0.08);
 		this.add(this.selectedItemDescription);
 
 
@@ -343,7 +343,7 @@ export class Shop extends Phaser.GameObjects.Container {
 		this.selectedItem = null;
 
 		const itemLeft = 160 * this.scene.SCALE;
-		const itemTop = 200 * this.scene.SCALE;
+		const itemTop = 195 * this.scene.SCALE;
 		const itemWidth = 320 * this.scene.SCALE;
 		const itemHeight = 306 * this.scene.SCALE;
 		const itemSize = 280 * this.scene.SCALE;
@@ -385,7 +385,7 @@ export class Shop extends Phaser.GameObjects.Container {
 		);
 
 		this.items.forEach(item => {
-			item.update(time, delta, item.itemData == this.selectedItem);
+			item.update(time, delta, item.itemData == this.selectedItem, this.scene.money);
 		});
 	}
 
@@ -408,7 +408,7 @@ export class Shop extends Phaser.GameObjects.Container {
 		});
 	}
 
-	addToShopQUeue(index: number, value: ItemData = SOLD_OUT_ITEM): boolean
+	addToShopQueue(index: number, value: ItemData = SOLD_OUT_ITEM): boolean
 	{
 		//may add an option to just put in an ItemData later but dead code for now
 		let myItem = value;
@@ -434,7 +434,7 @@ export class Shop extends Phaser.GameObjects.Container {
 		}
 		if(this.overwriteOldItem(this.restrictedItems[index])) {
 			return true;
-		} else if (this.addToShopQUeue(index)) {
+		} else if (this.addToShopQueue(index)) {
 			return true;
 		} else {
 			return false;
@@ -486,26 +486,30 @@ export class Shop extends Phaser.GameObjects.Container {
 		if (itemData) {
 			const cost = itemData.price[itemData.iteration-1];
 
-			if (this.scene.money >= cost) {
+			// if (this.scene.money >= cost) {
 				// this.selectedItemImage.setTexture("apple");
 				this.selectedItemTitle.setText(itemData.title[itemData.iteration-1]);
 				this.selectedItemDescription.setText(itemData.description[itemData.iteration-1]);
 				
 				if (cost > 0) {
-					this.selectedItemDescription.setText(`${itemData.description[itemData.iteration-1]}\nOnly ${cost} gold!`);
-					this.buyButton.enabled = true;
-					this.buyButton.setAlpha(1.0);
-					this.buyImage.input.cursor = "pointer"
+					// If tag labels work correctly, this won't be needed
+					// this.selectedItemDescription.setText(`${itemData.description[itemData.iteration-1]}\nOnly ${cost} gold!`);
 					this.ownerImage.setFrame(1);
+
+					if (this.scene.money >= cost) {
+						this.buyButton.enabled = true;
+						this.buyButton.setAlpha(1.0);
+						this.buyImage.input.cursor = "pointer"
+					}
 				}
-			}
-			else {
-				this.selectedItemTitle.setText("Shop owner");
-				this.selectedItemDescription.setText(
-					`You can't afford that!\nThe ${itemData.title[itemData.iteration-1].toLocaleLowerCase()}\nis ${cost} gold.`
-				);
+			// }
+			// else {
+				// this.selectedItemTitle.setText("Shop owner");
+				// this.selectedItemDescription.setText(
+					// `You can't afford that!\nThe ${itemData.title[itemData.iteration-1].toLocaleLowerCase()}\nis ${cost} gold.`
+				// );
 				// this.scene.sound.play("s_nofunds");
-			}
+			// }
 		}
 		else {
 			if (justPurchased) {
