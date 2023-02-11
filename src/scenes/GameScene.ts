@@ -706,13 +706,13 @@ export class GameScene extends BaseScene {
 					treefund=this.tree.maxEnergy-this.tree.energy;
 					this.tree.energy=this.tree.maxEnergy;
 				}
-				this.textParticle(collectible.x-35, collectible.y+5, "Green", `+${treefund} Energy!`, undefined, (pScale-25) * this.SCALE);
+				this.textParticle(collectible.x-35, collectible.y+5, "Green", `+${treefund} Energy!`, undefined, (pScale-25)/4 * this.SCALE);
 			}
 			this.textParticle(collectible.x, collectible.y-10, color, `${collectible.properName} +${tPoints}!`, true,
-			tScale*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
+			tScale/4*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
 			if(scoremultiplier > 1) {
 				this.textParticle(collectible.x, collectible.y+20, pColor, `Combo x${this.prettifyNumber(scoremultiplier)}!!!`, true,
-				pScale*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
+				pScale/4*this.SCALE, 2, this.textParticles.DEAFULT_EFFECTS_HALF);
 			}
 
 			if (this.currentNode && collectible.points) {
@@ -768,12 +768,12 @@ export class GameScene extends BaseScene {
 	textParticle(x: number, y: number, color: string, content: string, outline: boolean=true, size: number=40,
 		duration: number=1.5, effects: TextParticleEffects={ wave: {enable: true}, fadeOut: {enable: true} }) {
 
-		const text = this.createText(x, y, size*this.SCALE, color, content);
-		if(outline) text.setStroke("rgba(0,0,0,0.5)", 30);
+		const text = this.createText(x, y, size, color, content);
+		if(outline) text.setStroke("rgba(0,0,0,0.5)", 120*this.SCALE);
 
 		// Prevent text from going too far right
 		const right = text.getRightCenter().x;
-		const diff = this.W - right - 20;
+		const diff = this.W - right - 80 * this.SCALE;
 		if(diff < 0) text.setX(text.x+diff);
 
 		this.textParticles.push(text, duration, effects);
@@ -861,7 +861,7 @@ export class GameScene extends BaseScene {
 				this.sound.play("r_place_error", { volume: 0.25 });
 
 				this.textParticle(pointer.x, pointer.y-10, "OrangeRed", invalidReason,
-					undefined, 200 * this.SCALE, 3, this.textParticles.DEAFULT_EFFECTS_HALF);
+					undefined, 50 * this.SCALE, 3, this.textParticles.DEAFULT_EFFECTS_HALF);
 
 			} else if (!limitReached) {
 				this.oneTimeEvents.wrongPlacementSound = false;
@@ -978,7 +978,7 @@ export class GameScene extends BaseScene {
 
 		this.sound.play("r_place", { volume: 0.3, rate: 1 + Math.random() * 0.1 });
 
-		this.textParticle(newNode.x+5, newNode.y-5, "Yellow", `-${oldNode.cost}`, undefined, 150 * this.SCALE);
+		this.textParticle(newNode.x+5, newNode.y-5, "Yellow", `-${oldNode.cost}`, undefined, 40 * this.SCALE);
 		this.currentNode = newNode;
 
 		this.updateScore();

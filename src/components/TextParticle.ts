@@ -41,9 +41,9 @@ export class TextParticle extends Phaser.GameObjects.Container {
 		scene.add.existing(this);
 
         this.textParticles = [];
-        this.DEFAULT_MOVE_SPEED = this.scene.SCALE * 4;
-        this.DEFAULT_WAVE_SPEED = this.scene.SCALE * 20;
-        this.DEFAULT_WAVE_AMPLITUDE = this.scene.SCALE * 6;
+        this.DEFAULT_MOVE_SPEED = 1;
+        this.DEFAULT_WAVE_SPEED = 5;
+        this.DEFAULT_WAVE_AMPLITUDE = 2/3;
 
         this.DEAFULT_EFFECTS = {
             fadeOut: {enable: true},
