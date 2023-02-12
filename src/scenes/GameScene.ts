@@ -569,7 +569,7 @@ export class GameScene extends BaseScene {
 		this.nodes = [];
 
 		this.setDeepestNode(0);
-		this.undergroundEdge.y = this.cameraBounds.height + 1.5 * this.H;
+		this.undergroundEdge.y = 1.5 * this.H;
 
 		this.dragGraphics.clear();
 		this.rootsBackGraphics.clear();
@@ -991,7 +991,7 @@ export class GameScene extends BaseScene {
 		this.rootsFrontGraphics.clear();
 
 		if (this.firstNode) {
-			const thickness = 50 * this.SCALE;
+			const thickness = (this.firstNode.size+2) * this.SCALE;
 			const border = 16 * this.SCALE;
 			this.rootsBackGraphics.fillStyle(0x3e2723, 1.0);
 			this.rootsBackGraphics.fillCircle(Math.round(this.firstNode.x), Math.round(this.firstNode.y), (thickness + border)/2);
@@ -1019,6 +1019,7 @@ export class GameScene extends BaseScene {
 			let minSize = 3;
 			let thickness = 30 * Math.log10(0.2 * node.score + Math.exp(1/minSize));
 			thickness *= this.SCALE;
+			let circleRadius = Math.max(thickness, node.size * this.SCALE);
 			// const thickness = (3 + 4 * Math.sqrt(node.score)) * this.SCALE;
 
 
@@ -1033,7 +1034,7 @@ export class GameScene extends BaseScene {
 			this.rootsBackGraphics.strokePath();
 
 			this.rootsBackGraphics.fillStyle(0x3e2723, 1.0);
-			this.rootsBackGraphics.fillCircle(node.x, node.y, (thickness + border)/2);
+			this.rootsBackGraphics.fillCircle(node.x, node.y, (circleRadius + border)/2);
 
 			this.rootsFrontGraphics.lineStyle(thickness, 0x795548, 1.0);
 			this.rootsFrontGraphics.beginPath();
@@ -1043,7 +1044,7 @@ export class GameScene extends BaseScene {
 			this.rootsFrontGraphics.strokePath();
 
 			this.rootsFrontGraphics.fillStyle(0x795548, 1.0);
-			this.rootsFrontGraphics.fillCircle(node.x, node.y, thickness/2);
+			this.rootsFrontGraphics.fillCircle(node.x, node.y, circleRadius/2);
 		}
 
 
@@ -1061,7 +1062,7 @@ export class GameScene extends BaseScene {
 	}
 
 	onTreeClick() {
-		if (this.state == GameState.HarvestingTree || (this.state == GameState.GrowingRoots && this.totalScore > 10)) {
+		if (this.state == GameState.HarvestingTree || (this.state == GameState.GrowingRoots && this.score > 10)) {
 			this.moveSmoothCamera(-this.cameraSmoothY);
 
 			this.tree.clearActiveChains();
@@ -1085,7 +1086,7 @@ export class GameScene extends BaseScene {
 
 	updateScore() {
 		// Pass score to tree
-		this.tree.updateTreeScore(this.totalScore);
+		this.tree.updateTreeScore(this.score);
 	}
 
 
@@ -1136,16 +1137,31 @@ export class GameScene extends BaseScene {
 	}
 
 
+	get TREE_X() {
+		return 0.495 * this.W;
+	}
+
 	get SURFACE_Y() {
-		return 0.9 * this.H;
+		return 0.75 * this.H;
+	}
+
+	get BELOW_SURFACE_Y() {
+		return 0.85 * this.H;
 	}
 
 	get BEDROCK_Y() {
 		return 10000; // Fix
 	}
 
-	get totalScore() {
-		// return this.nodes.length > 0 ? this.nodes[0].score : 0;
-		return this.score;
+	get state(): GameState {
+		return this._state;
+	}
+
+	set state(value: GameState) {
+		this._state = value;
+
+		this.updateCameraBounds();
+
+		this.shop.checkIfAnyItemsAreAfforable(this.money);
 	}
 }

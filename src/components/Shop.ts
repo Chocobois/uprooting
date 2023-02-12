@@ -60,6 +60,7 @@ export class Shop extends Phaser.GameObjects.Container {
 	// Overworld
 	private overworldShop: Button;
 	private overworldShopScale: number;
+	private overworldShopHighlight: boolean;
 
 	// Overlay popup
 	private background: Phaser.GameObjects.Image;
@@ -235,6 +236,7 @@ export class Shop extends Phaser.GameObjects.Container {
 
 		// House
 		this.overworldShopScale = 0;
+		this.overworldShopHighlight = false;
 		this.overworldShop = new Button(this.scene, x, y);
 		let house = this.scene.add.image(0, 0, "overworld_shop");
 		house.setScrollFactor(0.9);
@@ -373,9 +375,16 @@ export class Shop extends Phaser.GameObjects.Container {
 	}
 
 	update(time: number, delta: number) {
-		this.overworldShop.setScale(this.overworldShopScale - 0.1 * this.overworldShop.holdSmooth);
 		this.exitButton.setScale(1.0 - 0.1 * this.exitButton.holdSmooth);
 		this.buyButton.setScale(1.0 - 0.1 * this.buyButton.holdSmooth * (this.buyButton.enabled ? 1 : 0));
+
+		const shopHoldX = 1.0 + 0.3 * this.overworldShop.holdSmooth;
+		const shopHoldY = 1.0 - 0.2 * this.overworldShop.holdSmooth;
+		const shopSquish = this.overworldShopHighlight ? 0.03 : 0.0;
+		this.overworldShop.setScale(
+			(1.0 + shopSquish * Math.sin(time/150)) * shopHoldX,
+			(1.0 + shopSquish * Math.sin(-time/150)) * shopHoldY
+		);
 
 		const jbunHoldX = 1.0 + 0.3 * this.ownerButton.holdSmooth;
 		const jbunHoldY = 1.0 - 0.2 * this.ownerButton.holdSmooth;
@@ -574,6 +583,15 @@ export class Shop extends Phaser.GameObjects.Container {
 			duration: 700,
 			delay: 500
 		});
+	}
+
+	checkIfAnyItemsAreAfforable(money: number) {
+		let anyItemsAffordable = this.items.some(item => {
+			let price = item.getPrice();
+			return price > 0 && money >= price;
+		});
+
+		this.overworldShopHighlight = anyItemsAffordable;
 	}
 
 
