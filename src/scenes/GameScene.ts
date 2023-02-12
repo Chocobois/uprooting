@@ -16,12 +16,14 @@ import { HUD } from "../components/HUD";
 
 enum GameState {
 	None = "None",
+
+	Overworld = "Overworld",
 	GrowingRoots = "Growing roots",
-	ReturningToSurfaceCutscene = "Returning to surface cutscene",
 	HarvestingTree = "Harvesting tree",
-	HarvestCompleteCutscene = "Harvest complete cutscene",
-	SomeOtherCutsceneIdk = "Some other cutscene idk",
 	InsideShop = "Inside shop",
+
+	CutsceneToSurface = "Cutscene to surface",
+	CutsceneToUnderground = "Cutscene to underground",
 }
 
 enum MusicState {
@@ -54,7 +56,7 @@ const MUSIC_VOLUME = 0.4;
 
 export class GameScene extends BaseScene {
 	// Gameplay state, see enum above
-	private state: GameState;
+	private _state: GameState;
 
 	private overworld: Phaser.GameObjects.Image;
 	private overworldBush: Phaser.GameObjects.Image;
@@ -66,6 +68,7 @@ export class GameScene extends BaseScene {
 	// Tree
 	public tree: Tree;
 	private firstNode: Node | null;
+	private secondNode: Node | null;
 	private currentNode: Node | null;
 	private nodes: Node[];
 	private deepestNodeY: number;
@@ -86,7 +89,7 @@ export class GameScene extends BaseScene {
 	public score: number;
 
 	// UI
-	private returnToSurfaceButton: SurfaceButton;
+	private surfaceButton: SurfaceButton;
 	private limitBreakButton: MiniButton;
 	private harvestButton: HarvestButton;
 	private musicButton: MiniButton;
@@ -130,8 +133,6 @@ export class GameScene extends BaseScene {
 		this.cameras.main.setBackgroundColor(0);
 		this.fade(false, 200, 0x000000);
 
-		this.state = GameState.GrowingRoots;
-
 
 		// Camera management
 
@@ -140,21 +141,21 @@ export class GameScene extends BaseScene {
 		this.cameraDragArea.setInteractive({ cursor: "pointer", draggable: true });
 		this.cameraDragArea.on('drag', this.onCameraDrag, this);
 
-		this.setCameraBounds(0, 0, this.W, this.H);
 		this.cameraSmoothY = 0;
 
 
 		// Background
 
-		this.overworld = this.add.image(this.CX, this.SURFACE_Y + 10*this.SCALE, "overworld");
-		this.overworld.setOrigin(0.5, 1.0);
-		this.overworld.setScrollFactor(0.3);
+		this.overworld = this.add.image(this.CX, 0, "overworld");
+		this.overworld.setOrigin(0.5, 0.0);
+		this.overworld.setScrollFactor(0.1);
 		this.fitToScreen(this.overworld);
 
-		this.overworldBush = this.add.image(this.CX, this.SURFACE_Y + 10*this.SCALE, "overworld_bush");
-		this.overworldBush.setOrigin(0.5, 1.0);
-		this.overworldBush.setScrollFactor(0.8);
-		this.fitToScreen(this.overworldBush);
+		this.overworldBush = this.add.image(this.CX, this.SURFACE_Y - 50*this.SCALE, "overworld_bush");
+		this.overworldBush.setOrigin(0.5);
+		this.overworldBush.setAlpha(0.8);
+		this.overworldBush.setScrollFactor(0.5);
+		this.containToScreen(this.overworldBush);
 
 		// this.fitToScreen(this.background);
 
@@ -166,15 +167,18 @@ export class GameScene extends BaseScene {
 
 		this.shop = new Shop(this, 0.2 * this.W, this.SURFACE_Y+192*this.SCALE);
 		this.shop.on("open", () => {
-			this.cameras.main.scrollY = 0;
-			this.cameraSmoothY = 0;
+			// Only allow shop to be opened during overworld scene
+			if (this.state == GameState.Overworld) {
+				// Ensure camera is at 0, since shop is an overlay
+				this.cameras.main.scrollY = 0;
+				this.cameraSmoothY = 0;
 
-			if (this.state == GameState.GrowingRoots) {
 				this.shop.open();
 				this.state = GameState.InsideShop;
-				this.musicState = MusicState.Shop;
 				this.hud.hideScore();
 				// this.hud.hideEnergy();
+
+				this.musicState = MusicState.Shop;
 				this.musicNormal.stop();
 				this.musicDrawing.stop();
 				this.musicJingle.stop();
@@ -182,9 +186,10 @@ export class GameScene extends BaseScene {
 			}
 		});
 		this.shop.on("close", () => {
-			this.state = GameState.GrowingRoots;
+			this.state = GameState.Overworld;
 			this.hud.showScore();
 			// this.hud.showEnergy();
+
 			this.musicShop.stop();
 			this.sound.play("m_shop", {
 				name: "shopEnding",
@@ -228,13 +233,13 @@ export class GameScene extends BaseScene {
 
 
 		// The underground mineral spawner
-		this.underground = new Underground(this, this.SURFACE_Y, this.BEDROCK_Y);
+		this.underground = new Underground(this, this.SURFACE_Y, this.BELOW_SURFACE_Y, this.BEDROCK_Y);
 		this.undergroundEdge.setDepth(this.underground.depth + 1)
 
 
 		// Tree
 
-		this.tree = new Tree(this, this.CX, this.SURFACE_Y);
+		this.tree = new Tree(this, this.TREE_X, this.SURFACE_Y);
 		this.tree.on("levelUp", this.onTreeLevelUp, this);
 		this.tree.on("click", this.onTreeClick, this);
 
@@ -255,8 +260,7 @@ export class GameScene extends BaseScene {
 		this.currentNode = null;
 		this.deepestNodeY = 0;
 		this.nodes = [];
-		this.firstNode = this.addNode(this.CX, this.SURFACE_Y + 10*this.SCALE, true);
-		this.dragPos = new Phaser.Math.Vector2(this.nodes[0].x, this.nodes[0].y);
+
 
 		// Particles
 
@@ -266,8 +270,17 @@ export class GameScene extends BaseScene {
 
 		// UI
 
-		this.returnToSurfaceButton = new SurfaceButton(this, this.CX, .1 * this.H);
-		this.returnToSurfaceButton.on("click", this.returnToSurface, this);
+		this.surfaceButton = new SurfaceButton(this);
+		this.surfaceButton.on("click", () => {
+			if (this.state == GameState.GrowingRoots) {
+				this.startCutsceneToSurface();
+			}
+			else if (this.state == GameState.Overworld) {
+				this.startCutsceneToUnderground();
+			}
+		}, this);
+		this.surfaceButton.show(false, true);
+
 
 		this.harvestButton = new HarvestButton(this, this.CX, 0.4*this.H);
 		// this.harvestButton.on("click", this.onHarvestComplete, this);
@@ -346,7 +359,13 @@ export class GameScene extends BaseScene {
 		}
 
 
-		this.updateScore()
+		// Init
+
+		this.state = GameState.Overworld;
+		this.updateScore();
+
+		this.addFirstNode();
+		this.dragPos = new Phaser.Math.Vector2(this.nodes[0].x, this.nodes[0].y);
 	}
 
 
@@ -355,23 +374,27 @@ export class GameScene extends BaseScene {
 		// This is actually possible now. Could be optimized if it's called whenever camera is moved. Still, it's cheap enough now.
 		this.drawAllRoots();
 
+		// Debug
+		this.debugText.setText(`${this.state}`);
+
 		// Smooth camera movement
 		if (this.state == GameState.GrowingRoots) {
 			this.cameras.main.scrollY += 0.3 * (this.cameraSmoothY - this.cameras.main.scrollY);
-			this.undergroundEdge.y = Math.max(this.undergroundEdge.y, this.cameras.main.scrollY + this.H);
 		}
+		this.undergroundEdge.y = Math.max(this.undergroundEdge.y, this.cameras.main.scrollY + this.H);
+
 
 		// Update game objects
 		this.particles.update(time, delta);
 		this.textParticles.update(time, delta);
 		this.underground.update(time, delta);
 		this.shop.update(time, delta);
-		this.hud.update(time, delta, this.money, this.tree.energy, this.tree.maxEnergy, this.totalScore, this.tree.bruteness, this.tree.persistence);
+		this.hud.update(time, delta, this.money, this.tree.energy, this.tree.maxEnergy, this.score, this.tree.bruteness, this.tree.persistence);
 		this.tree.update(time, delta);
 		this.nodes.forEach(node => {
 			node.update(time, delta);
 		});
-		this.returnToSurfaceButton.update(time, delta);
+		this.surfaceButton.update(time, delta);
 		this.updateMusic(time, delta);
 
 		if(this.scrolling) {
@@ -387,7 +410,7 @@ export class GameScene extends BaseScene {
 			this.handleCameraMovement();
 
 			this.handleRootDrawing(delta);
-			this.debugText.setText(`State: ${this.state}\nEnergy: ${this.tree.energy}/${this.tree.maxEnergy}`);
+			this.debugText.setText(`State: ${this.state}`);
 
 		}
 
@@ -449,7 +472,30 @@ export class GameScene extends BaseScene {
 	}
 
 
-	setCameraBounds(left: number, top: number, width: number, height: number) {
+	updateCameraBounds() {
+		let left, top, width, height;
+
+		left = 0;
+		top = 0;
+		width = this.W;
+		height = this.H;
+
+		if (this.state == GameState.GrowingRoots) {
+			top = this.BELOW_SURFACE_Y;
+			// height = this.deepestNodeY + 0.6 * this.H;
+			height = this.deepestNodeY + 1 * this.H;
+		}
+		else if (this.state == GameState.Overworld) {
+			top = -1000000;
+			height = 100000000;
+		}
+		else if (this.state == GameState.CutsceneToSurface || this.state == GameState.CutsceneToUnderground) {
+			top = 0;
+			height = 100000000;
+		}
+		// else if (this.state == GameState.) {
+		// }
+
 		this.cameraBounds = {
 			left: left,
 			top: top,
@@ -496,27 +542,25 @@ export class GameScene extends BaseScene {
 	setDeepestNode(y: number) {
 		if (y == 0) { this.deepestNodeY = 0; }
 		this.deepestNodeY = Math.max(y, this.deepestNodeY);
-		this.setCameraBounds(0, 0, this.W, this.deepestNodeY + 0.6 * this.H);
-		// this.setCameraBounds(0, 0, this.W, 100000);
-		// this.cameras.main.setBounds(-0.5*this.W, -this.H, 2*this.W, 1000000);
+		this.updateCameraBounds();
 
-		if (this.score > 0) {
-			this.returnToSurfaceButton.show(false);
+		if (this.state == GameState.GrowingRoots) {
+			this.surfaceButton.show(true, false);
 		}
 	}
 
-	returnToSurface() {
+	startCutsceneToSurface() {
 		this.sound.play("s_click");
-		this.state = GameState.ReturningToSurfaceCutscene;
-		this.returnToSurfaceButton.hide();
+		this.state = GameState.CutsceneToSurface;
+		this.surfaceButton.hide();
 		this.cameraSmoothY = 0;
 
 		// Smooth camera transition
 		this.tweens.addCounter({
 			from: this.cameras.main.scrollY,
 			to: 0,
-			duration: 1000,
-			ease: 'Quad',
+			duration: 1000 + this.deepestNodeY/100,
+			ease: 'Quad.easeInOut',
 			onUpdate: (tween) => {
 				this.cameras.main.scrollY = tween.getValue();
 			},
@@ -531,9 +575,42 @@ export class GameScene extends BaseScene {
 		});
 	}
 
+	startCutsceneToUnderground() {
+		this.sound.play("s_click");
+		this.state = GameState.CutsceneToUnderground;
+		this.surfaceButton.hide();
+		this.cameraSmoothY = this.BELOW_SURFACE_Y;
+
+		// Smooth camera transition
+		this.tweens.addCounter({
+			from: this.cameras.main.scrollY,
+			to: this.BELOW_SURFACE_Y,
+			delay: 500,
+			duration: 1500,
+			ease: 'Quad.easeInOut',
+			onUpdate: (tween) => {
+				this.cameras.main.scrollY = tween.getValue();
+			},
+			onComplete: () => {
+				this.state = GameState.GrowingRoots;
+			}
+		});
+
+		if (this.secondNode) {
+			this.tweens.add({
+				targets: this.secondNode,
+				y: { from: this.secondNode.y, to: this.BELOW_SURFACE_Y + 0.25 * this.H },
+				duration: 1500,
+				ease: 'Quad',
+			});
+		}
+	}
+
 	onHarvestComplete() {
-		this.state = GameState.GrowingRoots;
+		this.state = GameState.Overworld;
 		this.oneTimeEvents.outOfEnergy = false;
+
+		this.surfaceButton.show(false, true);
 
 		// Set to whatever the lowest priced item is
 		if (this.money >= 150) {
@@ -558,7 +635,7 @@ export class GameScene extends BaseScene {
 
 		// Add current score to growth
 		// Should be a whole sequence here instead and the shop thing, etc
-		//this.tree.addMaxEnergy(this.totalScore);
+		//this.tree.addMaxEnergy(this.score);
 		this.score = 0;
 
 		// Destroy all nodes
@@ -578,7 +655,7 @@ export class GameScene extends BaseScene {
 
 
 		// Restart tree
-		this.firstNode = this.addNode(this.CX, this.SURFACE_Y + 10, true);
+		this.addFirstNode();
 		this.tree.reset();
 		this.underground.reset();
 		this.updateScore();
@@ -851,7 +928,7 @@ export class GameScene extends BaseScene {
 			}
 			else if (!this.oneTimeEvents.outOfEnergy) {
 				this.oneTimeEvents.outOfEnergy = true;
-				this.returnToSurfaceButton.show(true);
+				this.surfaceButton.show(true, true);
 			}
 
 			const limitReached = !this.validDrawing && canDraw;
@@ -932,14 +1009,36 @@ export class GameScene extends BaseScene {
 		return end;
 	}
 
-	addNode(x: number, y: number, root: boolean = false): Node {
-		let node = new Node(this, x, y, root);
+	addFirstNode() {
+		this.firstNode = this.addNode(
+			this.TREE_X,
+			this.SURFACE_Y + 40*this.SCALE,
+			false,
+			48);
+
+		this.secondNode = this.addNode(
+			this.TREE_X,
+			this.firstNode.y,
+			true);
+		this.secondNode.addParent(this.firstNode);
+	}
+
+	addNode(x: number, y: number, enabled: boolean = true, size: number = 24): Node {
+		// let size = (root ? 96 : 24);
+		// let texture = (!enabled ? "seed" : "circle");
+		// let texture = "circle";
+
+		let node = new Node(this, x, y, size, enabled);
 		node.setDepth(100);
 
 		node.on("dragStart", this.onNodeDragStart, this);
 
 		this.nodes.push(node);
 		this.setDeepestNode(node.y);
+
+		// if (root) {
+			// node.disable();
+		// }
 
 		return node;
 	}
@@ -1052,13 +1151,13 @@ export class GameScene extends BaseScene {
 	}
 
 	onTreeLevelUp(level: number) {
-		if (level == 1) {
-			this.sound.play("r_grow", { volume: 0.3, rate: 1.25 });
-		}
+		// if (level == 1) {
+		// 	this.sound.play("r_grow", { volume: 0.3, rate: 1.25 });
+		// }
 
-		if (level == 2) {
-			this.sound.play("r_grow", { volume: 0.4, rate: 1.00 });
-		}
+		// if (level == 2) {
+		// 	this.sound.play("r_grow", { volume: 0.4, rate: 1.00 });
+		// }
 	}
 
 	onTreeClick() {
@@ -1067,7 +1166,7 @@ export class GameScene extends BaseScene {
 
 			this.tree.clearActiveChains();
 			this.tree.harvest();
-			this.money += this.totalScore + ((this.totalScore > this.tree.basevalue) ? this.tree.basevalue : (this.tree.basevalue*this.totalScore/this.tree.basevalue));
+			this.money += this.score + ((this.score > this.tree.basevalue) ? this.tree.basevalue : (this.tree.basevalue*this.score/this.tree.basevalue));
 
 			this.particles.createGreenMagic(this.tree.x, this.tree.y - 150*this.SCALE, 3*this.SCALE, 1.0, false);
 
@@ -1106,13 +1205,13 @@ export class GameScene extends BaseScene {
 	}
 
 	onScroll(pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) {
-		if (this.state != GameState.GrowingRoots) { return; }
+		if (this.state != GameState.GrowingRoots && this.state != GameState.Overworld) { return; }
 
 		this.moveSmoothCamera(deltaY * this.SCALE);
 	}
 
 	onCameraDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number) {
-		if (this.state != GameState.GrowingRoots) { return; }
+		if (this.state != GameState.GrowingRoots && this.state != GameState.Overworld) { return; }
 
 		this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom;
 		this.moveSmoothCamera(-(pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom);

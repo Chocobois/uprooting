@@ -23,7 +23,7 @@ export class HarvestButton extends Button {
 
 		this.text = this.scene.createText(0, 0, 60*this.scene.SCALE, "#111", "Click the tree to harvest it ");
 		this.text.setOrigin(0.5);
-		this.text.setStroke("#fff", 30);
+		this.text.setStroke("#fff", 120 * this.scene.SCALE);
 		this.add(this.text);
 
 		// this.bindInteractive(this.image, true);
