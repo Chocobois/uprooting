@@ -42,6 +42,7 @@ import tree from "./images/tree/tree.png";
 import tree_little from "./images/tree/tree_little.png";
 import sapling from "./images/tree/sapling.png";
 import rootline from "./images/tree/rootline.png";
+import seed from "./images/tree/seed.png";
 
 // Items
 import apple from "./images/items/apple.png";
@@ -110,6 +111,7 @@ const images: Asset[] = [
 	{ key: "tree_little", path: tree_little },
 	{ key: "sapling", path: sapling },
 	{ key: "rootline", path: rootline },
+	{ key: "seed", path: seed },
 
 	// Items
 	{ key: "apple", path: apple },

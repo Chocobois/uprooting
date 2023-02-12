@@ -1,6 +1,7 @@
 import { BaseScene } from "../scenes/BaseScene";
 import { Button } from "./Button";
 import { ComboClass, MineralType } from "./Underground";
+
 enum ChainType{
 	NONE,
 	LAST_ITEM,
@@ -64,10 +65,13 @@ export class Tree extends Button {
 	public lastlastValue: number;
 	public currentValue: number;
 
+	private outlineFilter: any;
+
 
 	constructor(scene: BaseScene, x: number, y: number) {
 		super(scene, x, y);
 		this.scene.add.existing(this);
+		this.setDepth(200);
 
 
 		// Stats
@@ -180,6 +184,14 @@ export class Tree extends Button {
 		this.treeSprite.setOrigin(0.5, 1.0);
 		// this.treeSprite.setScale(100 / this.treeSprite.width);
 		this.treeContainer.add(this.treeSprite);
+
+		let plugin: any = scene.plugins.get('rexOutlinePipeline');
+		this.outlineFilter = plugin.add(this.treeSprite, {
+			thickness: 8 * this.scene.SCALE,
+			outlineColor: 0x1B5E20,
+			quality: 0.1,
+		});
+
 
 		// Fruits
 		this.fruits = [];
@@ -362,29 +374,39 @@ export class Tree extends Button {
 	}
 
 	updateTreeScore(score: number) {
-		const level1 = 30;
-		const level2 = 500;
+		const level1 = 10;
+		const level2 = 30;
+		const level3 = 500;
 
 		let minSize, maxSize, interpolant;
 
 		if (score < level1) {
 			this.level = 0;
 
-			minSize = 150;
-			maxSize = 350;
+			minSize = 100;
+			maxSize = 0;
 			interpolant = Math.max(score, 1) / level1;
 		}
 
 		else if (score < level2) {
 			this.level = 1;
 
-			minSize = 300;
-			maxSize = 500;
+			minSize = 150;
+			maxSize = 350;
+			// interpolant = Math.max(score, 1) / level2;
 			interpolant = (score - level1) / (level2 - level1);
 		}
 
-		else {
+		else if (score < level3) {
 			this.level = 2;
+
+			minSize = 300;
+			maxSize = 500;
+			interpolant = (score - level2) / (level3 - level2);
+		}
+
+		else {
+			this.level = 3;
 
 			// Softcap log function
 			const height = 100 * Math.log10((score + 1) * Math.pow(10, 2));
@@ -422,17 +444,29 @@ export class Tree extends Button {
 
 			this.fruits.forEach(fruit => fruit.setVisible(false));
 
+			this.treeContainer.y = 0;
+			this.treeSprite.setOrigin(0.5, 1.0);
+			this.treeContainer.y = 0;
+			this.outlineFilter.setOutlineColor(0x1B5E20);
+
 			if (this.level <= 0) {
+				this.treeSprite.setTexture("seed");
+				this.treeContainer.y = 50*this.scene.SCALE;
+				this.treeSprite.setOrigin(0.5);
+				this.outlineFilter.setOutlineColor(0x4e342e);
+				this.harvestCount = 0;
+			}
+			else if (this.level == 1) {
 				this.treeSprite.setTexture("sapling");
 				this.harvestCount = 1;
 			}
-			else if (this.level == 1) {
+			else if (this.level == 2) {
 				this.treeSprite.setTexture("tree_little");
 				this.fruits[0].setVisible(true).setPosition(-0.27*this.scene.SCALE, -0.68*this.scene.SCALE);
 				this.fruits[1].setVisible(true).setPosition( 0.28*this.scene.SCALE, -0.58*this.scene.SCALE);
 				this.harvestCount = 2;
 			}
-			else if (this.level >= 2) {
+			else if (this.level >= 3) {
 				this.treeSprite.setTexture("tree");
 				this.fruits[0].setVisible(true).setPosition(-0.27*this.scene.SCALE, -0.65*this.scene.SCALE);
 				this.fruits[1].setVisible(true).setPosition( 0.00*this.scene.SCALE, -0.84*this.scene.SCALE);

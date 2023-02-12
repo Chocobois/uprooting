@@ -4,33 +4,39 @@ import { Button } from "./Button";
 export class Node extends Button {
 	private image: Phaser.GameObjects.Image;
 
+	public size: number;
 	public parent: Node | null;
 	public children: Node[];
 	public score: number;
 	public rootDepth: number; // Distance from roots (number of linked parents)
 
-	constructor(scene: BaseScene, x: number, y: number, root: boolean=false) {
+	constructor(scene: BaseScene, x: number, y: number, size: number, enabled: boolean) {
 		super(scene, x, y);
 		this.scene.add.existing(this);
 
+		this.size = size;
 		this.parent = null;
 		this.children = [];
 		this.score = 1;
 		this.rootDepth = 1;
 
-
 		this.image = this.scene.add.image(0, 0, "circle");
-		this.image.setScale((root ? 48 : 16)*this.scene.SCALE / this.image.width);
+		this.image.setScale(this.size * this.scene.SCALE / this.image.width);
 		this.add(this.image);
 
-		this.bindInteractive(this.image, true);
-		const inputPadding = 30*this.scene.SCALE / this.image.scaleX;
-		this.image.input.hitArea.setTo(-inputPadding, -inputPadding, this.image.width+2*inputPadding, this.image.height+2*inputPadding);
-		// this.scene.input.enableDebug(this.image);
+		if (enabled) {
+			this.bindInteractive(this.image, true);
+			const inputPadding = 30*this.scene.SCALE / this.image.scaleX;
+			this.image.input.hitArea.setTo(-inputPadding, -inputPadding, this.image.width+2*inputPadding, this.image.height+2*inputPadding);
+			// this.scene.input.enableDebug(this.image);
+		}
+		else {
+			this.image.setAlpha(0);
+		}
 	}
 
 	update(time: number, delta: number) {
-		if (this.image.input.enabled) {
+		if (this.image.input && this.image.input.enabled) {
 			this.image.setTint(this.hover ? 0xFF7700 : 0xB99578);
 		}
 	}
@@ -66,15 +72,19 @@ export class Node extends Button {
 
 
 	disable() {
-		this.image.input.enabled = false;
-		this.image.setTint(0x000000);
-		this.image.setAlpha(0.2);
+		if (this.image.input) {
+			this.image.input.enabled = false;
+			this.image.setTint(0x000000);
+			this.image.setAlpha(0.2);
+		}
 	}
 
 	enable() {
-		this.image.input.enabled = true;
-		this.image.setTint(0xB99578);
-		this.image.setAlpha(1);
+		if (this.image.input) {
+			this.image.input.enabled = true;
+			this.image.setTint(0xB99578);
+			this.image.setAlpha(1);
+		}
 	}
 
 

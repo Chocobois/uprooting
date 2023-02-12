@@ -395,7 +395,7 @@ export class Underground extends Phaser.GameObjects.Container {
 	private deltaY: number;
 
 
-	constructor(scene: BaseScene, surfaceY: number, bedrockY: number) {
+	constructor(scene: BaseScene, surfaceY: number, belowSurfaceY: number, bedrockY: number) {
 		super(scene);
 		this.scene = scene;
 		this.scene.add.existing(this);
@@ -406,7 +406,7 @@ export class Underground extends Phaser.GameObjects.Container {
 		const padding = 50 * this.scene.SCALE;
 		this.left = padding;
 		this.right = this.scene.W - padding;
-		this.top = surfaceY + 5*padding;
+		this.top = belowSurfaceY + 0.1 * this.scene.H;
 		this.bottom = bedrockY - padding;
 
 		this.gridSteps = 1000;
