@@ -3,10 +3,12 @@ import { Music } from "./../components/Music";
 import { Particles } from "./../components/Particles";
 import { Node } from "./../components/Node";
 import { Tree } from "./../components/Tree";
-import { Underground, MineralType } from "./../components/Underground";
+import { Underground, MineralType, ComboClass } from "./../components/Underground";
 import { Mineral } from "./../components/Mineral";
 import { SurfaceButton } from "./../components/SurfaceButton";
 import { HarvestButton } from "./../components/HarvestButton";
+import { LimitBreakButton } from "./../components/LimitBreakButton";
+import { ZombieButton } from "./../components/ZombieButton";
 import GetShortestDistance from "phaser/src/geom/line/GetShortestDistance";
 import { MiniButton } from "../components/MiniButton";
 import { Shop, ItemType, ItemData } from "../components/Shop";
@@ -24,6 +26,8 @@ enum GameState {
 
 	CutsceneToSurface = "Cutscene to surface",
 	CutsceneToUnderground = "Cutscene to underground",
+
+	EndGame = "A winner is you"
 }
 
 enum MusicState {
@@ -42,7 +46,7 @@ enum InvalidNodeReason {
 	SelfIntersecting = "Root self intersects!",
 	TooClose = "Roots are too close together!",
 	ObstacleInTheWay = "Root is obstructed!",
-	Unaffordable = "Not enough energy!"
+	Unaffordable = "Not enough resources!"
 }
 
 interface CameraBounds {
@@ -90,7 +94,8 @@ export class GameScene extends BaseScene {
 
 	// UI
 	private surfaceButton: SurfaceButton;
-	private limitBreakButton: MiniButton;
+	private limitBreakButton: LimitBreakButton;
+	private zombieButton: ZombieButton;
 	private harvestButton: HarvestButton;
 	private musicButton: MiniButton;
 	private audioButton: MiniButton;
@@ -164,6 +169,8 @@ export class GameScene extends BaseScene {
 		this.score = 0;
 
 		this.hud = new HUD(this);
+		//this.hud.on("limitbreakend", this.hud.toggleShadow, this);
+
 
 		this.shop = new Shop(this, 0.2 * this.W, this.SURFACE_Y+192*this.SCALE);
 		this.shop.on("open", () => {
@@ -176,6 +183,8 @@ export class GameScene extends BaseScene {
 				this.shop.open();
 				this.state = GameState.InsideShop;
 				this.hud.hideScore();
+				this.limitBreakButton.hide();
+				this.zombieButton.hide();
 				// this.hud.hideEnergy();
 
 				this.musicState = MusicState.Shop;
@@ -188,6 +197,14 @@ export class GameScene extends BaseScene {
 		this.shop.on("close", () => {
 			this.state = GameState.Overworld;
 			this.hud.showScore();
+			if(this.tree.limitBreak)
+			{
+				this.limitBreakButton.show();
+			}
+			if(this.tree.canZombie)
+			{
+				this.zombieButton.show();
+			}
 			// this.hud.showEnergy();
 
 			this.musicShop.stop();
@@ -303,6 +320,12 @@ export class GameScene extends BaseScene {
 				this.sound.mute = !this.audioButton.active;
 			})
 
+		this.limitBreakButton = new LimitBreakButton(this, this.W*0.95, this.H*0.75);
+		this.limitBreakButton.on("click", this.toggleLimitBreak, this);
+
+		this.zombieButton = new ZombieButton(this, this.W*0.95, this.H*0.6);
+		this.zombieButton.on("click", this.toggleZombie, this);
+
 		this.scrolling = false;
 		this.timeScrolling = 0;
 
@@ -391,10 +414,18 @@ export class GameScene extends BaseScene {
 		this.shop.update(time, delta);
 		this.hud.update(time, delta, this.money, this.tree.energy, this.tree.maxEnergy, this.score, this.tree.bruteness, this.tree.persistence);
 		this.tree.update(time, delta);
+		if (this.tree.updateLimitBreak(delta) == 2)
+		{
+			this.hud.toggleShadow();
+			this.limitBreakButton.advance();
+			this.sound.play("r_unlimitbreak");
+		} //extreme hax
 		this.nodes.forEach(node => {
 			node.update(time, delta);
 		});
 		this.surfaceButton.update(time, delta);
+		this.limitBreakButton.update(time, delta, this.tree.percent);
+		this.zombieButton.update(this.score);
 		this.updateMusic(time, delta);
 
 		if(this.scrolling) {
@@ -661,8 +692,47 @@ export class GameScene extends BaseScene {
 		this.updateScore();
 	}
 
+	toggleLimitBreak()
+	{
+		let r = this.tree.toggleLimitBreak();
+		if (r == 1) {
+			this.sound.play("r_limitbreak");
+		} else if (r == 2) {
+			this.sound.play("r_unlimitbreak");
+		}
+		this.hud.toggleShadow();
+		this.limitBreakButton.advance();
+		
+	}
+
+	toggleZombie()
+	{
+		if(this.score > 100 && !this.tree.isZombie)
+		{
+			let m = this.tree.toggleZombie(this.score);
+			this.zombieButton.advance(this.score, m);
+			this.judgeNodes();
+		} else if (this.tree.isZombie){
+			this.tree.untoggleZombie();
+			this.zombieButton.advance(0,1);
+			this.judgeNodes();
+		}
+	}
+
+	resetLimitBreak()
+	{
+		this.tree.resetLimitBreak();
+		if(this.hud.cancelShadow())
+		{
+			this.sound.play("r_unlimitbreak");
+			this.limitBreakButton.setWaitTimer(this.hud.shiftTime);
+		}
+		this.limitBreakButton.resetButtonState();
+	}
+
 	parseItemFunction(itemData:ItemData)
 	{
+		this.tree.clearActiveChains();
 		switch(itemData.type){
 			case ItemType.TreeEnergy: {
 				this.tree.addMaxEnergy(itemData.value[itemData.iteration-1]);
@@ -677,7 +747,8 @@ export class GameScene extends BaseScene {
 			} case ItemType.ChainUpgrade: {
 				this.tree.unlockChain(itemData.value[itemData.iteration-1]);
 				break;
-			} case ItemType.TreeEfficiency: {
+			} 
+			case ItemType.TreeEfficiency: {
 				this.tree.energyMitigation = itemData.value[itemData.iteration-1];
 				break;
 			} case ItemType.SuperChain: {
@@ -688,6 +759,17 @@ export class GameScene extends BaseScene {
 				this.tree.bruteChance = itemData.value[itemData.iteration-1];
 				this.hud.showBombs();
 				break;
+			} case ItemType.MemoryChain: {
+				this.tree.unlockChain(itemData.value[itemData.iteration-1]);
+				break;
+			} case ItemType.LimitBreak: {
+				this.tree.limitBreak = true;
+				this.resetLimitBreak();
+				break;
+			} case ItemType.ZombieMode: {
+				this.tree.canZombie = true;
+				this.resetZombie();
+				break;
 			} default: {
 				break;
 			}
@@ -697,6 +779,10 @@ export class GameScene extends BaseScene {
 	getSuperChain(): number
 	{
 		let r = Math.random()*200;
+		if(this.tree.transcending)
+		{
+			return 99;
+		}
 		if(r <= 100) {
 			return 0.01;
 		} else if (r <= 150) {
@@ -796,8 +882,10 @@ export class GameScene extends BaseScene {
 				this.currentNode.addScore();
 				this.score += Math.round(collectible.points*scoremultiplier);
 			}
-
 			this.sound.play("r_collect");
+			if(scoremultiplier > 99) {
+				this.sound.play("r_bigfire");
+			}
 
 			// Create sparkle effect
 			if (collectible.type == MineralType.applecore) {
@@ -836,10 +924,17 @@ export class GameScene extends BaseScene {
 		//clean persisting chains if you collected minerals, otherwise only clear the default "any chain"
 		if(collectibles.length > 0)
 		{
-			this.tree.cleanChains();
+			this.tree.updateMineralTracking();
+			if(!this.tree.transcending) {
+				this.tree.cleanChains();
+			}	
 		} else {
-			this.tree.cleanSelectedChain(this.tree.ANY_CHAIN_ID);
+			if(!this.tree.transcending) {
+				this.tree.cleanSelectedChain(this.tree.ANY_CHAIN_ID);
+			}
 		}
+		this.tree.clearMineralMap();
+
 	}
 
 	textParticle(x: number, y: number, color: string, content: string, outline: boolean=true, size: number=40,
@@ -887,7 +982,10 @@ export class GameScene extends BaseScene {
 				}
 			}
 			const touchingObstacle = mineralIntersects.some((mineral => mineral.hardness > str));
-			const canAfford = this.tree.energy >= this.currentNode.cost;
+			let canEnergy = ((this.tree.energy >= Math.round(this.currentNode.cost*this.tree.energyMitigation)) && !(this.tree.isZombie) || this.tree.isZombie);
+			let canZombie = this.getZombiness();
+
+			const canAfford = ( canEnergy && canZombie );
 			this.validDrawing = !!next && !touchingObstacle && canAfford;
 
 			const invalidReason = nextPosResult instanceof Phaser.Math.Vector2
@@ -900,13 +998,16 @@ export class GameScene extends BaseScene {
 
 			this.dragPos = this.dragPos.lerp(end, delta/100);
 
-			if (this.tree.energy >= this.currentNode.cost) {
+			if (canEnergy && canZombie) {
 				if (next && this.validDrawing && canDraw) {
 					this.addConnection(next);
 					this.dragPos = new Phaser.Math.Vector2(next.x, next.y);
 					//handling cherry bomb explosions
 					this.handleMineralCollection(mineralIntersects);
 							// add or remove bombs
+					if(this.tree.isZombie){
+						this.zombieButton.advancePercent(this.score, this.tree.popZombieNumber())
+					}
 					if(this.tree.bruteStrength && this.tree.persistence <= 0)
 					{
 						if((Math.random()*1000) > (1000-(this.tree.bruteChance*1000)))
@@ -951,6 +1052,19 @@ export class GameScene extends BaseScene {
 			this.dragGraphics.lineTo(this.dragPos.x, this.dragPos.y);
 			this.dragGraphics.closePath();
 			this.dragGraphics.strokePath();
+		}
+	}
+
+	getZombiness(): boolean
+	{
+		if(this.tree.isZombie)	{
+			if(this.score > this.tree.popZombieNumber()) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return true;
 		}
 	}
 
@@ -1053,7 +1167,14 @@ export class GameScene extends BaseScene {
 		// Add growth score
 		oldNode.addScore();
 		this.score += 1;
-		this.tree.energy -= Math.round(oldNode.cost*this.tree.energyMitigation);
+		if(!this.tree.isZombie){
+			this.tree.energy -= Math.round(oldNode.cost*this.tree.energyMitigation);
+		} else if (this.tree.isZombie)
+		{
+			this.score -= this.tree.popZombieNumber();
+			this.textParticle(newNode.x-15, newNode.y-5, "Red", `-${this.tree.popZombieNumber()}`, undefined, 150 * this.SCALE);
+			this.tree.advanceZombie();
+		}
 		// old stuff for refreshing energy on root growth
 		/*
 		if(this.tree.refundValue > 0)
@@ -1067,13 +1188,7 @@ export class GameScene extends BaseScene {
 			}
 		} 
 		*/
-		this.nodes.forEach(node => {
-			if (node.cost > this.tree.energy) {
-				node.disable();
-			} else if (node.cost <= this.tree.energy) {
-				node.enable();
-			}
-		});
+		this.judgeNodes();
 
 		this.sound.play("r_place", { volume: 0.3, rate: 1 + Math.random() * 0.1 });
 
@@ -1081,6 +1196,17 @@ export class GameScene extends BaseScene {
 		this.currentNode = newNode;
 
 		this.updateScore();
+	}
+
+	judgeNodes()
+	{
+		this.nodes.forEach(node => {
+			if (((node.cost > this.tree.energy) && !this.tree.isZombie) || (this.tree.isZombie && (this.score < this.tree.popZombieNumber()))) {
+				node.disable();
+			} else if (((node.cost <= this.tree.energy) && !this.tree.isZombie) || (this.tree.isZombie && (this.score > this.tree.popZombieNumber()))) {
+				node.enable();
+			}
+		});
 	}
 
 	drawAllRoots() {
@@ -1165,6 +1291,8 @@ export class GameScene extends BaseScene {
 			this.moveSmoothCamera(-this.cameraSmoothY);
 
 			this.tree.clearActiveChains();
+			this.resetLimitBreak();
+			this.resetZombie();
 			this.tree.harvest();
 			this.money += this.score + ((this.score > this.tree.basevalue) ? this.tree.basevalue : (this.tree.basevalue*this.score/this.tree.basevalue));
 
@@ -1181,6 +1309,12 @@ export class GameScene extends BaseScene {
 				this.sound.play("t_rustle", {rate: 1 + 0.1 * Math.random()});
 			}
 		}
+	}
+
+	resetZombie()
+	{
+		this.tree.resetZombie();
+		this.zombieButton.resetButtonState();
 	}
 
 	updateScore() {

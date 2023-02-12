@@ -54,9 +54,14 @@ export class Tree extends Button {
 	public maxPersistence = 5;
 	//feather
 	public limitBreak: boolean;
+	public maxLiminal = 10000;
+	public transcending: boolean;
+	public nodeCounter: number;
+	public maxNodes = 10;
 	public liminalTime: number;
 	public usageCount: number;
 	public maxUsage = 1;
+	public percent: number;
 
 	//mandrake
 	public canZombie: boolean;
@@ -64,6 +69,14 @@ export class Tree extends Button {
 	public lastValue: number;
 	public lastlastValue: number;
 	public currentValue: number;
+	public storedScore: number;
+
+	private lastTrackedClass: ComboClass;
+	private lastValuableItem: MineralType;
+	public lastValuableClass: ComboClass;
+	private changeClassFlag: boolean;
+	private deletePrevClass: boolean;
+	public myMap: Map<ComboClass, number>;
 
 	private outlineFilter: any;
 
@@ -86,16 +99,33 @@ export class Tree extends Button {
 		this.unlockedChains = new Map();
 		this.activeChains = new Map();
 		this.updateMap = new Map();
+		this.lastTrackedClass = ComboClass.NONE;
+		this.lastValuableItem = MineralType.NOTYPE;
+		this.lastValuableClass = ComboClass.FRUIT;
+		this.changeClassFlag = true;
+		this.deletePrevClass = true;
+		this.myMap = new Map();
 		
 		this.superChains = false;
 		this.bruteStrength = false;
 		this.bruteness = 0;
 		this.bruteChance = 0;
 		this.persistence = 0;
+		this.percent = 0;
 		
 		this.limitBreak = false;
 		this.liminalTime = 0;
-		this.usageCount = 0
+		this.nodeCounter = 0;
+		this.usageCount = 0;
+		this.transcending = false;
+
+		this.canZombie = false;
+		this.isZombie = false;
+		this.lastValue = 0.01;
+		this.lastlastValue = 0.005;
+		this.currentValue = 0.01;
+		this.storedScore = 1;
+
 		this.defaultChain = {
 			type: MineralType.NOTYPE,
 			class: 	ComboClass.NONE,
@@ -120,7 +150,7 @@ export class Tree extends Button {
 			{
 				type: MineralType.applecore,
 				class: 	ComboClass.FRUIT,
-				multiplier: [1.5,2.5,5],
+				multiplier: [1.5,2.5,3.5],
 				iteration: 0,
 				chainID: 1,
 				hasBeenActive: false,
@@ -129,7 +159,7 @@ export class Tree extends Button {
 			{
 				type: MineralType.applecore,
 				class: 	ComboClass.FRUIT,
-				multiplier: [1.5,2.5,5,10],
+				multiplier: [2,3,4,5],
 				iteration: 0,
 				chainID: 1,
 				hasBeenActive: false,
@@ -154,23 +184,50 @@ export class Tree extends Button {
 				chainType: ChainType.ITEM_CLASS
 			},
 			{
+				type: MineralType.badrock,
+				class: 	ComboClass.ROCK,
+				multiplier: [1.5,2],
+				iteration: 0,
+				chainID: 40,
+				hasBeenActive: false,
+				chainType: ChainType.ITEM_CLASS
+			},
+			{
+				type: MineralType.badrock,
+				class: 	ComboClass.ROCK,
+				multiplier: [1.75,2.5,3.5],
+				iteration: 0,
+				chainID: 40,
+				hasBeenActive: false,
+				chainType: ChainType.ITEM_CLASS
+			},
+			{
 				type: MineralType.diamond,
 				class: 	ComboClass.GEM,
-				multiplier: [1.5,2.5,5],
+				multiplier: [1.125,1.25,1.5],
 				iteration: 0,
-				chainID: 10,
+				chainID: 30,
+				hasBeenActive: false,
+				chainType: ChainType.ITEM_CLASS
+			},
+			{
+				type: MineralType.diamond,
+				class: 	ComboClass.GEM,
+				multiplier: [1.25,1.5,1.75,2],
+				iteration: 0,
+				chainID: 30,
 				hasBeenActive: false,
 				chainType: ChainType.ITEM_CLASS
 			},
 
 			{
-				type: MineralType.badrock,
-				class: 	ComboClass.ROCK,
-				multiplier: [3,10],
+				type: MineralType.applecore,
+				class: 	ComboClass.NONE,
+				multiplier: [1.25,1.5],
 				iteration: 0,
-				chainID: 4,
+				chainID: 33,
 				hasBeenActive: false,
-				chainType: ChainType.ITEM_CLASS
+				chainType: ChainType.LAST_ITEM
 			},
 		];
 
@@ -213,7 +270,6 @@ export class Tree extends Button {
 	update(time: number, delta: number) {
 		// Click animation, no real use, maybe harvesting
 		this.setScale(1.0 - 0.1 * this.holdSmooth);
-
 		// this.updateTreeScore(30 * (0.5+0.5*Math.sin(time/500)));
 		// this.updateTreeScore(30 + (500-30) * (0.5+0.5*Math.sin(time/500)));
 		// this.updateTreeScore(500 + (1000-500) * (0.5+0.5*Math.sin(time/500)));
@@ -235,6 +291,21 @@ export class Tree extends Button {
 	}
 
 
+	maximizeChains()
+	{
+		for (let[key,value] of this.unlockedChains)
+		{
+			if(this.activeChains.size == 0 || !this.activeChains.has(key))
+			{
+				this.activeChains.set(key, value);
+			}
+		}
+		for (let [key, value] of this.activeChains)
+		{
+			value.iteration = value.multiplier.length;
+		}
+	}
+
 	updateChainList(mtype: MineralType, mclass: ComboClass)
 	{
 		//please improve this
@@ -251,6 +322,7 @@ export class Tree extends Button {
 						}
 						case ChainType.LAST_ITEM: {
 							value.type=mtype;
+							value.class = mclass;
 							this.activeChains.set(key,value);
 							break;
 						}
@@ -303,6 +375,10 @@ export class Tree extends Button {
 
 	clearActiveChains()
 	{
+		this.lastValuableClass = ComboClass.NONE;
+		this.lastValuableItem = MineralType.NOTYPE;
+		this.changeClassFlag = true;
+		this.clearMineralMap();
 		this.updateMap.clear();
 		for (let value of this.activeChains.values())
 		{
@@ -311,12 +387,46 @@ export class Tree extends Button {
 		this.activeChains.clear();
 	}
 
+	clearMineralMap()
+	{
+		this.myMap.clear();
+	}
+
+	updateMineralTracking()
+	{
+		if(!this.myMap.has(this.lastTrackedClass))
+		{
+			this.changeClassFlag = true;
+			// pick most valuable last class
+			if(this.myMap.size > 0){
+				for(let key of this.myMap.keys())
+				{
+					if(key > this.lastValuableClass)
+					{
+						this.lastValuableClass = key;
+					}
+				}
+			}
+		} else {
+			this.lastValuableClass = ComboClass.NONE;
+			this.changeClassFlag = false;
+		}
+	}
+
 	updateChainStatus(mtype: MineralType, mclass: ComboClass): number
 	{
 		// iterating separately over activeChains as assuming this is going to always be smaller than all chains
 		let multiplier = 1;
 		if(this.activeChains.size > 0)
 		{
+			//update list of collected
+			if(!this.myMap.has(mclass))
+			{
+				this.myMap.set(mclass, 1);
+			} else {
+				this.myMap.set(mclass, this.myMap.get(mclass)!+1);
+			}
+
 			for(let [key,value] of this.activeChains)
 			{
 				if(value.chainType == ChainType.ITEM_CLASS && value.class == mclass) {
@@ -326,12 +436,24 @@ export class Tree extends Button {
 					multiplier = this.updateMultiplier(value, multiplier);
 					this.updateChainFlags(key);
 				} else if (value.chainType == ChainType.LAST_ITEM) {
-					if(value.type == mtype)
+					if(this.changeClassFlag)
+					{
+						if(this.lastValuableClass == ComboClass.NONE)
+						{
+							this.lastValuableClass = ComboClass.FRUIT;
+						}
+						value.class = this.lastValuableClass;
+						this.lastTrackedClass = value.class;
+						this.lastValuableClass = ComboClass.NONE;
+						this.changeClassFlag = false;
+						if(!this.transcending) {
+							value.iteration = 1;
+						}
+					}
+					if(value.class == mclass)
 					{
 						multiplier = this.updateMultiplier(value, multiplier);
-					} else {
-						value.type = mtype;
-					} 
+					}
 					this.updateChainFlags(key);
 				} else if (value.chainType == ChainType.ANY) {
 					multiplier = this.updateMultiplier(value, multiplier);
@@ -363,6 +485,84 @@ export class Tree extends Button {
 		return currMult;
 	}
 
+	toggleLimitBreak(): number
+	{
+		if(this.usageCount < this.maxUsage) {
+			if(this.liminalTime == 0)
+			{
+				this.liminalTime = this.maxLiminal;
+				this.nodeCounter = 0;
+				this.usageCount++;
+				this.transcending = true;
+				this.maximizeChains();
+				return 1;
+			} else if (this.liminalTime > 0) {
+				this.liminalTime = 0;
+				this.nodeCounter = 0;
+				this.transcending = false;
+				this.clearActiveChains();
+				return 2;
+			}
+		}
+		return 0;
+	}
+
+	toggleZombie(sc: number): number
+	{
+		this.storedScore = sc;
+		this.isZombie = true;
+		return this.popZombieNumber();
+	}
+	popZombieNumber(): number
+	{
+		return 1+ Math.trunc(this.currentValue*this.storedScore);
+	}
+	advanceZombie()
+	{
+		this.currentValue = this.lastValue + this.lastlastValue;
+		//this.lastlastValue = this.lastValue;
+		this.lastValue = this.currentValue;
+	}
+
+	untoggleZombie()
+	{
+		this.isZombie = false;
+	}
+
+	resetZombie()
+	{
+		this.isZombie = false;
+		this.storedScore = 0;
+		this.lastValue = 0.01;
+		this.lastlastValue = 0.005;
+		this.currentValue = 0.01;
+	}
+
+	updateLimitBreak(t: number): number
+	{
+		if(this.transcending) {
+			if(this.liminalTime >= 0)
+			{
+				this.liminalTime -= t;
+				if (this.liminalTime < 0)
+				{
+					this.percent = 0;
+					this.liminalTime = 0;
+	//				this.emit("limitbreakend", this.level);
+					this.transcending = false;
+					this.clearActiveChains();
+					return 2;
+				}
+				this.percent = (((this.liminalTime/this.maxLiminal) > (this.nodeCounter/this.maxNodes)) ? (this.liminalTime/this.maxLiminal) : (this.nodeCounter/this.maxNodes));
+
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+		return 0;
+	}
+
 	addMaxEnergy(amount: number) {
 		this.maxEnergy += amount;
 	}
@@ -371,6 +571,23 @@ export class Tree extends Button {
 		this.level = 0;
 		this.energy = this.maxEnergy;
 		this.harvestCount = 0;
+	}
+
+	resetLimitBreak(): boolean
+	{
+		this.clearActiveChains();
+		this.transcending = false;
+		this.usageCount = 0;
+		if(this.liminalTime > 0)
+		{
+			// play the thingy if you returned while in the chains
+			this.liminalTime = 0;
+			return true;
+		} else {
+			this.liminalTime = 0;
+			return false;
+		}
+
 	}
 
 	updateTreeScore(score: number) {

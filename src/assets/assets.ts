@@ -72,7 +72,11 @@ import energy from "./images/items/energy.png";
 import energy2 from "./images/items/energy2.png";
 import greendice from "./images/items/greendice.png";
 import cherrybomb from "./images/items/cherrybomb.png";
-
+import twin_feather from "./images/items/twin_feather.png";
+import cat_thing from "./images/items/catblock.png";
+import multigem from "./images/items/multigem.png";
+import rockbolt from "./images/items/rockbolt.png";
+import mandrake from "./images/items/mandrake.png";
 
 // Titlescreen
 import title_foreground from "./images/titlescreen/foreground.png";
@@ -89,6 +93,7 @@ import audio from "./images/ui/audio.png";
 import shop_exit_sign from "./images/ui/shop_exit_sign.png";
 import shop_buy_button from "./images/ui/shop_buy_button.png";
 import shop_sold_out from "./images/ui/shop_sold_out.png";
+import twin_feather_icon from "./images/ui/twin_feather_icon.png";
 
 // Other
 import circle from "./images/circle.png";
@@ -141,6 +146,11 @@ const images: Asset[] = [
 	{ key: "energy2", path: energy2 },
 	{ key: "greendice", path: greendice },
 	{ key: "cherrybomb", path: cherrybomb },
+	{ key: "twin_feather", path: twin_feather },
+	{ key: "cat_thing", path: cat_thing },
+	{ key: "multigem", path: multigem },
+	{ key: "rockbolt", path: rockbolt },
+	{ key: "mandrake", path: mandrake },
 
 	// Titlescreen
 	{ key: "title_foreground", path: title_foreground },
@@ -171,6 +181,7 @@ import dust_explosion from "./images/effects/dustyexplosion.png";
 import blue_sparkle from "./images/effects/blue_sparkle.png";
 import bad_fire from "./images/effects/bad_fire.png";
 import item_tag from "./images/ui/item_tag.png";
+import mandrake_button from "./images/ui/mandrake_button.png";
 
 // NPCs
 import jbun from "./images/character/jbun_spritesheet.png";
@@ -179,6 +190,9 @@ const spritesheets: SpriteSheet[] = [
 	//UI with buttonstates
 	{ key: "audio", path: audio, width: 300, height: 300 },
 	{ key: "music", path: music, width: 300, height: 300 },
+	{ key: "limitbreak", path: twin_feather_icon, width: 256, height: 256 },
+	{ key: "zombiemode", path: mandrake_button, width: 256, height: 256 },
+
 	{ key: "item_tag", path: item_tag, width: 512, height: 512 },
 
 	// Effects
@@ -212,6 +226,9 @@ import r_place from "./sounds/roots/place.mp3";
 import r_place_error from "./sounds/roots/place_error.mp3";
 import r_collect from "./sounds/roots/collect.mp3";
 import r_splash from "./sounds/roots/splash.mp3";
+import r_limitbreak from "./sounds/roots/limitbreak.mp3";
+import r_unlimitbreak from "./sounds/roots/unlimitbreak.mp3";
+import r_bigfire from "./sounds/roots/bigfire.mp3";
 
 // SFX: Tree
 import t_branch_snap from "./sounds/tree/branch_snap.mp3";
@@ -236,6 +253,9 @@ const audios: Audio[] = [
 	{ key: "r_place_error", path: r_place_error, volume: 0.5 },
 	{ key: "r_collect", path: r_collect, volume: 1 },
 	{ key: "r_splash", path: r_splash, volume: 1 },
+	{ key: "r_limitbreak", path: r_limitbreak, volume: 0.75 },
+	{ key: "r_unlimitbreak", path: r_unlimitbreak, volume: 0.75 },
+	{ key: "r_bigfire", path: r_bigfire, volume: 0.15 },
 	{ key: "t_branch_snap", path: t_branch_snap, volume: 0.5 },
 	{ key: "t_chop_plant", path: t_chop_plant, volume: 0.5 },
 	{ key: "t_rustle", path: t_rustle, volume: 0.5 },
