@@ -49,6 +49,15 @@ export class Mineral extends Button {
 			this.image.setAngle(Phaser.Math.RND.between(0, 360));
 		}
 
+		let plugin: any = scene.plugins.get('rexOutlinePipeline');
+		if (plugin) {
+			let pipelineInstance = plugin.add(this.image, {
+				thickness: 4 * this.scene.SCALE,
+				outlineColor: 0x000000,
+				quality: 0.1,
+			});
+		}
+
 		// this.bindInteractive(this.image, true);
 		// const inputPadding = 40 / this.image.scaleX;
 		// this.image.input.hitArea.setTo(-inputPadding, -inputPadding, this.image.width+2*inputPadding, this.image.height+2*inputPadding);
