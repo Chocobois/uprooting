@@ -43,6 +43,15 @@ export class HUD extends Phaser.GameObjects.Container {
 	private scoreIcon: Phaser.GameObjects.Image;
 	private scoreText: Phaser.GameObjects.Text;
 
+	private darken: boolean;
+	private undarken: boolean;
+	private overlayer: Phaser.GameObjects.Graphics;
+	private shadow: Phaser.Geom.Circle;
+	public shiftTime = 500;
+	private timeTracker: number;
+	private maxR: number;
+	private darkness: number; //if needed in settings later
+
 
 	constructor(scene: BaseScene) {
 		super(scene);
@@ -71,6 +80,16 @@ export class HUD extends Phaser.GameObjects.Container {
 		const mx = mw/2 + 3*pad;
 		const imw = mw - pad;
 		const ml = mx - mw/2 + pad;
+
+		// draw the ability shadow underneath GUI
+		this.darken = false;
+		this.undarken = false;
+		this.maxR = Math.sqrt(Math.pow(this.scene.W,2)+Math.pow(this.scene.H,2)) + 10;
+		this.darkness = 0.5;
+		this.overlayer = this.scene.add.graphics();
+		this.add(this.overlayer);
+		this.timeTracker = 0;
+		this.shadow = new Phaser.Geom.Circle(this.scene.W/2, this.scene.H/2, 1);
 
 		this.moneyContainer = this.scene.add.container();
 		this.add(this.moneyContainer);
@@ -113,6 +132,8 @@ export class HUD extends Phaser.GameObjects.Container {
 		this.bombContainer.add(this.bombText);
 
 
+
+
 		// Energy
 
 		const ew = 0.2 * this.scene.W;
@@ -143,7 +164,6 @@ export class HUD extends Phaser.GameObjects.Container {
 		this.energyText.setOrigin(0.5, 0.5);
 		this.energyContainer.add(this.energyText);
 
-
 		// Score
 
 		const sy = y - h - 2*pad;
@@ -171,19 +191,17 @@ export class HUD extends Phaser.GameObjects.Container {
 	showScore() { this.scoreContainer.setVisible(true); }
 	hideEnergy() { this.energyContainer.setVisible(false); }
 	showEnergy() { this.energyContainer.setVisible(true); }
+	resetShadow() {
+		this.darken = false;
+		this.timeTracker = 0;
+	}
 
-
-	update(time: number, delta: number, money: number, energy: number, maxEnergy: number, score: number = 0, bombs: number=0, persistence: number=0) {
-
-		this.moneyText.setText(`${money}`);
-		this.energyText.setText(`${energy}/${maxEnergy}`);
-		this.scoreText.setText(`+ ${score}`);
-		this.bombText.setText(`x${bombs}`)
-
+	updateBombBorder(pCount: number)
+	{
 		let bmc = 0x373D83;
-		if (persistence > 0)
+		if (pCount > 0)
 		{
-			switch(persistence)
+			switch(pCount)
 			{
 				case 5: {
 					bmc = 0x56EAFF;
@@ -210,6 +228,81 @@ export class HUD extends Phaser.GameObjects.Container {
 			}
 		}
 		this.bombBorder.setColor(bmc);
+	}
+
+	resetShadows()
+	{
+		this.darken = false;
+		this.undarken = false;
+		this.timeTracker = 0;
+		this.overlayer.clear();
+		this.shadow.radius = 1;
+	}
+
+	toggleShadow()
+	{
+		if(this.darken == false)
+		{
+			this.undarken = false;
+			this.darken = true;
+			this.timeTracker = 0;
+		} else if (this.undarken == false) {
+			this.darken = false;
+			this.undarken = true;
+			this.timeTracker = this.shiftTime;
+		}
+	}
+
+	cancelShadow(): boolean
+	{
+		if(this.darken == true)
+		{
+			this.darken = false;
+			this.undarken = true;
+			this.timeTracker = this.shiftTime;
+			return true;
+		}
+		return false;
+	}
+
+	updateShadow(t: number)
+	{
+		if(this.darken)
+		{
+			if(this.timeTracker < this.shiftTime) {
+				this.timeTracker += t;
+				if(this.timeTracker > this.shiftTime) {this.timeTracker = this.shiftTime;}
+			}
+			this.shadow.radius = ((this.timeTracker/this.shiftTime)*this.maxR);
+			this.overlayer.clear();
+			this.overlayer.fillStyle(0x080045, this.darkness);
+			this.overlayer.fillCircleShape(this.shadow);
+		} else if (this.undarken)
+		{
+			if(this.timeTracker > 0) {
+				this.timeTracker -= t;
+				if (this.timeTracker < 0) {this.timeTracker = 0;}
+			} else { this.resetShadows(); }
+			this.shadow.radius = ((this.timeTracker/this.shiftTime)*this.maxR);
+			this.overlayer.clear();
+			this.overlayer.fillStyle(0x080045, this.darkness);
+			this.overlayer.fillCircleShape(this.shadow);
+		}
+	}
+
+	update(time: number, delta: number, money: number, energy: number, maxEnergy: number, score: number = 0, bombs: number=0, persistence: number=0) {
+
+		this.moneyText.setText(`${money}`);
+		//this.moneyText.setText(`${this.timeTracker}`);
+
+		this.energyText.setText(`${energy}/${maxEnergy}`);
+		this.scoreText.setText(`+ ${score}`);
+		this.bombText.setText(`x${bombs}`);
+		this.updateShadow(delta);
+
+		this.updateBombBorder(persistence);
+
+
 
 		const factor = energy / maxEnergy;
 		this.energyMeter.setWidth(factor * this.energyBack.width);

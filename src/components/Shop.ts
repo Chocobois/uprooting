@@ -14,6 +14,9 @@ export enum ItemType {
 	ShopOwner,
 	SoldOut,
 	EnergyRefund,
+	LimitBreak,
+	MemoryChain,
+	ZombieMode,
 	NOTYPE,
 }
 
@@ -86,6 +89,9 @@ export class Shop extends Phaser.GameObjects.Container {
 	//stuff to be pushed to shop queue
 	private queueMap: Map<number, number>;
 
+	private unlockedQueue: Map<number, string[]>;
+	private purchasedUpgrades: Map<string, number>;
+
 
 	constructor(scene: GameScene, x: number, y: number) {
 		super(scene);
@@ -95,18 +101,20 @@ export class Shop extends Phaser.GameObjects.Container {
 
 		this.reserveNumber = 3;
 		this.queueMap = new Map();
+		this.purchasedUpgrades = new Map();
+		this.unlockedQueue = new Map();
 
 		this.itemsForSale = [
 			{
 				type: ItemType.TreeEnergy,
 				image: ["sapling","sapling","sapling","sapling","sapling","sapling"],
 				title: ["Magic Storage","Magic Font","Magical Spring", "Great Heart of Magic","Unified Magic Theory", "Magia of the Developer"],
-				description: ["Increase your root energy a little.","Increase your root energy significantly.","Increase your root energy by a huge amount.","Increase your root energy massively.","An inconceivable amount of root energy!"],
+				description: ["Increase your root energy a little.","Increase your root energy significantly.","Increase your root energy by a huge amount.","Increase your root energy massively.", "Increase your root energy by a heartbreaking amount.", "An inconceivable amount of root energy!"],
 				price: [150,1000,5000,50000,200000,1000000],
 				iteration: 1,
 				maxIteration: 6,
 				value: [150,500,1000,5000,10000,33350],
-				sideEffect: [null,null,() => this.addItemToEmptySlot(this.restrictedItems[1]),null,null],
+				sideEffect: [null,() => this.addItemToEmptySlot(this.restrictedItems[1]),null,() => this.queueByPrerequisites(10,["True Gaia Roots"]),null,null],
 				//fixme both this and below should use overwriteOldItem because it already handles empty check
 			},
 			{
@@ -126,11 +134,11 @@ export class Shop extends Phaser.GameObjects.Container {
 				image: ["bones", "ylw_badrock", "badrock", "ruby", "gray_badrock","ancient_diamond","demon_rock","curse_rock"],
 				title: ["Hard Roots","Iron Roots","Titanium Roots","Gluttonous Roots","Adamantite Roots","Prosperous Roots","Dauntless Roots","Roots of the Developer"],
 				description: ["Gain the ability to break through bones!","Break through rocks!","Break through hard rocks!","Break through and harvest gems!","Break through bedrock!","Break and harvest ancient diamonds! Superb!","Break through hot rocks!","Venture into the unknown..."],
-				price: [3200,25000,75000,250000,375000,1150000,1500000,9999999],
+				price: [3200,25000,75000,250000,375000,975000,1500000,9999999],
 				iteration:1,
 				maxIteration:8,
 				value: [2,3,4,5,6,7,8,9],
-				sideEffect: [() => this.overwriteOldItem(this.restrictedItems[2]),null,null,null,null,null,null,null],
+				sideEffect: [() => this.queueByPrerequisites(2,["Apple Devourer"]),null,() => this.queueByPrerequisites(8,["Apple Devourer","Bone Cruncher"]),() => this.queueByPrerequisites(9,["Apple Devourer","Bone Cruncher","Great Stone Splitter"]),null,null,null,null],
 			},
 			SOLD_OUT_ITEM,
 			SOLD_OUT_ITEM,
@@ -158,7 +166,7 @@ export class Shop extends Phaser.GameObjects.Container {
 				iteration: 1,
 				maxIteration: 5,
 				value: [0.98, 0.95, 0.9, 0.85, 0.8],
-				sideEffect: [null,null,null,null,null],
+				sideEffect: [null,null,() => this.queueByPrerequisites(6,["Cherry Bomb","Apple Devourer","Bone Cruncher","Iron Roots"]),null,() => this.queueByPrerequisites(5,["Cherry Bomb","Cat's Riddle","Apple Devourer","Bone Cruncher","Prosperous Roots","Great Stone Splitter"])],
 			},
 			{
 				type: ItemType.ChainUpgrade,
@@ -176,7 +184,7 @@ export class Shop extends Phaser.GameObjects.Container {
 				image: ["greendice"],
 				title: ["Lucky Dice"],
 				description: ["A lucky dice which randomly improves your chains. I wonder where it's from..."],
-				price: [3621],
+				price: [362169],
 				iteration: 1,
 				maxIteration: 1,
 				value: [1],
@@ -194,25 +202,25 @@ export class Shop extends Phaser.GameObjects.Container {
 				sideEffect: [null],
 			},
 			{
-				type: ItemType.SuperChain,
-				image: ["greendice"],
+				type: ItemType.LimitBreak,
+				image: ["twin_feather"],
 				title: ["Twilight Feather"],
 				description: ["A feather that manipulates polarity. Briefly maxes all chains."],
-				price: [96420],
+				price: [4209669],
 				iteration: 1,
 				maxIteration: 1,
 				value: [1],
 				sideEffect: [null],
 			},
 			{
-				type: ItemType.ChainUpgrade,
-				image: ["greendice"],
+				type: ItemType.MemoryChain,
+				image: ["cat_thing"],
 				title: ["Cat's Riddle"],
-				description: ["The -ground- is -scared- of the -tree-. Chain off your last item!"],
+				description: ["The -ground- is -scared- of the -tree-. Chain off your last item type!"],
 				price: [13337],
 				iteration: 1,
 				maxIteration: 1,
-				value: [1],
+				value: [9],
 				sideEffect: [null],
 			},
 			{
@@ -225,6 +233,39 @@ export class Shop extends Phaser.GameObjects.Container {
 				maxIteration: 5,
 				value: [5, 10, 25, 50, 100],
 				sideEffect: [null,null,null,null,null],
+			},
+			{
+				type: ItemType.ChainUpgrade,
+				image: ["applecore","applecore","applecore","bone","bone","rockbolt","rockbolt"],
+				title: ["Apple Eater","Apple Jack", "Apple Devourer","Bone Sucker", "Bone Cruncher","Riddle of Gravel","Great Stone Splitter"],
+				description: ["Chain apple cores for a bonus. How's them apples?","Upgrade apple chains. For a great lover of apples.","For apple experts. Probably not healthy.", "Consume a chain of bones for score. Gross.", "Improved bone chaining. Minerals are good for trees.","Collect rock chains for score. A favorite of geologists.","Improved rock chains. Split the earth with your might!"],
+				price: [400,1200,1600,2000,3000,10000,20000],
+				iteration: 6,
+				maxIteration: 7,
+				value: [0,1,2,3,4,5,6],
+				sideEffect: [null,null,null,null,null,null,null],
+			},
+			{
+				type: ItemType.ChainUpgrade,
+				image: ["applecore","applecore","applecore","bone","bone","rockbolt","rockbolt","multigem","multigem"],
+				title: ["Apple Eater","Apple Jack", "Apple Devourer","Bone Sucker", "Bone Cruncher","Riddle of Gravel","Great Stone Splitter","Gem Queen","Empress of Diamonds"],
+				description: ["Chain apple cores for a bonus. How's them apples?","Upgrade apple chains. For a great lover of apples.","For apple experts. Probably not healthy.", "Consume a chain of bones for score. Gross.", "Improved bone chaining. Minerals are good for trees.","Collect rock chains for score. A favorite of geologists.","Improved rock chains. Split the earth with your might!","Glitter with a chain of gems. For the most bejeweled of trees.","Dazzling quantities of gems. Enough to pay off even a college debt!"],
+				price: [400,1200,1600,2000,3000,10000,20000,1250000,2000000],
+				iteration: 8,
+				maxIteration: 9,
+				value: [0,1,2,3,4,5,6,7,8],
+				sideEffect: [null,null,null,null,null,null,null,null,null],
+			},
+			{
+				type: ItemType.ZombieMode,
+				image: ["mandrake"],
+				title: ["Mandrake"],
+				description: ["Sacrifice score to keep growing when out of energy. Use sparingly!"],
+				price: [150000],
+				iteration: 1,
+				maxIteration: 1,
+				value: [0],
+				sideEffect: [null],
 			},
 		];
 
@@ -392,6 +433,21 @@ export class Shop extends Phaser.GameObjects.Container {
 
 
 	updateItemsForSale() {
+		for(let [key,value] of this.unlockedQueue)
+		{
+			let full = true;
+			value.forEach((req, index) => {
+				if (!this.purchasedUpgrades.has(req))
+				{
+					full = false;
+				}
+			});
+			if(full)
+			{
+				this.addNewItemByIndex(key);
+				this.unlockedQueue.delete(key);
+			}
+		}
 		for(let [key,value] of this.queueMap)
 		{
 			//use this to not check twice against map
@@ -409,6 +465,13 @@ export class Shop extends Phaser.GameObjects.Container {
 		});
 	}
 
+	queueByPrerequisites(index: number, args: string[])
+	{
+		if(!this.unlockedQueue.has(index))
+		{
+			this.unlockedQueue.set(index,args);
+		}
+	}
 	addToShopQueue(index: number, value: ItemData = SOLD_OUT_ITEM): boolean
 	{
 		//may add an option to just put in an ItemData later but dead code for now
@@ -533,6 +596,10 @@ export class Shop extends Phaser.GameObjects.Container {
 			if (this.scene.money >= cost) {
 				this.scene.money -= cost;
 				this.scene.sound.play("s_buy");
+				if(!this.purchasedUpgrades.has(this.selectedItem.title[this.selectedItem.iteration-1]))
+				{
+					this.purchasedUpgrades.set(this.selectedItem.title[this.selectedItem.iteration-1], this.purchasedUpgrades.size);
+				}
 				this.emit("buy", this.selectedItem);
 				const sideEffect = this.selectedItem.sideEffect[this.selectedItem.iteration-1];
 				if(sideEffect)
@@ -547,7 +614,7 @@ export class Shop extends Phaser.GameObjects.Container {
 
 	upgradeShopItem(itemData: ItemData) {
 		const index = this.itemsForSale.indexOf(itemData);
-
+		/*
 		if (itemData.type == ItemType.TreeEnergy) {
 			itemData.price[itemData.iteration-1] = Math.round(itemData.price[itemData.iteration-1] * 1.5);
 		}
@@ -555,6 +622,7 @@ export class Shop extends Phaser.GameObjects.Container {
 			itemData.price[itemData.iteration-1] = Math.round(itemData.price[itemData.iteration-1] * 2.0);
 			// Go through a list...
 		}
+		*/
 		itemData.iteration++;
 		if (itemData.iteration > itemData.maxIteration) {
 			this.itemsForSale[index] = SOLD_OUT_ITEM;

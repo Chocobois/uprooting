@@ -30,12 +30,12 @@ export enum MineralType {
 }
 
 export enum ComboClass {
+	NONE,
 	FRUIT,
-	GEM,
 	BONE,
 	ROCK,
-	CAVE,
-	NONE
+	GEM,
+	CAVE
 }
 
 export interface MineralRange {
@@ -76,7 +76,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 120,
 		spacingRadius: 300,
 		collectible: true,
-		points: 2,
+		points: 12,
 		hardness: 1,
 		comboClass: ComboClass.FRUIT
 	},
@@ -89,7 +89,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 70,
 		spacingRadius: 100,
 		collectible: true,
-		points: 4,
+		points: 14,
 		hardness: 1,
 		comboClass: ComboClass.FRUIT
 	},
@@ -102,7 +102,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 70,
 		spacingRadius: 65,
 		collectible: true,
-		points: 10,
+		points: 20,
 		hardness: 2,
 		comboClass: ComboClass.BONE
 	},
@@ -115,7 +115,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 135,
 		spacingRadius: 125,
 		collectible: true,
-		points: 20,
+		points: 30,
 		hardness: 2,
 		comboClass: ComboClass.BONE
 	},
@@ -128,7 +128,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 90,
 		spacingRadius: 55,
 		collectible: true,
-		points: 5,
+		points: 15,
 		hardness: 3,
 		comboClass: ComboClass.ROCK
 	},
@@ -141,7 +141,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 160,
 		spacingRadius: 7,
 		collectible: true,
-		points: 10,
+		points: 20,
 		hardness: 3,
 		comboClass: ComboClass.ROCK
 	},
@@ -154,7 +154,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 195,
 		spacingRadius: 70,
 		collectible: true,
-		points: 200,
+		points: 225,
 		hardness: 8,
 		comboClass: ComboClass.ROCK
 	},
@@ -168,7 +168,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 70,
 		spacingRadius: 55,
 		collectible: true,
-		points: 10,
+		points: 20,
 		hardness: 4,
 		comboClass: ComboClass.ROCK
 	},
@@ -194,7 +194,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 200,
 		spacingRadius: 60,
 		collectible: true,
-		points: 30,
+		points: 40,
 		hardness: 6,
 		comboClass: ComboClass.ROCK
 	},
@@ -207,7 +207,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 160,
 		spacingRadius: 70,
 		collectible: true,
-		points: 20,
+		points: 30,
 		hardness: 4,
 		comboClass: ComboClass.ROCK
 	},
@@ -220,7 +220,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 50,
 		spacingRadius: 10,
 		collectible: true,
-		points: 7,
+		points: 17,
 		hardness: 4,
 		comboClass: ComboClass.ROCK
 	},
@@ -233,7 +233,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 80,
 		spacingRadius: 35,
 		collectible: true,
-		points: 20,
+		points: 30,
 		hardness: 6,
 		comboClass: ComboClass.ROCK
 	},
@@ -247,7 +247,7 @@ const MINERALS: MineralRange[] = [
 		collisionRadius: 70,
 		spacingRadius: 100,
 		collectible: true,
-		points: 2,
+		points: 12,
 		hardness: 1,
 		comboClass: ComboClass.FRUIT
 	},
