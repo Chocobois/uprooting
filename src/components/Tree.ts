@@ -77,6 +77,7 @@ export class Tree extends Button {
 	private changeClassFlag: boolean;
 	private deletePrevClass: boolean;
 	public myMap: Map<ComboClass, number>;
+	private staticinc = 0.002;
 
 	private outlineFilter: any;
 
@@ -122,8 +123,8 @@ export class Tree extends Button {
 		this.canZombie = false;
 		this.isZombie = false;
 		this.lastValue = 0.01;
-		this.lastlastValue = 0.005;
-		this.currentValue = 0.01;
+		this.lastlastValue = this.staticinc;
+		this.currentValue = this.staticinc;
 		this.storedScore = 1;
 
 		this.defaultChain = {
@@ -519,9 +520,9 @@ export class Tree extends Button {
 	}
 	advanceZombie()
 	{
-		this.currentValue = this.lastValue + this.lastlastValue;
+		this.currentValue += this.lastValue;
 		//this.lastlastValue = this.lastValue;
-		this.lastValue = this.currentValue;
+		//this.lastValue = this.currentValue;
 	}
 
 	untoggleZombie()
@@ -533,9 +534,9 @@ export class Tree extends Button {
 	{
 		this.isZombie = false;
 		this.storedScore = 0;
-		this.lastValue = 0.01;
-		this.lastlastValue = 0.005;
-		this.currentValue = 0.01;
+		this.lastValue = this.staticinc;
+		//this.lastlastValue = this.staticinc;
+		this.currentValue = this.staticinc;
 	}
 
 	updateLimitBreak(t: number): number

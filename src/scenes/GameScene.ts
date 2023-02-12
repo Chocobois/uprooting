@@ -824,6 +824,12 @@ export class GameScene extends BaseScene {
 			{
 				scoremultiplier += this.getSuperChain();
 			}
+			//did we contact a normally indestructible object
+			if(collectible.hardness > this.tree.strength)
+			{
+				bcheck = true;
+				scoremultiplier+=5;
+			}
 			let tPoints = Math.round(collectible.points*scoremultiplier);
 			let color = "Lime";
 			let pColor = "Lime"
@@ -857,11 +863,7 @@ export class GameScene extends BaseScene {
 				pColor = "yellow";
 				pScale = 175
 			}
-			//did we contact a normally indestructible object
-			if(collectible.hardness > this.tree.strength)
-			{
-				bcheck = true;
-			}
+
 			let treefund=Math.round(this.tree.refundValue*scoremultiplier);
 			if(this.tree.refundValue>0){
 				if(this.tree.maxEnergy-this.tree.energy>treefund){
@@ -1173,7 +1175,7 @@ export class GameScene extends BaseScene {
 		} else if (this.tree.isZombie)
 		{
 			this.score -= this.tree.popZombieNumber();
-			this.textParticle(newNode.x-15, newNode.y-5, "Red", `-${this.tree.popZombieNumber()}`, undefined, 150 * this.SCALE);
+			this.textParticle(newNode.x-15, newNode.y-5, "Red", `-${this.tree.popZombieNumber()}`, undefined, 40 * this.SCALE);
 			this.tree.advanceZombie();
 		}
 		// old stuff for refreshing energy on root growth
