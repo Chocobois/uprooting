@@ -805,6 +805,9 @@ export class GameScene extends BaseScene {
 				this.score += Math.round(collectible.points*scoremultiplier);
 			}
 			this.sound.play("r_collect");
+			if(scoremultiplier > 99) {
+				this.sound.play("r_bigfire");
+			}
 
 			// Create sparkle effect
 			if (collectible.type == MineralType.applecore) {

@@ -226,6 +226,7 @@ import r_collect from "./sounds/roots/collect.mp3";
 import r_splash from "./sounds/roots/splash.mp3";
 import r_limitbreak from "./sounds/roots/limitbreak.mp3";
 import r_unlimitbreak from "./sounds/roots/unlimitbreak.mp3";
+import r_bigfire from "./sounds/roots/bigfire.mp3";
 
 // SFX: Tree
 import t_branch_snap from "./sounds/tree/branch_snap.mp3";
@@ -252,6 +253,7 @@ const audios: Audio[] = [
 	{ key: "r_splash", path: r_splash, volume: 1 },
 	{ key: "r_limitbreak", path: r_limitbreak, volume: 0.75 },
 	{ key: "r_unlimitbreak", path: r_unlimitbreak, volume: 0.75 },
+	{ key: "r_bigfire", path: r_bigfire, volume: 0.15 },
 	{ key: "t_branch_snap", path: t_branch_snap, volume: 0.5 },
 	{ key: "t_chop_plant", path: t_chop_plant, volume: 0.5 },
 	{ key: "t_rustle", path: t_rustle, volume: 0.5 },
