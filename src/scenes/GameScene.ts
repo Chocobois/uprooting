@@ -743,7 +743,7 @@ export class GameScene extends BaseScene {
 				this.tree.strength = itemData.value[itemData.iteration-1];
 				break;
 			} case ItemType.FruitUpgrade: {
-				this.tree.basevalue = itemData.value[itemData.iteration-1];
+				this.tree.upgradeFruit(itemData);
 				break;
 			} case ItemType.ChainUpgrade: {
 				this.tree.unlockChain(itemData.value[itemData.iteration-1]);
@@ -1397,6 +1397,11 @@ export class GameScene extends BaseScene {
 
 		this.updateCameraBounds();
 
-		this.shop.checkIfAnyItemsAreAfforable(this.money);
+		if (this.state == GameState.Overworld) {
+			this.shop.checkIfAnyItemsAreAfforable(this.money);
+		}
+		else {
+			this.shop.checkIfAnyItemsAreAfforable(0);
+		}
 	}
 }

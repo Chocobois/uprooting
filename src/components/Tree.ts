@@ -650,6 +650,13 @@ export class Tree extends Button {
 		}
 	}
 
+	upgradeFruit(itemData) {
+		this.basevalue = itemData.value[itemData.iteration-1];
+		this.fruits.forEach(fruit => {
+			fruit.setTexture(itemData.image[itemData.iteration-1]);
+		});
+	}
+
 
 	get level() {
 		return this._level;
