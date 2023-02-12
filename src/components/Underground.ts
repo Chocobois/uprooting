@@ -4,6 +4,8 @@ import Perlin from 'phaser3-rex-plugins/plugins/perlin.js';
 
 
 export enum MineralType {
+	spawn_area = "spawn_area",
+
 	apple = "apple",
 	applecore = "applecore",
 	banana = "banana",
@@ -54,6 +56,19 @@ export interface MineralRange {
 }
 
 const MINERALS: MineralRange[] = [
+	{
+		type: MineralType.spawn_area,
+		properName: "Spawn area",
+		centerDepth: 0,
+		centerRadius: 0,
+		odds: 0,
+		collisionRadius: 300,
+		spacingRadius: 300,
+		collectible: false,
+		noRotation: true,
+		hardness: 0,
+		comboClass: ComboClass.NONE
+	},
 	{
 		type: MineralType.curse_rock,
 		properName: "Banished Rock",
@@ -408,6 +423,8 @@ export class Underground extends Phaser.GameObjects.Container {
 			mineralRange.collisionRadius *= this.scene.SCALE;
 			mineralRange.spacingRadius *= this.scene.SCALE;
 		});
+
+		this.reset();
 	}
 
 	update(time: number, delta: number, ) {
@@ -428,6 +445,11 @@ export class Underground extends Phaser.GameObjects.Container {
 			item.destroy();
 		});
 		this.items = [];
+
+		// Add spawn area to prevent items from spawning inside the starting root
+		let spawnArea = new Mineral(this.scene, MINERALS[0], this.scene.CX, this.top);
+		this.add(spawnArea);
+		this.items.push(spawnArea);
 
 		this.currentY = this.top;
 	}

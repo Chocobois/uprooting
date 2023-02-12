@@ -35,8 +35,11 @@ export class Mineral extends Button {
 		// console.log(size);
 		// this.size = size;
 
-		// const key = Phaser.Math.RND.pick(["bone", "apple"]);
-		// const key = Phaser.Math.RND.pick(["circle"]);
+		if (params.type == MineralType.spawn_area) {
+			return;
+		}
+
+
 		this.image = this.scene.add.image(0, 0, params.type);
 		this.image.setScale(this.size / this.image.width);
 		this.add(this.image);
@@ -52,6 +55,6 @@ export class Mineral extends Button {
 	}
 
 	update(time: number, delta: number) {
-		this.setScale(1.0 - 0.1 * this.holdSmooth);
+		// this.setScale(1.0 - 0.1 * this.holdSmooth);
 	}
 }
