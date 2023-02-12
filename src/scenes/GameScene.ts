@@ -163,7 +163,7 @@ export class GameScene extends BaseScene {
 		// this.fitToScreen(this.background);
 
 		// Money
-		this.money = 99999990;
+		this.money = 0;
 		this.score = 0;
 
 		this.hud = new HUD(this);
@@ -634,8 +634,9 @@ export class GameScene extends BaseScene {
 			let m = this.tree.toggleZombie(this.score);
 			this.zombieButton.advance(this.score, m);
 			this.judgeNodes();
-		} else {
+		} else if (this.tree.isZombie){
 			this.tree.untoggleZombie();
+			this.zombieButton.advance(0,1);
 			this.judgeNodes();
 		}
 	}
