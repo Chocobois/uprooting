@@ -125,7 +125,7 @@ export class Tree extends Button {
 		this.defaultChain = {
 			type: MineralType.NOTYPE,
 			class: 	ComboClass.NONE,
-			multiplier: [1.1,1.1,1.1,1.1,1.1],
+			multiplier: [1.1,1.25,1.5,2,3],
 			iteration: 0,
 			chainID: this.ANY_CHAIN_ID,
 			hasBeenActive: false,
