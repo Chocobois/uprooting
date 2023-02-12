@@ -146,7 +146,7 @@ export class Tree extends Button {
 			{
 				type: MineralType.applecore,
 				class: 	ComboClass.FRUIT,
-				multiplier: [1.5,2.5,5],
+				multiplier: [1.5,2.5,3.5],
 				iteration: 0,
 				chainID: 1,
 				hasBeenActive: false,
@@ -155,7 +155,7 @@ export class Tree extends Button {
 			{
 				type: MineralType.applecore,
 				class: 	ComboClass.FRUIT,
-				multiplier: [1.5,2.5,5,10],
+				multiplier: [2,3,4,5],
 				iteration: 0,
 				chainID: 1,
 				hasBeenActive: false,
