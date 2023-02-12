@@ -104,6 +104,6 @@ export class Node extends Button {
 
 	// How much does this node cost to expand from
 	get cost() {
-		return this.rootDepth;
+		return this.rootDepth - 1;
 	}
 }

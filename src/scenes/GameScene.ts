@@ -182,10 +182,10 @@ export class GameScene extends BaseScene {
 
 				this.shop.open();
 				this.state = GameState.InsideShop;
-				this.hud.hideScore();
 				this.limitBreakButton.hide();
 				this.zombieButton.hide();
-				// this.hud.hideEnergy();
+				this.hud.hideScore();
+				this.hud.hideBombs();
 
 				this.musicState = MusicState.Shop;
 				this.musicNormal.stop();
@@ -197,6 +197,7 @@ export class GameScene extends BaseScene {
 		this.shop.on("close", () => {
 			this.state = GameState.Overworld;
 			this.hud.showScore();
+			this.hud.showBombs();
 			if(this.tree.limitBreak)
 			{
 				this.limitBreakButton.show();
@@ -1198,13 +1199,14 @@ export class GameScene extends BaseScene {
 		this.updateScore();
 	}
 
-	judgeNodes()
-	{
+	judgeNodes() {
 		this.nodes.forEach(node => {
 			if (((node.cost > this.tree.energy) && !this.tree.isZombie) || (this.tree.isZombie && (this.score < this.tree.popZombieNumber()))) {
 				node.disable();
 			} else if (((node.cost <= this.tree.energy) && !this.tree.isZombie) || (this.tree.isZombie && (this.score > this.tree.popZombieNumber()))) {
-				node.enable();
+				if (node.children.length < 2) {
+					node.enable();
+				}
 			}
 		});
 	}

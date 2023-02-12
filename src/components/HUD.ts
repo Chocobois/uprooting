@@ -187,10 +187,11 @@ export class HUD extends Phaser.GameObjects.Container {
 	}
 
 	showBombs() { this.bombContainer.setVisible(true); }
-	hideScore() { this.scoreContainer.setVisible(false); }
+	hideBombs() { this.bombContainer.setVisible(false); }
 	showScore() { this.scoreContainer.setVisible(true); }
-	hideEnergy() { this.energyContainer.setVisible(false); }
+	hideScore() { this.scoreContainer.setVisible(false); }
 	showEnergy() { this.energyContainer.setVisible(true); }
+	hideEnergy() { this.energyContainer.setVisible(false); }
 	resetShadow() {
 		this.darken = false;
 		this.timeTracker = 0;
