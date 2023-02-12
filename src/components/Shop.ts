@@ -423,8 +423,8 @@ export class Shop extends Phaser.GameObjects.Container {
 		const shopHoldY = 1.0 - 0.2 * this.overworldShop.holdSmooth;
 		const shopSquish = this.overworldShopHighlight ? 0.03 : 0.0;
 		this.overworldShop.setScale(
-			(1.0 + shopSquish * Math.sin(time/150)) * shopHoldX,
-			(1.0 + shopSquish * Math.sin(-time/150)) * shopHoldY
+			this.overworldShopScale * (1.0 + shopSquish * Math.sin(time/150)) * shopHoldX,
+			this.overworldShopScale * (1.0 + shopSquish * Math.sin(-time/150)) * shopHoldY
 		);
 
 		const jbunHoldX = 1.0 + 0.3 * this.ownerButton.holdSmooth;

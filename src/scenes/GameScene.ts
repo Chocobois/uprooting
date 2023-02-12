@@ -401,7 +401,7 @@ export class GameScene extends BaseScene {
 		this.debugText.setText(`${this.state}`);
 
 		// Smooth camera movement
-		if (this.state == GameState.GrowingRoots) {
+		if (this.state == GameState.GrowingRoots || this.state == GameState.Overworld) {
 			this.cameras.main.scrollY += 0.3 * (this.cameraSmoothY - this.cameras.main.scrollY);
 		}
 		this.undergroundEdge.y = Math.max(this.undergroundEdge.y, this.cameras.main.scrollY + this.H);
@@ -517,8 +517,8 @@ export class GameScene extends BaseScene {
 			height = this.deepestNodeY + 1 * this.H;
 		}
 		else if (this.state == GameState.Overworld) {
-			top = -1000000;
-			height = 100000000;
+			top = 0;
+			height = this.H;
 		}
 		else if (this.state == GameState.CutsceneToSurface || this.state == GameState.CutsceneToUnderground) {
 			top = 0;
