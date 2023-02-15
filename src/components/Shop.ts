@@ -139,7 +139,7 @@ export class Shop extends Phaser.GameObjects.Container {
 				iteration:1,
 				maxIteration:8,
 				value: [2,3,4,5,6,7,8,9],
-				sideEffect: [() => this.queueByPrerequisites(2,["Apple Devourer"]),null,() => this.queueByPrerequisites(8,["Apple Devourer","Bone Cruncher"]),() => this.queueByPrerequisites(9,["Apple Devourer","Bone Cruncher","Great Stone Splitter"]),null,null,null,null],
+				sideEffect: [() => this.queueByPrerequisites(2,["Apple Devourer"]),() => this.queueByPrerequisites(8,["Apple Devourer","Bone Cruncher"]),null,() => this.queueByPrerequisites(9,["Apple Devourer","Bone Cruncher","Great Stone Splitter"]),null,null,null,null],
 			},
 			SOLD_OUT_ITEM,
 			SOLD_OUT_ITEM,
