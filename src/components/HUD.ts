@@ -24,6 +24,7 @@ export class HUD extends Phaser.GameObjects.Container {
 	private moneyIcon: Phaser.GameObjects.Image;
 	private moneyText: Phaser.GameObjects.Text;
 
+	private bombEnabled: boolean;
 	private bombContainer: Phaser.GameObjects.Container;
 	private bombIcon: Phaser.GameObjects.Image;
 	private bombBack: RoundRectangle;
@@ -76,7 +77,7 @@ export class HUD extends Phaser.GameObjects.Container {
 
 		// Money
 
-		const mw = 0.12 * this.scene.W;
+		const mw = 0.17 * this.scene.W;
 		const mx = mw/2 + 3*pad;
 		const imw = mw - pad;
 		const ml = mx - mw/2 + pad;
@@ -112,6 +113,8 @@ export class HUD extends Phaser.GameObjects.Container {
 		// Bombs
 
 		const by = y - h - 2*pad;
+
+		this.bombEnabled = false;
 
 		this.bombContainer = this.scene.add.container();
 		this.bombContainer.setVisible(false);
@@ -186,7 +189,12 @@ export class HUD extends Phaser.GameObjects.Container {
 		this.scoreContainer.add(this.scoreText);
 	}
 
-	showBombs() { this.bombContainer.setVisible(true); }
+	showBombs(buyBombs: boolean) {
+		if (buyBombs) {
+			this.bombEnabled = true;
+		}
+		this.bombContainer.setVisible(this.bombEnabled);
+	}
 	hideBombs() { this.bombContainer.setVisible(false); }
 	showScore() { this.scoreContainer.setVisible(true); }
 	hideScore() { this.scoreContainer.setVisible(false); }

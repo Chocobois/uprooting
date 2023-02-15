@@ -197,7 +197,7 @@ export class GameScene extends BaseScene {
 		this.shop.on("close", () => {
 			this.state = GameState.Overworld;
 			this.hud.showScore();
-			this.hud.showBombs();
+			this.hud.showBombs(false);
 			if(this.tree.limitBreak)
 			{
 				this.limitBreakButton.show();
@@ -758,7 +758,7 @@ export class GameScene extends BaseScene {
 			} case ItemType.BombUpgrade: {
 				this.tree.bruteStrength = true;
 				this.tree.bruteChance = itemData.value[itemData.iteration-1];
-				this.hud.showBombs();
+				this.hud.showBombs(true);
 				break;
 			} case ItemType.MemoryChain: {
 				this.tree.unlockChain(itemData.value[itemData.iteration-1]);
