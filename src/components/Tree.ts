@@ -79,7 +79,7 @@ export class Tree extends Button {
 	public myMap: Map<ComboClass, number>;
 	private staticinc = 0.002;
 
-	private outlineFilter: any;
+	private treeOutlineFilter: any;
 
 
 	constructor(scene: BaseScene, x: number, y: number) {
@@ -243,8 +243,7 @@ export class Tree extends Button {
 		// this.treeSprite.setScale(100 / this.treeSprite.width);
 		this.treeContainer.add(this.treeSprite);
 
-		let plugin: any = scene.plugins.get('rexOutlinePipeline');
-		this.outlineFilter = plugin.add(this.treeSprite, {
+		this.treeOutlineFilter = (scene.plugins.get('rexOutlinePipeline') as any).add(this.treeSprite, {
 			thickness: 8 * this.scene.SCALE,
 			outlineColor: 0x1B5E20,
 			quality: 0.1,
@@ -259,6 +258,13 @@ export class Tree extends Button {
 			fruit.setVisible(false);
 			this.treeContainer.add(fruit);
 			this.fruits.push(fruit);
+
+			// let fruitOutlineFilter = (scene.plugins.get('rexOutlinePipeline') as any).add(fruit, {
+			// 	thickness: 4 * this.scene.SCALE,
+			// 	outlineColor: 0x7f0000,
+			// 	quality: 0.1,
+			// });
+			// fruit.setData("outline", fruitOutlineFilter);
 		}
 
 
@@ -672,13 +678,13 @@ export class Tree extends Button {
 			this.treeContainer.y = 0;
 			this.treeSprite.setOrigin(0.5, 1.0);
 			this.treeContainer.y = 0;
-			this.outlineFilter.setOutlineColor(0x1B5E20);
+			this.treeOutlineFilter.setOutlineColor(0x1B5E20);
 
 			if (this.level <= 0) {
 				this.treeSprite.setTexture("seed");
 				this.treeContainer.y = 50*this.scene.SCALE;
 				this.treeSprite.setOrigin(0.5);
-				this.outlineFilter.setOutlineColor(0x4e342e);
+				this.treeOutlineFilter.setOutlineColor(0x4e342e);
 				this.harvestCount = 0;
 			}
 			else if (this.level == 1) {

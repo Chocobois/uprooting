@@ -1240,8 +1240,8 @@ export class GameScene extends BaseScene {
 		// Culling check
 		const parentY = node.parent.y;
 		const currentY = node.y;
-		const topY    = this.cameras.main.scrollY - 0.2 * this.H;
-		const bottomY = this.cameras.main.scrollY + 1.2 * this.H;
+		const topY    = this.cameras.main.scrollY - 0.35 * this.H;
+		const bottomY = this.cameras.main.scrollY + 1.35 * this.H;
 		if (topY < parentY && topY < currentY && bottomY > parentY && bottomY > currentY) {
 
 			// https://www.desmos.com/calculator/s0kxcaovyr
