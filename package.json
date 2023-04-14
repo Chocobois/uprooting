@@ -7,7 +7,7 @@
   "scripts": {
     "start": "vite",
     "dev": "vite",
-    "build": "rimraf dist && tsc && vite build",
+    "build": "rimraf dist && vite build",
     "postinstall": "neu update"
   },
   "devDependencies": {
