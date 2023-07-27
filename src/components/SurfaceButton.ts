@@ -67,7 +67,8 @@ export class SurfaceButton extends Button {
 			+ 0.06 * bobValue
 		);
 		this.alpha += 0.2 * (this.alphaGoal - this.alpha); // Smooth transition
-		this.image.input.enabled = (this.alphaGoal > 0.5);
+		if(this.image.input)
+			this.image.input.enabled = (this.alphaGoal > 0.5);
 	}
 
 

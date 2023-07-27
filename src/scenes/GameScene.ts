@@ -947,7 +947,7 @@ export class GameScene extends BaseScene {
 		if(outline) text.setStroke("rgba(0,0,0,0.5)", 120*this.SCALE);
 
 		// Prevent text from going too far right
-		const right = text.getRightCenter().x;
+		const right = text.getRightCenter().x ?? 0;
 		const diff = this.W - right - 80 * this.SCALE;
 		if(diff < 0) text.setX(text.x+diff);
 

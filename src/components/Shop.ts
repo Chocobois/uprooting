@@ -315,7 +315,7 @@ export class Shop extends Phaser.GameObjects.Container {
 		this.ownerButton.add(this.ownerImage);
 
 		this.ownerButton.bindInteractive(this.ownerImage);
-		this.ownerImage.input.hitArea.setTo(0, 0, this.ownerImage.width, this.ownerImage.height * 2/3);
+		this.ownerImage.input?.hitArea.setTo(0, 0, this.ownerImage.width, this.ownerImage.height * 2/3);
 		this.ownerButton.on("down", () => {
 			this.scene.sound.play("s_squish1", {rate: 1 + 0.07*Math.sin(this.scene.time.now/800)});
 		});
@@ -553,7 +553,8 @@ export class Shop extends Phaser.GameObjects.Container {
 
 		this.buyButton.enabled = false;
 		this.buyButton.setAlpha(0.5);
-		this.buyImage.input.cursor = "not-allowed"
+		if(this.buyImage.input)
+			this.buyImage.input.cursor = "not-allowed"
 		this.ownerImage.setFrame(0);
 
 		if (itemData) {
@@ -572,7 +573,8 @@ export class Shop extends Phaser.GameObjects.Container {
 					if (this.scene.money >= cost) {
 						this.buyButton.enabled = true;
 						this.buyButton.setAlpha(1.0);
-						this.buyImage.input.cursor = "pointer"
+						if(this.buyImage.input)
+							this.buyImage.input.cursor = "pointer"
 					}
 				}
 			// }

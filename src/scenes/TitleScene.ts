@@ -1,6 +1,7 @@
 import { BaseScene } from "./BaseScene";
 import { RoundRectangle } from "../components/RoundRectangle";
 import { Music } from "./../components/Music";
+import { version } from '@/version.json';
 
 
 const creditsLeft = `Global Game Jam 2023
@@ -37,6 +38,7 @@ export class TitleScene extends BaseScene {
 	public title: Phaser.GameObjects.Text;
 	public subtitle: Phaser.GameObjects.Text;
 	public tap: Phaser.GameObjects.Text;
+	public version: Phaser.GameObjects.Text;
 
 	public musicTitle: Phaser.Sound.WebAudioSound;
 	public select: Phaser.Sound.WebAudioSound;
@@ -97,6 +99,12 @@ export class TitleScene extends BaseScene {
 		this.tap.setStroke("#FFF", 40*4*this.SCALE);
 		this.tap.setPadding(2*40*4*this.SCALE);
 
+		this.version = this.createText(1, 1, 4*12*this.SCALE, "#000", version);
+		this.version.setOrigin(0, 0);
+		this.version.setAlpha(-1);
+		this.version.setStroke("#FFF", 20);
+		this.version.setPadding(2);
+
 		this.credits = this.add.container(0, 0);
 		this.credits.setVisible(false);
 		this.credits.setAlpha(0);
@@ -130,7 +138,7 @@ export class TitleScene extends BaseScene {
 
 		// Input
 
-		this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE).on('down', this.progress, this);
+		this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE).on('down', this.progress, this);
 		this.input.on('pointerdown', (pointer) => {
 			if (pointer.button == 0) {
 				this.progress();
@@ -151,6 +159,7 @@ export class TitleScene extends BaseScene {
 
 			if (this.credits.visible) {
 				this.credits.alpha += 0.02 * (1 - this.credits.alpha);
+				this.version.alpha += 0.02 * ((this.version.visible ? 1 : 0) - this.version.alpha);
 			}
 		}
 		else {

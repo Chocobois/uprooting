@@ -59,7 +59,7 @@ export class ShopItem extends Button {
 
 		this.bindInteractive(this.background, true);
 		const inputPadding = 0 * this.scene.SCALE / this.background.scaleX;
-		this.background.input.hitArea.setTo(-inputPadding, -inputPadding, this.background.width+2*inputPadding, this.background.height+2*inputPadding);
+		this.background.input?.hitArea.setTo(-inputPadding, -inputPadding, this.background.width+2*inputPadding, this.background.height+2*inputPadding);
 		// this.scene.input.enableDebug(this.itemImage);
 	}
 

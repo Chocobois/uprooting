@@ -92,7 +92,8 @@ export class ZombieButton extends Button {
             this.backContainer.setAlpha(this.alphaMode);
             this.sprite.setAlpha(this.alphaMode);
             this.usedUp = true;
-            this.sprite.input.enabled = false;
+            if(this.sprite.input)
+                this.sprite.input.enabled = false;
         }
     }
     advance(sc: number, inc: number)
@@ -119,7 +120,8 @@ export class ZombieButton extends Button {
         this.sprite.setFrame(0);
         this.percent.clear();
         this.usedUp = false;
-        this.sprite.input.enabled = true;
+        if(this.sprite.input)
+            this.sprite.input.enabled = true;
         this.hiScore = 0;
     }
 

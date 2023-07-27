@@ -1,0 +1,16 @@
+{
+	"team": "Chocobois",
+	"title": "Rerooted",
+	"description": "Grow a tree, navigate your roots in the underground and upgrade your tree!",
+	"itch": {
+		"upload": true,
+		"username": "golen",
+		"game": "rerooted"
+	},
+	"neutralino": {
+		"allow": [
+			"app.exit", 
+			"window.center"
+		]
+	}
+}

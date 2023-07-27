@@ -7,8 +7,8 @@ import OutlinePipelinePlugin from 'phaser3-rex-plugins/plugins/outlinepipeline-p
 
 const config: Phaser.Types.Core.GameConfig = {
 	type: Phaser.WEBGL,
-	width: 1920,
-	height: 1080,
+	width: 1920/4,
+	height: 1080/4,
 	mipmapFilter: 'LINEAR_MIPMAP_LINEAR',
 	// mipmapFilter: 'NEAREST',
 	pixelArt: true,

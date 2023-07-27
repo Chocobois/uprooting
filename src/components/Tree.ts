@@ -271,7 +271,7 @@ export class Tree extends Button {
 		// Make the tree clickable
 		this.bindInteractive(this.treeSprite);
 		const inputPadding = 40 * this.scene.SCALE / this.treeSprite.scaleX;
-		this.treeSprite.input.hitArea.setTo(-inputPadding, -inputPadding, this.treeSprite.width+2*inputPadding, this.treeSprite.height+2*inputPadding);
+		this.treeSprite.input?.hitArea.setTo(-inputPadding, -inputPadding, this.treeSprite.width+2*inputPadding, this.treeSprite.height+2*inputPadding);
 	}
 
 	update(time: number, delta: number) {
@@ -709,7 +709,7 @@ export class Tree extends Button {
 			this.treeSprite.setScale(this.scene.SCALE / this.treeSprite.height);
 			// Resize and expand input area
 			const inputPadding = 0.1 * this.scene.SCALE / this.treeSprite.scaleX;
-			this.treeSprite.input.hitArea.setTo(-inputPadding, -inputPadding, this.treeSprite.width+2*inputPadding, this.treeSprite.height+2*inputPadding);
+			this.treeSprite.input?.hitArea.setTo(-inputPadding, -inputPadding, this.treeSprite.width+2*inputPadding, this.treeSprite.height+2*inputPadding);
 
 			this.emit("levelUp", this.level);
 		}

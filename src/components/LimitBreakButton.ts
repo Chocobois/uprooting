@@ -90,7 +90,8 @@ export class LimitBreakButton extends Button {
         if(this.LState == this.UNUSED)
         {
             this.LState = this.USING;
-            this.sprite.input.enabled = false;
+            if(this.sprite.input)
+                this.sprite.input.enabled = false;
             //this.setInteractive(false);
             //this.active = !this.active;
 
@@ -111,7 +112,8 @@ export class LimitBreakButton extends Button {
             this.LState = this.UNUSED;
             this.sprite.setAlpha(1);
             this.sprite.setFrame(this.LState);
-            this.sprite.input.enabled = true;
+            if(this.sprite.input)
+                this.sprite.input.enabled = true;
             this.queueResetFlag = false;
         } else {
             this.queueResetFlag = true;

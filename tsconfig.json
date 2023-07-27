@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES2022",
     "module": "ESNext",
     "strict": true,
     "useDefineForClassFields": true,
@@ -20,7 +20,11 @@
     "removeComments": true,
     "stripInternal":true,
     "allowJs": true,
-    "emitDecoratorMetadata": false
+    "emitDecoratorMetadata": false,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["src", "typings"]
+  "include": ["src", "typings"],
+  "exclude": ["node_modules"]
 }

@@ -12,45 +12,38 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 18
 
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1
+        run: npm install && sudo apt install genisoimage
+
+      - name: Load game.config.json
+        uses: antifree/json-to-variables@v1.0.1
         with:
-          useLockFile: false
+          filename: 'game.config.json'
+          prefix: game
 
       - name: Build project
         run: npm run build
 
-      - name: Upload production-ready build files
-        uses: actions/upload-artifact@v2
+      - name: Load meta.json
+        uses: antifree/json-to-variables@v1.0.1
         with:
-          name: production-files
-          path: ./dist
-
-  deploy:
-    name: Deploy
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: production-files
-          path: ./built/
+          filename: 'dist/meta.json'
+          prefix: meta
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./built/unpacked
+          publish_dir: ./dist/web
 
       - name: Create release
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -58,7 +51,25 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
           prerelease: false
-          title: "Rerooted latest build"
+          title: "${{ env.game_title }} latest build"
           files: |
-            /home/runner/work/uprooting/uprooting/built/Rerooted-GGJ2023-release.zip
-            /home/runner/work/uprooting/uprooting/built/game-web.zip
+            ./dist/${{ env.meta_title }}-web.zip
+            ./dist/${{ env.meta_title }}-win.zip
+            ./dist/${{ env.meta_title }}-mac.dmg
+            ./dist/${{ env.meta_title }}-linux.zip
+
+      - name: Upload to Itch
+        if: ${{env.game_itch_upload  == 'true'}}
+        uses: Ayowel/butler-to-itch@v1.0.0
+        with:
+          butler_key: ${{ secrets.BUTLER_CREDENTIALS }}
+          itch_user: ${{ env.game_itch_username }}
+          itch_game: ${{ env.game_itch_game }}
+          files: |
+            ./dist/${{ env.meta_title }}-web.zip
+            ./dist/${{ env.meta_title }}-win.zip
+            ./dist/${{ env.meta_title }}-mac.dmg
+            ./dist/${{ env.meta_title }}-linux.zip
+          auto_channel: true
+          butler_version: "latest"
+          check_signature: false
